@@ -1,0 +1,40 @@
+{# Modal für Deputat-Erstellung #}
+<div class="modal fade" id="createDeputatModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Neues Deputat erstellen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ path('admin_create_deputat_submit') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="schoolYear" class="form-label">Schuljahr</label>
+                        <select name="schoolYear" id="schoolYear" class="form-select" required>
+                            {% set currentYear = "now"|date("Y")|number_format %}
+                            {% set currentMonth = "now"|date("n")|number_format %}
+
+                            {# Wenn wir vor August sind, ist das aktuelle Schuljahr letztes Jahr #}
+                            {% if currentMonth < 8 %}
+                                {% set startYear = currentYear - 1 %}
+                            {% else %}
+                                {% set startYear = currentYear %}
+                            {% endif %}
+
+                            {% for i in 0..5 %}
+                                {% set year = startYear + i %}
+                                <option value="{{ year }}" {% if i == 0 %}selected{% endif %}>
+                                    {{ year }}/{{ year + 1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary">Erstellen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

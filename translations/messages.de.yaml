@@ -1,0 +1,51 @@
+Administration: Verwaltung
+Dashboard: Übersicht
+Settings: Einstellungen
+Accounts: Zeitkonten
+
+Entry Types: Eintragsarten
+EntryType: Eintragsart
+
+Users: Benutzer
+User: Benutzer
+
+AzVo: AZVO
+Debutat: Stundendeputat
+Valid From: gültig ab
+Invalid From: ungültig ab
+
+Teachers: Lehrkräfte
+Teacher: Lehrkraft
+
+Username: Benutzername
+Password: Passwort
+Short Name: Kürzel
+ID: ID
+Untis Code: Untis Code
+Label: Bezeichnung
+Effects Total: Zahlt auf Konto ein
+Factor: Summand
+Birthdate: Geburtsdatum
+TeacherDebutat: Deputat
+Debutats: Deputate
+Discount: Pflichtstundenermäßigung
+Discount Valid From: Ermäßigung gültig ab
+Threshold: Vergütungsfreie Mehrarbeit
+OvertimeEntry: Arbeitszeitkonto
+UntisImport: GPU-Upload
+Incident Date: Ereignisdatum
+Untis Id:  	Untis-ID
+Teacher Short Name: Lehrkraft-Kürzel
+Teacher Shortname: Lehrkraft-Kürzel
+Reason: Grund
+Amount: Stundendifferenz
+Course Hour: Schulstunde
+Class: Klasse
+Subject: Fach
+Rooom: Raum
+Expires At: Freizeitausgleich bis
+Invalidated By: Ausgeglichen durch ID
+Created At: Erstellt am
+Created By: Erstellt durch
+Room: Raum
+

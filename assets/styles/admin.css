@@ -1,0 +1,82 @@
+/* === EASYADMIN 4: STICKY HEADER + SIDEBAR === */
+
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
+
+thead {
+    position: sticky!important;
+    top: 140px!important;
+    z-index: 1020!important;
+}
+
+tbody > tr:hover > td {
+    background-color: #efefef!important;
+}
+
+tbody > tr {
+    background-color: #333333!important;
+}
+
+tbody > tr, tbody > tr > td {
+    background-color: #fafafa!important;
+}
+
+
+.content-panel-footer {
+    position: sticky!important;
+    bottom: 0!important;
+    z-index: 1020!important;
+    background-color: var(--body-bg, #fff) !important;
+    border-top: 1px solid var(--border-color, #e5e7eb) !important;
+}
+
+/* Oberste Leiste sticky */
+.content-top {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1030 !important;
+    background-color: var(--body-bg, #fff) !important;
+    border-bottom: 1px solid var(--border-color, #e5e7eb) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+.content-header {
+    position: sticky !important;
+    top: 57px !important; /* Höhe von .content-top - anpassen falls nötig */
+    z-index: 1025 !important;
+    background-color: var(--body-bg, #fff) !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Sidebar sticky */
+.ea-sidebar {
+    position: sticky !important;
+    top: 0 !important;
+    height: 100vh !important;
+    overflow-y: auto !important;
+    z-index: 1020 !important;
+}
+
+/* Scroll-Container anpassen, damit sticky relativ zum Viewport funktioniert */
+.content-wrapper,
+.ea-content,
+.ea-main-wrapper {
+    overflow: visible !important;
+}
+
+/* Hauptinhalt braucht Platz neben der Sidebar */
+.ea-content {
+    margin-left: 0 !important;
+}
+
+/* Falls die Sidebar schmaler/breiter ist, anpassen */
+@media (min-width: 992px) {
+    .ea-content {
+        margin-left: 260px !important; /* Standard-Sidebar-Breite in EasyAdmin */
+    }
+}
+
+/* html/body als scrollende Container */
+html, body {
+    overflow-x: hidden !important;
+    height: 100% !important;
+}
