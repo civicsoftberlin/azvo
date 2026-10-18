@@ -1,0 +1,15 @@
+<div class="dropdown d-inline-block">
+    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+        Lehrkraft
+    </button>
+    <ul class="dropdown-menu">
+        {# Hier müsstest du die Lehrkräfte iterieren, z.B. über eine Twig Extension #}
+        {% for teacher in get_teachers() %}
+            <li>
+                <a class="dropdown-item" href="{{ ea_url().set('filters[teacher][value]', teacher.id) }}">
+                    {{ teacher.name }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

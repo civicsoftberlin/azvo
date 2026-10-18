@@ -1,0 +1,6 @@
+{% set yearFilter = app.request.query.all('filters')['incidentDateYear'] ?? null %}
+{% set monthFilter = app.request.query.all('filters')['incidentDateMonth'] ?? null %}
+
+<a href="{{ action.linkUrl }}" class="btn btn-sm btn-{% if yearFilter is empty or monthFilter is empty %}secondary{% else %}primary{% endif %}">
+    {{ action.label|trans }}
+</a>

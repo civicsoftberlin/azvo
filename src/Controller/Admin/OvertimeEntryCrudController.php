@@ -5,15 +5,18 @@ namespace App\Controller\Admin;
 use App\Entity\OvertimeEntry;
 use App\Filter\MonthFilter;
 use App\Filter\YearFilter;
+use App\Repository\TeacherRepository;
 use App\Service\ExcelExportService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\ActionGroup;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\FieldFactory;
@@ -36,14 +39,16 @@ class OvertimeEntryCrudController extends AbstractCrudController
 {
 
     private EntityRepository $eaEntityRepository;
+    private TeacherRepository $teacherRepository;
     private ExcelExportService $exportService;
     private FieldFactory $fieldFactory;
     private FilterFactory $filterFactory;
 
     // Service hier injizieren
-    public function __construct(EntityRepository $eaEntityRepository, FieldFactory $fieldFactory, FilterFactory $filterFactory, ExcelExportService $exportService)
+    public function __construct(EntityRepository $eaEntityRepository, TeacherRepository $teacherRepo, FieldFactory $fieldFactory, FilterFactory $filterFactory, ExcelExportService $exportService)
     {
         $this->eaEntityRepository = $eaEntityRepository;
+        $this->teacherRepository = $teacherRepo;
         $this->fieldFactory = $fieldFactory;
         $this->filterFactory = $filterFactory;
         $this->exportService = $exportService;
@@ -62,6 +67,12 @@ class OvertimeEntryCrudController extends AbstractCrudController
             return $monthNames[($filters['incidentDateMonth'] ?? date('n'))];
         };
 
+        $currentYear   = function () {
+            $request = $this->getContext()->getRequest();
+            $filters = $request->query->all('filters') ?? [];
+            return $filters['incidentDateYear'] ?? date('Y');
+        };
+
         $monthNames = [
             0 => 'Januari',
             1 => 'Januar',
@@ -77,8 +88,8 @@ class OvertimeEntryCrudController extends AbstractCrudController
             11 => 'November',
             12 => 'Dezember',
         ];
-        $int = function () use ($currentMonth, $monthNames) {
-        return $currentMonth($monthNames);
+        $int = function () use ($currentMonth, $monthNames, $currentYear) {
+        return $currentMonth($monthNames) . " " . $currentYear();
     };
 
 
@@ -108,6 +119,14 @@ class OvertimeEntryCrudController extends AbstractCrudController
             return $request->getSchemeAndHttpHost() . $request->getBaseUrl() . $request->getPathInfo() . '?' . $newQueryString;
         };
 
+        $dateActionGroup = ActionGroup::new("dateControl");
+
+        $prevYearAction = Action::new('prevYear', "", 'ti ti-chevrons-left')
+            ->linkToUrl(function () use ($buildMonthUrl) {
+                return $buildMonthUrl(-12);
+            })
+            ->createAsGlobalAction();
+
         $prevMonthAction = Action::new('prevMonth', "", 'ti ti-chevron-left')
             ->linkToUrl(function () use ($buildMonthUrl) {
                 return $buildMonthUrl(-1);
@@ -117,6 +136,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
             ->linkToUrl(function () use ($buildMonthUrl) {
                 return $buildMonthUrl(0);
             })
+            ->setTemplatePath('admin/overtime_entries/today_button.html.twig')
             ->createAsGlobalAction();
 
         $nextMonthAction = Action::new('nextMonth', "", 'ti ti-chevron-right')
@@ -125,10 +145,32 @@ class OvertimeEntryCrudController extends AbstractCrudController
             })
             ->createAsGlobalAction();
 
+        $nextYearAction = Action::new('nextYear', "", 'ti ti-chevrons-right')
+            ->linkToUrl(function () use ($buildMonthUrl) {
+                return $buildMonthUrl(12);
+            })
+            ->createAsGlobalAction();
+
         $exportAction = Action::new('export', 'Excel Export', 'ti ti-file-type-xls')
             ->linkToCrudAction('exportExcel')
             ->setCssClass("btn-success")
             ->createAsGlobalAction();
+
+        $teacherAction = Action::new('teacher', 'Teacher', 'fa fa-users')
+            ->linkToCrudAction('teacherSelect')
+            ->setTemplatePath('admin/actions/teacher_dropdown.html.twig')
+            ->createAsGlobalAction();
+        ;
+
+        $dateActionGroup
+            ->addHeader("Gallo")
+            ->addAction($nextYearAction)
+            ->addAction($nextMonthAction)
+            ->addAction($currentMonthAction)
+            ->addAction($prevMonthAction)
+            ->addAction($prevYearAction)
+            ->createAsGlobalActionGroup()
+        ;
 
 
         return $actions
@@ -137,17 +179,31 @@ class OvertimeEntryCrudController extends AbstractCrudController
             ->disable(Action::SAVE_AND_ADD_ANOTHER, Action::EDIT, Action::DELETE, Action::NEW)
 
             ->add(Crud::PAGE_INDEX, $exportAction)
+            ->add(Crud::PAGE_INDEX, $nextYearAction)
             ->add(Crud::PAGE_INDEX, $nextMonthAction)
             ->add(Crud::PAGE_INDEX, $currentMonthAction)
             ->add(Crud::PAGE_INDEX, $prevMonthAction)
+            ->add(Crud::PAGE_INDEX, $prevYearAction)
             ;
+    }
+
+    public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
+    {
+        // Daten nur auf der Index-Seite laden
+        if (Crud::PAGE_INDEX === $responseParameters->get('pageName')) {
+            $responseParameters->set('teachers', $this->teacherRepository->findAll());
+        }
+
+        return $responseParameters;
     }
 
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
             // Filter nach Lehrkraft (Dropdown mit allen Lehrern)
-            ->add(EntityFilter::new('teacher', 'Lehrkraft'))
+            ->add(EntityFilter::new('teacher', 'Lehrkraft')
+
+            )
             ->add(MonthFilter::new('incidentDateMonth', 'Monat'))
             ->add(YearFilter::new('incidentDateYear', 'Jahr'))
             ;
@@ -179,13 +235,15 @@ class OvertimeEntryCrudController extends AbstractCrudController
             DateField::new('incidentDate'),
             TextField::new('class'),
             NumberField::new('courseHour'),
-            TextField::new('subject'),
-            TextField::new('room'),
+            //TextField::new('subject'),
+            //TextField::new('room'),
             //TextField::new('untisId'),
             TextField::new('reason'),
             NumberField::new('amount'),
             DateField::new('expiresAt'),
-            //AssociationField::new('invalidatedBy'),
+            DateField::new('invalidatedAt'),
+            AssociationField::new('invalidatedBy'),
+
             //DateField::new('createdAt'),
             //AssociationField::new('createdBy'),
             TextField::new('comment'),
@@ -197,7 +255,11 @@ class OvertimeEntryCrudController extends AbstractCrudController
         return $crud
             // Setzt die Anzahl der Einträge pro Seite auf 50
             ->setPaginatorPageSize(50)
+            ->overrideTemplates([
+                'crud/index' => 'admin/overtime_entries/index.html.twig',
+            ])
             ->setDefaultSort(['teacher.shortName' => 'ASC', 'incidentDate' => 'ASC'])
+            ->setHelp('index', '...')
             ;
     }
 
@@ -241,15 +303,18 @@ class OvertimeEntryCrudController extends AbstractCrudController
             ['header' => 'Datum', 'align' => 'left'],
             ['header' => 'Klasse', 'align' => 'left'],
             ['header' => 'Schulstunde', 'align' => 'right'],
-            ['header' => 'Fach', 'align' => 'left'],
-            ['header' => 'Raum', 'align' => 'left'],
+            //['header' => 'Fach', 'align' => 'left'],
+            //['header' => 'Raum', 'align' => 'left'],
             //['header' => 'Units-ID', 'align' => 'left'],
             ['header' => 'Grund', 'align' => 'left'],
             ['header' => 'Differenz', 'align' => 'right', 'sum' => true],
             ['header' => 'Systemkommentar', 'align' => 'left'],
-            ['header' => 'Freizeitausgleich bis', 'align' => 'right'],
+            ['header' => 'ID', 'align' => 'left'],
+            ['header' => 'ausgeglichen durch ID', 'align' => 'right'],
+            ['header' => 'auszugleichen bis', 'align' => 'right'],
+            ['header' => 'ausgeglichen am', 'align' => 'right'],
 
-            //['header' => 'ausgeglichen durch', 'align' => 'right'],
+
         ];
 
         // 7. Die Entity-Daten in das Rows-Array mappen
@@ -263,7 +328,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
         $isYearActive    = array_key_exists('incidentDateYear', $activeFilters);
 
 
-        $showCarryover = $isTeacherActive && $isMonthActive && $isYearActive;
+        $showCarryover = $isMonthActive && $isYearActive;
         $teacherShortname = null;
         foreach ($entities as $entity) {
             /** @var OvertimeEntry $entity */
@@ -277,15 +342,19 @@ class OvertimeEntryCrudController extends AbstractCrudController
                 $entity->getIncidentDate() ? $entity->getIncidentDate()->format('d.m.Y') : '',
                 $entity->getClass() ?: '',
                 $entity->getCourseHour() ?: '',
-                $entity->getSubject() ?? '',
-                $entity->getRoom() ? $entity->getRoom() : '',
+                //$entity->getSubject() ?? '',
+                //$entity->getRoom() ? $entity->getRoom() : '',
                 //$entity->getUntisId() ? $entity->getUntisId() : '',
                 $entity->getReason() ? $entity->getReason() : '',
                 $entity->getAmount() ? $entity->getAmount() : '0',
                 $entity->getComment() ?: '',
+                $entity->getId(),
+                $entity->getInvalidatedBy() ?: '',
                 $entity->getExpiresAt() ? $entity->getExpiresAt()->format('d.m.Y') : '',
+                $entity->getInvalidatedAt() ? $entity->getInvalidatedAt()->format('d.m.Y') : '',
 
-                //$entity->getInvalidatedBy() ?: '',
+
+
             ];
             $sum += $entity->getAmount();
             $teacherShortname = $entity->getTeacherShortname();

@@ -152,7 +152,7 @@ class WorkingTimeImportService
             if ($amount > 0) {
                 $entry->setExpiresAt($expiryDate);
             } else {
-                $entry->setExpiresAt($expiryDate);
+                $entry->setExpiresAt(null);
             }
 
         }

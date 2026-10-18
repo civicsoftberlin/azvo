@@ -32,6 +32,7 @@ Discount: Pflichtstundenermäßigung
 Discount Valid From: Ermäßigung gültig ab
 Threshold: Vergütungsfreie Mehrarbeit
 OvertimeEntry: Arbeitszeitkonto
+Overtime Entries: Stundeneinträge
 UntisImport: GPU-Upload
 Incident Date: Ereignisdatum
 Untis Id:  	Untis-ID
@@ -43,8 +44,9 @@ Course Hour: Schulstunde
 Class: Klasse
 Subject: Fach
 Rooom: Raum
-Expires At: Freizeitausgleich bis
+Expires At: Auszugleichen bis
 Invalidated By: Ausgeglichen durch ID
+Invalidated At: Ausgeglichen am
 Created At: Erstellt am
 Created By: Erstellt durch
 Room: Raum

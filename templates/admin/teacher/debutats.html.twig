@@ -1,0 +1,33 @@
+{% set myActionUrl = ea_url()
+    .setController('App\\Controller\\Admin\\TeacherCrudController')
+    .setAction('exportExcel')
+%}
+
+
+
+
+        {# Select mit Autocomplete #}
+        <form class="w-100" action="{{ myActionUrl }}">
+            <div class="row">
+                <div class="col-md-9">
+                    <select id="debutat-select" class="form-select form-select-sm" name="debutat" required="required" data-placeholder="Schuljahr auswählen...">
+                        <option value="" selected>Schuljahr auswählen ...</option>
+                        {% for debutat in field.value %}
+                            <option value="{{ debutat.id }}">
+                                {{ debutat.validFrom|date('d.m.Y') }} - {{ debutat.invalidFrom|date_modify('-1 day')|date('d.m.Y') }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <label for="debutat-select"></label>
+                    <input type="hidden" name="_token" value="{{ csrf_token('export-debutat') }}">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" id="" class="btn btn-success w-100">
+                        <i class="fas fa-file-excel"></i> Exportieren
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
+

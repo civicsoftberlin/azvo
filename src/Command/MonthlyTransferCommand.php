@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\OvertimeEntry;
+use App\Entity\Teacher;
 use App\Repository\OvertimeEntryRepository;
 use App\Repository\TeacherRepository;
 use DateTime;
@@ -104,7 +105,7 @@ class MonthlyTransferCommand extends Command
             }
             if ($totalAmount > 0) {
                 $hasCarryOver = $this->overtimeEntryRepository->hasCarryOverForTeacherAndDate(
-                    $data['teacherId'], DateTime::createFromImmutable($startDate), "CARRYOVER"
+                    $data['teacherId'], DateTime::createFromImmutable($endDate->modify("+1 day")), "CARRYOVER"
                 );
                 if ($hasCarryOver) {
                     continue;
@@ -144,18 +145,14 @@ class MonthlyTransferCommand extends Command
                 continue;
             }
             if ($totalAmount < 0) {
+                $decayAmount = (int) abs($totalAmount);
                 $hasCarryOver = $this->overtimeEntryRepository->hasCarryOverForTeacherAndDate(
                     $data['teacherId'], DateTime::createFromImmutable($endDate), "DECAY"
                 );
                 if ($hasCarryOver) {
                     continue;
                 }
-                $hasCarryOver = $this->overtimeEntryRepository->hasCarryOverForTeacherAndDate(
-                    $data['teacherId'], DateTime::createFromImmutable($startDate), "CARRYOVER"
-                );
-                if ($hasCarryOver) {
-                    continue;
-                }
+
                 $carryOverEntry = new OvertimeEntry();
                 $carryOverEntry->setTeacher($teacher);
                 $carryOverEntry->setTeacherShortname($teacher->getShortName());
@@ -163,10 +160,50 @@ class MonthlyTransferCommand extends Command
                 $carryOverEntry->setIncidentDate(DateTime::createFromImmutable($endDate));
                 $carryOverEntry->setCourseHour(0);
                 $carryOverEntry->setComment("DECAY");
-                $carryOverEntry->setExpiresAt(DateTime::createFromImmutable($endDate->modify("+12 month")));
+                $carryOverEntry->setExpiresAt(null);
                 $carryOverEntry->setReason("Verfall von Minderarbeit");
                 $this->entityManager->persist($carryOverEntry);
+                $this->entityManager->flush();
+
+                $this->invalidateOldEntries($teacher, $decayAmount, $carryOverEntry);
             }
+
+        }
+
+    }
+
+    /**
+     * @throws \DateMalformedStringException
+     */
+    private function invalidateOldEntries(Teacher $teacher, int $amountToInvalidate, OvertimeEntry $decayEntry): void
+    {
+        if ($amountToInvalidate <= 0) return;
+
+        $decayDateBegin = clone $decayEntry->getIncidentDate();
+        $decayDateBegin->modify('-12 months')->modify('first day of this month');
+
+        // Hole genau die Anzahl an ältesten, noch gültigen +1 Einträgen
+        $entriesToKill = $this->entityManager->createQueryBuilder()
+            ->select('e')
+            ->from(OvertimeEntry::class, 'e')
+            ->where('e.teacher = :teacher')
+            ->andWhere('e.amount > 0')
+            ->andWhere('e.invalidatedBy IS NULL')
+            ->andWhere('e.comment IS NULL OR e.comment NOT IN (:systemComments)')
+            ->andWhere('e.incidentDate >= :decayBegin')
+            ->andWhere('e.incidentDate <= :decayDate')
+            ->orderBy('e.incidentDate', 'ASC')
+            ->setParameter('teacher', $teacher)
+            ->setParameter('systemComments', ['CARRYOVER', 'DECAY'])
+            ->setParameter('decayBegin', $decayDateBegin->format('Y-m-d'))
+            ->setParameter('decayDate', $decayEntry->getIncidentDate()->format('Y-m-d'))
+            ->getQuery()
+            ->getResult();
+
+        foreach ($entriesToKill as $entry) {
+            $entry->setInvalidatedBy($decayEntry);
+            $entry->setInvalidatedAt($decayEntry->getIncidentDate());
+            $this->entityManager->persist($entry);
         }
         $this->entityManager->flush();
     }

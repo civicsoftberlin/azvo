@@ -1,0 +1,36 @@
+{% set allQueryParams = app.request.query.all() %}
+
+{# 2. Extrahiere die bestehenden Filter (oder leeres Array, wenn nicht vorhanden) #}
+{% set currentFilters = allQueryParams['filters'] ?? {} %}
+
+{# 3. Füge den teacher-Filter hinzu #}
+{% set filterParams = currentFilters | merge({
+    'teacher': {
+        'comparison': '=',
+        'value': entity.instance.id
+    }
+}) %}
+
+{% set myActionUrl = ea_url()
+    .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+    .setAction('index')
+    .set('filters', filterParams)
+%}
+
+<div class=" w-100">
+    <div class="row">
+        <div class="col-md-9">
+            <input id="debutat-select" class="form-control form-control-sm" name="debutat" readonly disabled
+                   value="{{ field.value|length }}">
+            <label for="debutat-select"></label>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ myActionUrl }}" class="btn btn-secondary w-100">
+                <i class="fas fa-eye"></i>Arbeitszeitkonto Anzeigen
+            </a>
+        </div>
+    </div>
+</div>
+
+
+

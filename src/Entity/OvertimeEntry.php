@@ -46,10 +46,11 @@ class OvertimeEntry
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $room = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $expiresAt = null;
 
-    #[ORM\OneToOne(targetEntity: self::class, cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(name: 'invalidated_by_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?self $invalidatedBy = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
@@ -64,6 +65,14 @@ class OvertimeEntry
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $hook = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $invalidatedAt = null;
+
+    public function __toString(): string
+    {
+        return (string) $this->id;
+    }
 
     public function getId(): ?int
     {
@@ -195,7 +204,7 @@ class OvertimeEntry
         return $this->expiresAt;
     }
 
-    public function setExpiresAt(\DateTime $expiresAt): static
+    public function setExpiresAt(?\DateTime $expiresAt): static
     {
         $this->expiresAt = $expiresAt;
 
@@ -251,6 +260,18 @@ class OvertimeEntry
     public function setHook(?string $hook): static
     {
         $this->hook = $hook;
+
+        return $this;
+    }
+
+    public function getInvalidatedAt(): ?\DateTime
+    {
+        return $this->invalidatedAt;
+    }
+
+    public function setInvalidatedAt(?\DateTime $invalidatedAt): static
+    {
+        $this->invalidatedAt = $invalidatedAt;
 
         return $this;
     }
