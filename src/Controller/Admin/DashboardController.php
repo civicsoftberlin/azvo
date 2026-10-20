@@ -92,10 +92,11 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(UntisImportCrudController::class, 'UntisImport', 'ti ti-file-type-csv')->setAction('new');
 
         yield MenuItem::section('Accounts', 'ti ti-clock-hour-4');
+        yield MenuItem::linkTo(TeacherCrudController::class, 'Teachers', 'ti ti-school');
         yield MenuItem::linkTo(OvertimeEntryCrudController::class, 'OvertimeEntry', 'ti ti-calendar');
 
         yield MenuItem::section('Settings', 'ti ti-settings');
-        yield MenuItem::linkTo(TeacherCrudController::class, 'Teachers', 'ti ti-school');
+
         yield MenuItem::linkTo(TeacherDebutatCrudController::class, 'Debutats', 'ti ti-calendar');
         yield MenuItem::linkTo(EntryTypeCrudController::class, 'Entry Types', 'ti ti-tag');
         yield MenuItem::linkTo(UserCrudController::class, 'Users', 'ti ti-user');
