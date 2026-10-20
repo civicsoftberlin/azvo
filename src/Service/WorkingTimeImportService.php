@@ -6,19 +6,24 @@ use App\Entity\Teacher;
 use App\Entity\OvertimeEntry;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class WorkingTimeImportService
 {
+    private array $errors = [];
     public function __construct(
-        private EntityManagerInterface $em
+        private readonly EntityManagerInterface $em,
     ) {}
 
     /**
      * @throws DateMalformedStringException
      */
-    public function importFromCsv(File $file, UserInterface $currentUser): int
+    public function importFromCsv(File $file, UserInterface $currentUser, bool $autoCreate): array
     {
         $handle  = fopen($file->getPathname(), "r");
         if ($handle === false) {
@@ -43,15 +48,18 @@ class WorkingTimeImportService
             $updatedRoom = str_replace('~', ', ', trim($data[12]));
 
             $classes = str_replace('~', ', ', trim($data[14]));
-            $message = trim($data[16]); // Ggf. hier noch dein iconv für ANSI einbauen
+            $message = trim($data[16]);
 
             // 2. Logik bestimmen
-            $isSubstitution = !empty($updatedTeacher) && ($updatedTeacher !== $plannedTeacher);
-            $isCancellation = stripos($message, 'ausfall') !== false || stripos($message, 'entfall') !== false;
-            $isRoomChangeOnly = ($plannedTeacher === $updatedTeacher) && ($plannedRoom !== $updatedRoom);
+            $isSubstitution = (trim($data[19]) === 'S' || (trim($data[19]) === '' and $updatedTeacher !== '') || trim($data[19]) === '~') ||
+                trim($data[19]) === 'A' && ($plannedTeacher !== '' and $updatedTeacher !== '' and $plannedTeacher !== $updatedTeacher and $updatedSubject !== ''); // Substitution
+            $isCancellation = trim($data[19]) === 'C' || (trim($data[19]) === '' and $updatedTeacher === '');; // Cancellation
+            $isPropagation  = trim($data[19]) === 'P'; // Propagation
+
+            // $isRoomChangeOnly = ($plannedTeacher === $updatedTeacher) && ($plannedRoom !== $updatedRoom);
 
             // 3. Einträge erzeugen
-            if ($isSubstitution) {
+            if ($isSubstitution || $isPropagation) {
                 // A) Ursprünglicher Lehrer verliert die Stunde (-1)
                 $this->createEntry(
                     $untisId . '_orig',
@@ -60,7 +68,7 @@ class WorkingTimeImportService
                     $courseHour,
                     -1,
                     "Ausfall (vertreten durch {$updatedTeacher})",
-                    $plannedSubject, $classes, $plannedRoom, $currentUser
+                    $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message
                 );
 
                 // B) Vertretungslehrer bekommt die Stunde (+1)
@@ -71,7 +79,7 @@ class WorkingTimeImportService
                     $courseHour,
                     1,
                     "Vertretung für {$plannedTeacher}",
-                    $updatedSubject ?: $plannedSubject, $classes, $updatedRoom ?: $plannedRoom, $currentUser
+                    $updatedSubject ?: $plannedSubject, $classes, $updatedRoom ?: $plannedRoom, $currentUser, $autoCreate, $message
                 );
                 $importCount += 2;
             }
@@ -84,7 +92,7 @@ class WorkingTimeImportService
                     $courseHour,
                     -1,
                     "Ausfall",
-                    $plannedSubject, $classes, $plannedRoom, $currentUser
+                    $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message
                 );
                 $importCount++;
             }
@@ -93,8 +101,8 @@ class WorkingTimeImportService
 
         fclose($handle);
         $this->em->flush();
-
-        return $importCount;
+        $this->errors['success'] = $importCount;
+        return $this->errors;
     }
 
     /**
@@ -111,13 +119,22 @@ class WorkingTimeImportService
         ?string $subject,
         ?string $className,
         ?string $room,
-        ?UserInterface $currentUser
+        ?UserInterface $currentUser,
+        bool $autoCreate,
+        ?string $message
     ): void {
         // 1. Lehrer finden
         $teacher = $this->em->getRepository(Teacher::class)->findOneBy(['shortName' => $teacherKuerzel]);
         if (!$teacher) {
-            // Optional: Fehler loggen, aber Import nicht abbrechen
-            return;
+            $this->errors['missing'][$teacherKuerzel] = $teacherKuerzel;
+            if (!$autoCreate) {
+                return;
+            }
+            $teacher = new Teacher();
+            $teacher->setShortName($teacherKuerzel);
+            $this->errors['created'][$teacherKuerzel] = $teacherKuerzel;
+            $this->em->persist($teacher);
+            $this->em->flush();
         }
 
         // 2. Doppelbuchung verhindern (Idempotenz)
@@ -142,6 +159,7 @@ class WorkingTimeImportService
         $entry->setSubject($subject);
         $entry->setClass($className);
         $entry->setRoom($room);
+        $entry->setUntisComment($message);
         $entry->setCreatedBy($currentUser); // Falls du den aktuellen User injizierst
 
         // 4. Verfallsdatum nur bei Mehrarbeit (+1) berechnen

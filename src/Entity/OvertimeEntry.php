@@ -20,6 +20,7 @@ class OvertimeEntry
     private ?string $untisId = null;
 
     #[ORM\ManyToOne(inversedBy: 'overtimeEntries')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'RESTRICT')]
     private ?Teacher $teacher = null;
 
     #[ORM\Column(length: 255)]
@@ -68,6 +69,9 @@ class OvertimeEntry
 
     #[ORM\Column(nullable: true)]
     private ?\DateTime $invalidatedAt = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $untisComment = null;
 
     public function __toString(): string
     {
@@ -272,6 +276,18 @@ class OvertimeEntry
     public function setInvalidatedAt(?\DateTime $invalidatedAt): static
     {
         $this->invalidatedAt = $invalidatedAt;
+
+        return $this;
+    }
+
+    public function getUntisComment(): ?string
+    {
+        return $this->untisComment;
+    }
+
+    public function setUntisComment(?string $untisComment): static
+    {
+        $this->untisComment = $untisComment;
 
         return $this;
     }

@@ -1,0 +1,32 @@
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+
+{% block content_title %}
+    Arbeitszeitkonto:
+    <div class="d-inline-block me-auto">
+        <label>
+            {# Basis-URL ohne Teacher-Filter erstellen #}
+            {% set baseUrl = ea_url().unset('filters[teacher]') %}
+
+            <select class="form-select form-select-sm"
+                    style="width: auto; min-width: 180px;"
+                    onchange="if(this.value) { window.location.href = this.value; } else {
+                        window.location.href = '{{ baseUrl }}';
+                        }">
+
+                {# Option "Alle Lehrkräfte" (Reset) - nutzt die saubere Basis-URL #}
+                <option disabled value=""
+                        {% if app.request.query.all('filters')['teacher'] is not defined %}selected{% endif %}>
+                    Alle Lehrkräfte
+                </option>
+
+                {# Lehrkräfte-Optionen - alle bauen auf der sauberen Basis-URL auf #}
+                {% for teacher in teachers|sort((a, b) => a.shortName <=> b.shortName) %}
+                    <option value="{{ baseUrl.set('filters[teacher][value]', teacher.id).set('filters[teacher][comparison]', '=') }}"
+                            {% if app.request.query.all('filters')['teacher']['value'] is defined and app.request.query.all('filters')['teacher']['value'] == teacher.id %}selected{% endif %}>
+                        {{ teacher.shortName }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+{% endblock %}

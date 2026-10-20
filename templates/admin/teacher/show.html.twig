@@ -1,10 +1,2 @@
-{# templates/easyadmin/teacher/detail.html.twig #}
 {% extends '@!EasyAdmin/crud/detail.html.twig' %}
 
-{# Wir überschreiben den 'content' Block, um die Standard-Felder nicht zu verlieren #}
-{% block content %}
-    {# 1. Die normalen Teacher-Felder rendern #}
-    {{ parent() }}
-
-
-{% endblock %}

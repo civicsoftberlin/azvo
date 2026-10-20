@@ -33,7 +33,11 @@ Discount Valid From: Ermäßigung gültig ab
 Threshold: Vergütungsfreie Mehrarbeit
 OvertimeEntry: Arbeitszeitkonto
 Overtime Entries: Stundeneinträge
+Count Current Month Overtime Entries: Mehrstunden in diesem Monat
+Count Last Month Overtime Entries: Letzter Monat
 UntisImport: GPU-Upload
+Untis Comment: Untis-Kommentar
+Comment: Systemkommentar
 Incident Date: Ereignisdatum
 Untis Id:  	Untis-ID
 Teacher Short Name: Lehrkraft-Kürzel

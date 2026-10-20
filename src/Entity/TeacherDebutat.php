@@ -14,7 +14,7 @@ class TeacherDebutat
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'teacherDebutats')]
+    #[ORM\ManyToOne(cascade: ['remove'], inversedBy: 'teacherDebutats')]
     private ?Teacher $teacher = null;
 
     #[ORM\Column]

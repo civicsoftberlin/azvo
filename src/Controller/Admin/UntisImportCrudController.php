@@ -11,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
@@ -25,6 +26,11 @@ use Vich\UploaderBundle\Form\Type\VichFileType;
 
 class UntisImportCrudController extends AbstractCrudController
 {
+
+    public function __construct(private WorkingTimeImportService $workingTimeImportService)
+    {
+    }
+
     public static function getEntityFqcn(): string
     {
         return UntisImport::class;
@@ -60,6 +66,7 @@ class UntisImportCrudController extends AbstractCrudController
                 ])
                 ->setRequired(true)
                 ->setHelp('Bereits vorhandene Buchungen werden ignoriert.'),
+            BooleanField::new('autoCreate')
         ];
     }
 
@@ -68,9 +75,16 @@ class UntisImportCrudController extends AbstractCrudController
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        $importService = new WorkingTimeImportService($entityManager);
-        $count = $importService->importFromCsv($entityInstance->getUploadFile(), $this->getUser());
-        $this->addFlash("success", "Import erfolgreich");
+        $result = $this->workingTimeImportService->importFromCsv($entityInstance->getUploadFile(), $this->getUser(), $entityInstance->isAutoCreate());
+        if(array_key_exists('missing', $result)) {
+            $this->addFlash('warning', sprintf("Folgende Lehrkräfte fehlen im System: %s", implode(', ', $result['missing'])));
+        }
+        if(array_key_exists('created', $result)) {
+            $this->addFlash('info', sprintf("Folgende Lehrkräfte wurden erzeugt: %s", implode(', ', $result['missing'])));
+        }
+        if(array_key_exists('success', $result)) {
+            $this->addFlash("success", "Import erfolgreich.");
+        }
     }
 
     /**

@@ -3,8 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\TeacherRepository;
+use DateMalformedStringException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -20,13 +22,13 @@ class Teacher
 
     private ?string $shortName = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $birthdate = null;
 
     /**
      * @var Collection<int, TeacherDebutat>
      */
-    #[ORM\OneToMany(targetEntity: TeacherDebutat::class, mappedBy: 'teacher')]
+    #[ORM\OneToMany(targetEntity: TeacherDebutat::class, mappedBy: 'teacher', cascade: ['remove'])]
     private Collection $teacherDebutats;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -141,6 +143,85 @@ class Teacher
     public function getOvertimeEntries(): Collection
     {
         return $this->overtimeEntries;
+    }
+
+    /**
+     * @throws DateMalformedStringException
+     */
+    public function getCurrentMonthOvertimeEntries(?\DateTimeInterface $date = null, ?string $filter = null): Collection
+    {
+        if ($date === null) {
+            $startOfMonth = new \DateTime('first day of this month');
+            $endOfMonth = new \DateTime('last day of this month 23:59:59');
+        } else {
+            $startOfMonth = $date;
+            $endOfMonth = $date->modify('last day of this month 23:59:59');
+        }
+
+
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->gte('incidentDate', $startOfMonth->format('Y-m-d')))
+            ->andWhere(Criteria::expr()->lte('incidentDate', $endOfMonth->format('Y-m-d')));
+
+        if ($filter !== null) {
+            $expr = Criteria::expr();
+            $criteria->andWhere(
+                $expr->orX(
+                    $expr->neq('comment', $filter),      // comment != $filter
+                    $expr->isNull('comment')             // OR comment IS NULL
+                )
+            );
+        }
+
+        // Filtert die bereits geladene Collection (oder baut eine SQL-Abfrage, wenn noch nicht geladen)
+        return $this->overtimeEntries->matching($criteria);
+    }
+
+    /**
+     * @throws DateMalformedStringException
+     */
+    public function countCurrentMonthOvertimeEntries(): int
+    {
+        $entries = $this->getCurrentMonthOvertimeEntries();
+        $totalAmount = 0;
+
+        foreach ($entries as $entry) {
+            /** @var OvertimeEntry $entry */
+            $totalAmount += $entry->getAmount();
+        }
+        return $totalAmount;
+    }
+
+    /**
+     * @throws DateMalformedStringException
+     */
+    public function countLastMonthOvertimeEntries(): int
+    {
+        $entries = $this->getCurrentMonthOvertimeEntries(
+            new \DateTimeImmutable('first day of last month'),
+            "DECAY"
+        );
+        $totalAmount = 0;
+
+        foreach ($entries as $entry) {
+            /** @var OvertimeEntry $entry */
+            $totalAmount += $entry->getAmount();
+        }
+        return $totalAmount;
+    }
+
+    /**
+     * @throws DateMalformedStringException
+     */
+    public function countCurrentExpiringEntries(): int
+    {
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq('expiresAt', new \DateTime("last day of this month")->format('Y-m-d')))
+            ->andWhere(Criteria::expr()->isNull('invalidatedAt'))
+            //->andWhere(Criteria::expr()->neq('comment', "CARRYOVER"))
+        ;
+        $entries = $this->overtimeEntries->matching($criteria);
+        return $entries->count();
     }
 
     public function addOvertimeEntry(OvertimeEntry $overtimeEntry): static

@@ -4,11 +4,16 @@ namespace App\Controller\Admin;
 
 use App\Constants\Debutat;
 use App\Entity\TeacherDebutat;
+use App\Filter\MonthFilter;
+use App\Filter\YearFilter;
+use App\Repository\TeacherRepository;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
@@ -16,9 +21,17 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
 
 class TeacherDebutatCrudController extends AbstractCrudController
 {
+    private TeacherRepository $teacherRepository;
+
+    public function __construct(TeacherRepository $teacherRepository)
+    {
+        $this->teacherRepository = $teacherRepository;
+    }
+
     public static function getEntityFqcn(): string
     {
         return TeacherDebutat::class;
@@ -26,28 +39,38 @@ class TeacherDebutatCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $goToStripe = Action::new('goToStripe')
-            ->linkToUrl('https://www.stripe.com/')
-            ->setIcon('ti ti-plus')
-            ->createAsGlobalAction()
-        ;
 
-        $exportData = Action::new('Exportieren')
-            ->linkToUrl('https://www.stripe.com/')
-            ->setIcon('ti ti-file-type-xls')
-            ->createAsGlobalAction()
-        ;
 
-        return $actions
-            ->add(Crud::PAGE_INDEX, $goToStripe)
-            ->add(Crud::PAGE_INDEX, $exportData)
-            ;
+        return $actions;
     }
 
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
             ->showEntityActionsInlined()
+            ->setPaginatorPageSize(100)
+            ->overrideTemplates([
+                'crud/index' => 'admin/deputat/index.html.twig',
+            ])
+            ->setDefaultSort(['teacher' => 'ASC', 'validFrom' => 'ASC'])
+            ;
+    }
+
+    public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
+    {
+        // Daten nur auf der Index-Seite laden
+        if (Crud::PAGE_INDEX === $responseParameters->get('pageName')) {
+            $responseParameters->set('teachers', $this->teacherRepository->findAll());
+        }
+
+        return $responseParameters;
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            // Filter nach Lehrkraft (Dropdown mit allen Lehrern)
+            ->add(EntityFilter::new('teacher', 'Lehrkraft'))
             ;
     }
 

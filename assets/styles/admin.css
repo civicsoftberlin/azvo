@@ -8,6 +8,7 @@ thead {
     z-index: 1020!important;
 }
 
+
 tbody > tr:hover > td {
     background-color: #efefef!important;
 }
@@ -80,3 +81,18 @@ html, body {
     overflow-x: hidden !important;
     height: 100% !important;
 }
+
+.tk-text-primary {
+    color: var(--ea-primary) !important;
+}
+
+.table-info {
+    border-top: 2px solid var(--ea-primary)!important;
+}
+
+.table-info td {
+    font-weight: bold;
+    border-top: 2px solid var(--ea-primary)!important;
+}
+
+

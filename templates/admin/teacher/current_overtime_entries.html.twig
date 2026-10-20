@@ -1,0 +1,65 @@
+{% set allQueryParams = app.request.query.all() %}
+
+{# 2. Extrahiere die bestehenden Filter (oder leeres Array, wenn nicht vorhanden) #}
+{% set currentFilters = allQueryParams['filters'] ?? {} %}
+
+{# 3. Füge den teacher-Filter hinzu #}
+{% set filterParams = currentFilters | merge({
+    'teacher': {
+        'comparison': '=',
+        'value': entity.instance.id
+    },
+    'incidentDateMonth' : "now"|date('n'),
+    'incidentDateYear' : "now"|date('Y'),
+}) %}
+
+{% set filterParamsNew = {
+    'teacher': {
+        'comparison': '=',
+        'value': entity.instance.id
+    }
+} %}
+
+{% set myActionUrl = ea_url()
+    .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+    .setAction('index')
+    .set('filters', filterParams)
+%}
+
+{% set exportActionUrl = ea_url()
+    .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+    .setAction('exportExcel')
+    .set('filters', filterParams)
+%}
+
+{% set allEntriesUrl = ea_url()
+    .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+    .setAction('index')
+    .set('filters', filterParamsNew)
+%}
+
+<div class=" w-100">
+    <h4 class="h5 fw-bold">Mehr-/Minderstunden</h4>
+    <p class="text-muted">
+        Anzeigen oder Export aller Einträge des jeweiligen Monats.
+    </p>
+    <h6 class="">{{ "now"|format_datetime(date_format='none', time_format='none', locale='de', pattern='MMMM Y') }}</h6>
+    <div class="d-flex gap-3 align-items-center justify-content-between">
+        <div class="d-flex gap-3 align-items-center">
+            <div>
+                <input id="debutat-select" class="form-control form-control-sm" name="debutat" readonly value="{{ field.value }}">
+            </div>
+            <div class="btn-group">
+                <a href="{{ myActionUrl }}" class="btn btn-secondary"><i class="ti ti-eye tk-text-primary"></i>Anzeigen</a>
+                <a href="{{ exportActionUrl }}" class="btn btn-secondary"><i class="ti ti-file-type-xls text-success"></i>Exportieren</a>
+            </div>
+        </div>
+        <div class="d-flex gap-3 align-items-center">
+            <a href="{{ allEntriesUrl }}" class="btn btn-secondary"><i class="ti ti-table-shortcut tk-text-primary"></i>Alle Einträge</a>
+        </div>
+    </div>
+    <hr>
+</div>
+
+
+

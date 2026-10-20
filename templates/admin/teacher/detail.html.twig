@@ -1,0 +1,17 @@
+{% extends '@EasyAdmin/crud/detail.html.twig' %}
+
+{# Wir überschreiben den Block, der die Felder rendert #}
+{% block detail_field %}
+    {# Original-Code von EasyAdmin, aber Grid-Klassen angepasst #}
+    <div class="row mb-2">
+        {# Label-Spalte komplett ausblenden #}
+        <div class="col-md-3 d-none">
+            <span class="form-label">{{ field.label|trans(domain = ea.i18n.translationDomain) }}</span>
+        </div>
+
+        {# Wert-Spalte auf volle Breite ziehen #}
+        <div class="col-md-12">
+            {{ include(field.templatePath, { field: field, entity: entity }) }}
+        </div>
+    </div>
+{% endblock %}

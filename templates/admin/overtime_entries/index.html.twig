@@ -54,4 +54,32 @@
 
 
 
+{% block table_body %}
+    {{ parent() }}
 
+    {% if entities|length > 0 %}
+        {% set totalOvertime = 0 %}
+        {% set totalEntries = 0 %}
+
+        {# entities ist eine iterable von EntityDto Objekten #}
+        {% for entityDto in entities %}
+            {% set entry = entityDto.instance %}
+            {% set totalOvertime = totalOvertime + entry.getAmount %}
+        {% endfor %}
+
+        <tr class="table-info">
+            <td  class="text-start">Anzahl</td>
+            <td>
+                <span class="">{{ entities|length }}</span>
+            </td>
+            <td colspan="3" class=""></td>
+            <td  class="">Virtuelles IST</td>
+            <td class="{{ totalOvertime >= 0 ? 'bg-success' : 'bg-danger' }}">
+                <span>
+                    {{ totalOvertime|number_format(0, ',', '.') }}
+                </span>
+            </td>
+            <td colspan="4" class="text-end"></td>
+        </tr>
+    {% endif %}
+{% endblock %}

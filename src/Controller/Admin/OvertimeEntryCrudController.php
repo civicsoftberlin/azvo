@@ -19,6 +19,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Event\AfterCrudActionEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\FieldFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\FilterFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -33,6 +34,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class OvertimeEntryCrudController extends AbstractCrudController
@@ -223,7 +225,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
 
                     // Generiert den Link zur Detailseite der Lehrkraft
                     $url = $this->container->get(AdminUrlGenerator::class)
-                        ->setController(TeacherCrudController::class) // <-- HIER DEINEN TEACHER-CONTROLLER EINTRAGEN!
+                        ->setController(TeacherCrudController::class)
                         ->setAction(Action::DETAIL)
                         ->setEntityId($teacher->getId())
                         ->generateUrl();
@@ -239,6 +241,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
             //TextField::new('room'),
             //TextField::new('untisId'),
             TextField::new('reason'),
+            TextField::new('untisComment'),
             NumberField::new('amount'),
             DateField::new('expiresAt'),
             DateField::new('invalidatedAt'),
@@ -258,7 +261,12 @@ class OvertimeEntryCrudController extends AbstractCrudController
             ->overrideTemplates([
                 'crud/index' => 'admin/overtime_entries/index.html.twig',
             ])
-            ->setDefaultSort(['teacher.shortName' => 'ASC', 'incidentDate' => 'ASC'])
+            ->setDefaultSort([
+                'teacher.shortName' => 'ASC',
+                'incidentDate' => 'ASC',
+                'class' => 'DESC',
+                'courseHour' => 'DESC',
+            ])
             ->setHelp('index', '...')
             ;
     }
@@ -268,7 +276,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
      * @throws ContainerExceptionInterface
      */
     #[AdminRoute(path: '/export-excel')]
-    public function exportExcel(AdminContext $context): StreamedResponse
+    public function exportExcel(AdminContext $context): Response
     {
         $searchDto = $context->getSearch();
         $entityDto = $context->getEntity();
@@ -307,6 +315,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
             //['header' => 'Raum', 'align' => 'left'],
             //['header' => 'Units-ID', 'align' => 'left'],
             ['header' => 'Grund', 'align' => 'left'],
+            ['header' => 'Untis-Kommentar', 'align' => 'left'],
             ['header' => 'Differenz', 'align' => 'right', 'sum' => true],
             ['header' => 'Systemkommentar', 'align' => 'left'],
             ['header' => 'ID', 'align' => 'left'],
@@ -330,6 +339,16 @@ class OvertimeEntryCrudController extends AbstractCrudController
 
         $showCarryover = $isMonthActive && $isYearActive;
         $teacherShortname = null;
+
+        if (empty($entities)) {
+            $this->addFlash('warning', 'Keine Einträge für den Zeitraum gefunden.');
+            $referer = $request->headers->get('referer');
+
+            if ($referer) {
+                return $this->redirect($referer);
+            }
+        }
+
         foreach ($entities as $entity) {
             /** @var OvertimeEntry $entity */
 
@@ -345,8 +364,9 @@ class OvertimeEntryCrudController extends AbstractCrudController
                 //$entity->getSubject() ?? '',
                 //$entity->getRoom() ? $entity->getRoom() : '',
                 //$entity->getUntisId() ? $entity->getUntisId() : '',
-                $entity->getReason() ? $entity->getReason() : '',
-                $entity->getAmount() ? $entity->getAmount() : '0',
+                $entity->getReason() ?: '',
+                $entity->getUntisComment() ?: '',
+                $entity->getAmount() ?: '0',
                 $entity->getComment() ?: '',
                 $entity->getId(),
                 $entity->getInvalidatedBy() ?: '',

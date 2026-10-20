@@ -2,7 +2,11 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\OvertimeEntry;
 use App\Entity\Teacher;
+use App\Repository\OvertimeEntryRepository;
+use App\Repository\TeacherDebutatRepository;
+use App\Repository\TeacherRepository;
 use App\Service\ExcelExportService;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -11,20 +15,30 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TeacherCrudController extends AbstractCrudController
 {
     private ExcelExportService $exportService;
+    private OvertimeEntryRepository $entryRepository;
+    private TeacherDebutatRepository $debutatRepository;
 
-    public function __construct(private readonly AdminUrlGenerator $urlGenerator, ExcelExportService $exportService)
+    public function __construct(private readonly AdminUrlGenerator $urlGenerator,
+                                ExcelExportService $exportService,
+                                OvertimeEntryRepository $entryRepository,
+                                TeacherDebutatRepository $teacherRepository,
+    )
     {
         $this->exportService = $exportService;
+        $this->entryRepository = $entryRepository;
+        $this->debutatRepository = $teacherRepository;
     }
 
     public static function getEntityFqcn(): string
@@ -37,7 +51,7 @@ class TeacherCrudController extends AbstractCrudController
         return $crud
             ->setDefaultSort(['shortName' => 'ASC'])
             ->overrideTemplate('crud/detail', 'admin/teacher/show.html.twig')
-            ->setPageTitle(Crud::PAGE_DETAIL, fn (Teacher $teacher) => 'Lehrkraft: ' . ($teacher->getShortName() ?? 'Unbekannt'))
+            ->setPageTitle(Crud::PAGE_DETAIL, fn (Teacher $teacher) => 'Details für <span class="tk-text-primary">' . ($teacher->getShortName() ?? 'Unbekannt').'</span>')
             ->showEntityActionsInlined()
             ;
     }
@@ -70,6 +84,10 @@ class TeacherCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, $showOvertimes)
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->add(Crud::PAGE_DETAIL, $exportExcelAction)
+            ->remove(Crud::PAGE_INDEX, Action::BATCH_DELETE)
+            ->remove(Crud::PAGE_INDEX, Action::DELETE)
+            ->remove(Crud::PAGE_DETAIL, Action::DELETE)
+
 
             //->add(Crud::PAGE_DETAIL, $showOvertimes)
             ->remove(Crud::PAGE_INDEX, Action::EDIT)
@@ -81,38 +99,96 @@ class TeacherCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm(),
-            TextField::new('shortName'),
-            AssociationField::new('overtimeEntries')
-                ->setTemplatePath('admin/teacher/overtime_entries.html.twig')
-                ->onlyOnDetail(),
+            IdField::new('id')->onlyOnIndex(),
+            TextField::new('shortName')->hideOnDetail(),
+            Field::new('countCurrentMonthOvertimeEntries','')
+                ->setTemplatePath('admin/teacher/current_overtime_entries.html.twig')
+                ->onlyOnDetail()->setLabel(false),
+            Field::new('countLastMonthOvertimeEntries','')
+                ->setTemplatePath('admin/teacher/last_overtime_entries.html.twig')
+                ->onlyOnDetail()->setLabel(false),
+            Field::new('countCurrentExpiringEntries','')
+                ->setTemplatePath('admin/teacher/current_expiring_entries.html.twig')
+                ->onlyOnDetail()->setLabel(false),
             AssociationField::new('teacherDebutats')
-                ->setLabel("Schuljahr")
+                ->setLabel("")
                 ->setTemplatePath('admin/teacher/debutats.html.twig')
-                ->onlyOnDetail(),
+                ->onlyOnDetail()->setLabel(false),
         ];
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
     #[AdminRoute(path: '/export-excel', name: 'export_excel')]
-    public function exportExcel(AdminContext $context, Request $request): StreamedResponse
+    public function exportExcel(AdminContext $context, Request $request): Response
     {
+        $teacher = $context->getEntity()->getInstance();
+        $debutatId = (int) $request->request->get('debutat');
+        $deputat = $this->debutatRepository->findOneBy(['id' => $debutatId]);
+
+        if (!$deputat) {
+            throw $this->createNotFoundException($debutatId);
+        }
+        $validFrom = $deputat->getValidFrom();
+        $invalidFrom = $deputat->getInvalidFrom();
+        $entries = $this->entryRepository->createQueryBuilder('e')
+            ->where('e.teacher = :teacher')
+            ->andWhere('e.incidentDate >= :validFrom')
+            ->andWhere('e.incidentDate < :invalidFrom')
+            ->andWhere('e.comment != :carryover OR e.comment IS NULL')
+            ->setParameter('teacher', $teacher)
+            ->setParameter('validFrom', $validFrom->format('Y-m-d'))
+            ->setParameter('invalidFrom', $invalidFrom->format('Y-m-d'))
+            ->setParameter('carryover', 'CARRYOVER')
+            ->orderBy('e.incidentDate', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
         $columns = [
             ['header' => 'Lehrkraft', 'align' => 'left'],
             ['header' => 'Datum', 'align' => 'left'],
             ['header' => 'Klasse', 'align' => 'left'],
             ['header' => 'Schulstunde', 'align' => 'right'],
-            //['header' => 'Fach', 'align' => 'left'],
-            //['header' => 'Raum', 'align' => 'left'],
-            //['header' => 'Units-ID', 'align' => 'left'],
             ['header' => 'Grund', 'align' => 'left'],
+            ['header' => 'Untis-Kommentar', 'align' => 'left'],
             ['header' => 'Differenz', 'align' => 'right', 'sum' => true],
             ['header' => 'Systemkommentar', 'align' => 'left'],
-            ['header' => 'Freizeitausgleich bis', 'align' => 'right'],
-
-            //['header' => 'ausgeglichen durch', 'align' => 'right'],
+            ['header' => 'ID', 'align' => 'left'],
+            ['header' => 'ausgeglichen durch ID', 'align' => 'right'],
+            ['header' => 'auszugleichen bis', 'align' => 'right'],
+            ['header' => 'ausgeglichen am', 'align' => 'right'],
         ];
+        $rows = [];
+        $teacherShortname = "";
 
-        return $this->exportService->createXlsxResponse($columns, [], "test.xlsx");
+        if (empty($entries)) {
+            $this->addFlash('warning', sprintf('Keine Einträge für den Zeitraum %s bis %s gefunden.', $validFrom->format('d.m.Y'), $invalidFrom->format('d.m.Y')));
+            $referer = $request->headers->get('referer');
+
+            if ($referer) {
+                return $this->redirect($referer);
+            }
+        }
+        foreach ($entries as $entity) {
+            /** @var OvertimeEntry $entity */
+            $rows[] = [
+                $entity->getTeacherShortname(),
+                $entity->getIncidentDate() ? $entity->getIncidentDate()->format('d.m.Y') : '',
+                $entity->getClass() ?: '',
+                $entity->getCourseHour() ?: '',
+                $entity->getReason() ?: '',
+                $entity->getUntisComment() ?: '',
+                $entity->getAmount() ?: '0',
+                $entity->getComment() ?: '',
+                $entity->getId(),
+                $entity->getInvalidatedBy() ?: '',
+                $entity->getExpiresAt() ? $entity->getExpiresAt()->format('d.m.Y') : '',
+                $entity->getInvalidatedAt() ? $entity->getInvalidatedAt()->format('d.m.Y') : '',
+            ];
+            $teacherShortname = $entity->getTeacherShortname();
+        }
+        $filename = date('ymd'). "-$teacherShortname-Schuljahr-" . $validFrom->format("m-Y") . "-" . $invalidFrom->modify("-1 day")->format("m-Y")  . '.xlsx';
+        return $this->exportService->createXlsxResponse($columns, $rows, $filename);
     }
-
 }

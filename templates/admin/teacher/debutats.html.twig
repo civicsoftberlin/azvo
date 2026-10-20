@@ -3,31 +3,51 @@
     .setAction('exportExcel')
 %}
 
+{% set filterParams = {
+    'teacher': {
+        'comparison': '=',
+        'value': entity.instance.id
+    }
+} %}
 
+{% set viewDebutatActionUrl = ea_url()
+    .setController('App\\Controller\\Admin\\TeacherDebutatCrudController')
+    .setAction('index')
+    .set('filters', filterParams)
+%}
+
+<div class="w-100">
+    <h4 class="h5 fw-bold">Erweiterter Export</h4>
+    <p class="text-muted">
+        Export aller Einträge für einen bestimmten Zeitraum.
+    </p>
+</div>
 
 
         {# Select mit Autocomplete #}
-        <form class="w-100" action="{{ myActionUrl }}">
-            <div class="row">
-                <div class="col-md-9">
-                    <select id="debutat-select" class="form-select form-select-sm" name="debutat" required="required" data-placeholder="Schuljahr auswählen...">
-                        <option value="" selected>Schuljahr auswählen ...</option>
-                        {% for debutat in field.value %}
-                            <option value="{{ debutat.id }}">
-                                {{ debutat.validFrom|date('d.m.Y') }} - {{ debutat.invalidFrom|date_modify('-1 day')|date('d.m.Y') }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <label for="debutat-select"></label>
-                    <input type="hidden" name="_token" value="{{ csrf_token('export-debutat') }}">
+        <form class="w-100" action="{{ myActionUrl }}" method="post">
+            <h6>Schuljahr exportieren</h6>
+            <div class="d-flex gap-3 align-items-center justify-content-between w-100">
+                <div class="d-flex gap-3 align-items-center">
+                    <div>
+                        <select id="debutat-select" class="form-select form-select-sm" name="debutat" required="required" data-placeholder="Schuljahr auswählen...">
+                            <option value="" selected>Schuljahr auswählen ...</option>
+                            {% for debutat in field.value %}
+                                <option value="{{ debutat.id }}">
+                                    {{ debutat.validFrom|date('d.m.Y') }} - {{ debutat.invalidFrom|date_modify('-1 day')|date('d.m.Y') }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" id="" class="btn btn-secondary"><i class="ti ti-file-type-xls text-success"></i>Exportieren</button>
                 </div>
-                <div class="col-md-3">
-                    <button type="submit" id="" class="btn btn-success w-100">
-                        <i class="fas fa-file-excel"></i> Exportieren
-                    </button>
+                <div class="d-flex gap-3 align-items-center">
+                    <label for="debutat-select" class="d-none"></label>
+                    <input type="hidden" name="_token" value="{{ csrf_token('export-debutat') }}">
+                    <a href="{{ viewDebutatActionUrl }}" class="btn btn-secondary"><i class="ti ti-settings tk-text-primary"></i>Stundendeputat verwalten</a>
                 </div>
             </div>
-
         </form>
+<hr>
 
 
