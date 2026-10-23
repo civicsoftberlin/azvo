@@ -6,6 +6,7 @@ use App\Entity\OvertimeEntry;
 use App\Entity\Teacher;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<OvertimeEntry>
@@ -44,7 +45,7 @@ class OvertimeEntryRepository extends ServiceEntityRepository
             ->setParameter('startDate', $startDate->format('Y-m-d'))
             ->setParameter('endDate', $endDate->format('Y-m-d'))
             ->groupBy('t.id, t.shortName')
-            ->orderBy('t.shortName', 'ASC')
+            ->orderBy('t.shortName', SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }

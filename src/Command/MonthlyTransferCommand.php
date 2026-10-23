@@ -57,7 +57,7 @@ class MonthlyTransferCommand extends Command
                     ->modify('-1 month')
                     ->format('Y-m');
 
-                $io->note(sprintf('Kein Zeitraum angegeben. Verwende automatisch: %s', $period));
+                //$io->note(sprintf('Kein Zeitraum angegeben. Verwende automatisch: %s', $period));
             } else {
                 $date = DateTimeImmutable::createFromFormat('Y-m', $periodInput);
                 if (!$date || $date->format('Y-m') !== $periodInput) {
