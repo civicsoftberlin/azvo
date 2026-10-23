@@ -156,3 +156,7 @@ html, body {
 .icon-primary .icon {
     color: var(--color-primary);
 }
+
+.actions a {
+    font-size: var(--font-size-sm);
+}

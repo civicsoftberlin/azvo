@@ -67,7 +67,7 @@ class TeacherCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $showOvertimes = Action::new('showOvertimes', 'OvertimeEntry', 'ti ti-clock-hour-4')
+        $showOvertimes = Action::new('showOvertimes', 'OvertimeEntry', 'ti ti-table')->setCssClass('icon-primary')
             ->linkToUrl(function (Teacher $teacher) {
                 return $this->urlGenerator
                     ->setController(OvertimeEntryCrudController::class)
@@ -90,13 +90,18 @@ class TeacherCrudController extends AbstractCrudController
             ]);
 
         return $actions
-            ->add(Crud::PAGE_INDEX, $showOvertimes)
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->add(Crud::PAGE_INDEX, $showOvertimes)
+
             ->add(Crud::PAGE_DETAIL, $exportExcelAction)
             ->remove(Crud::PAGE_INDEX, Action::BATCH_DELETE)
             ->remove(Crud::PAGE_INDEX, Action::DELETE)
             ->remove(Crud::PAGE_DETAIL, Action::DELETE)
             ->remove(Crud::PAGE_DETAIL, Action::EDIT)
+
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, function (Action $action) {
+                return $action->setLabel('Details')->setIcon(('ti ti-school'))->setCssClass('icon-primary');
+            })
 
 
             //->add(Crud::PAGE_DETAIL, $showOvertimes)

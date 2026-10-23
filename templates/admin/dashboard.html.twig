@@ -62,8 +62,10 @@
                     <td class="text-end">{{ diff }}</td>
                     <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
                     <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
-                    <td class="text-end">
-                        <a href="{{ detailUrlB }}" class="btn btn-secondary me-3"><i class="ti ti-school tk-text-primary"></i>Details</a>
+                    <td class="text-end actions">
+                        <a href="{{ detailUrlB }}" class="btn btn-secondary me-3"><i class="ti ti-school tk-text-primary"></i>
+                            <span class="btn-label"><span class="action-label">Details</span></span>
+                        </a>
                         <a href="{{ viewUrl }}" class="btn btn-secondary"><i class="ti ti-table tk-text-primary"></i>Anzeigen</a>
                         <a href="{{ exportUrl }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Exportieren</a>
                     </td>
