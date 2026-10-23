@@ -277,7 +277,7 @@ class ExcelExportService
      * @param string $filename Dateiname ohne Endung
      * @return StreamedResponse
      */
-    public function createXlsxResponse(array $columns, array $rows, string $filename): StreamedResponse
+    public function createXlsxResponse(array $columns, array $rows, string $filename, int $sum, int $threshold, int $soll): StreamedResponse
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -345,14 +345,13 @@ class ExcelExportService
                 $formula = sprintf('=SUM(%s%d:%s%d)', $columnLetter, $firstDataRow, $columnLetter, $lastDataRow);
                 $sheet->setCellValue($cellAddress, $formula);
             }
-            elseif ($index === 0 && $hasRows) {
+            if ($index === 5 && $hasRows) {
                 // Beschriftung in der ersten Spalte
-                $sheet->setCellValue($cellAddress, 'GESAMT');
+                $sheet->setCellValue($cellAddress, 'Zwischensumme:');
             }
 
             // B) Styling-Array aufbauen
             $styleArray = [
-                'font' => ['bold' => true],
                 'borders' => [
                     'top' => [
                         'borderStyle' => Border::BORDER_MEDIUM, // Dicke obere Trennlinie
@@ -360,7 +359,7 @@ class ExcelExportService
                     ],
                 ],
                 'alignment' => [
-                    'horizontal' => $alignmentMap[$colConfig['align'] ?? 'left']
+                    'horizontal' => Alignment::HORIZONTAL_RIGHT
                 ]
             ];
 
@@ -368,9 +367,8 @@ class ExcelExportService
             if ($hasRows && empty($colConfig['sum']) && $index !== 0) {
                 // Diagonales Kreuzmuster (Cross-Hatch) für leere Spalten
                 $styleArray['fill'] = [
-                    'fillType' => Fill::FILL_PATTERN_DARKVERTICAL, // Echtes Kreuzmuster (Gitter)
-                    'startColor' => ['argb' => 'FFE0E0E0'],    // Farbe der Linien (Mittelgrau)
-                    'endColor' => ['argb' => 'FFE0E0E0'],      // Hintergrund (Weiß)
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['argb' => 'FFE0E0E0'],
                 ];
             }
             elseif ($index === 0 && $hasRows) {
@@ -382,6 +380,136 @@ class ExcelExportService
             }
 
             // Styling auf die Zelle anwenden
+            $sheet->getStyle($cellAddress)->applyFromArray($styleArray);
+        }
+
+        // vorletze
+
+        $deputatRow = $sumRow + 1; // Direkt unter der GESAMT-Zeile
+
+        foreach ($columns as $index => $colConfig) {
+            $colIndex = $index + 1;
+            $columnLetter = Coordinate::stringFromColumnIndex($colIndex);
+            $cellAddress = $columnLetter . $deputatRow;
+
+            $value = '';
+            $styleArray = [
+                'alignment' => ['horizontal' => $alignmentMap[$colConfig['align'] ?? 'left']],
+                'color' => ['argb' => 'FF000000'],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['argb' => 'FFE0E0E0'],
+                ],
+            ];
+
+            if ($index === 5) {
+                $value = 'Pflichtstunden:';
+                $styleArray = [
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
+                    'color' => ['argb' => 'FF000000'],
+                    'fill' => [
+                        'fillType' => Fill::FILL_SOLID,
+                        'startColor' => ['argb' => 'FFE0E0E0'],
+                    ],
+                ];
+            }
+
+            if ($index === 6) {
+                // HIER KANNST DU DEINE PRO-RATA-LOGIK EINBAUEN!
+                // Beispiel: Basis-Stunden minus Ermäßigung
+                $sollStunden = $threshold;
+                $value = $sollStunden;
+                $styleArray = [
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]
+                ];
+            }
+
+            $sheet->setCellValue($cellAddress, $value);
+            $sheet->getStyle($cellAddress)->applyFromArray($styleArray);
+        }
+
+        // letzte Zeile
+
+        $deputatRow = $sumRow + 2;
+
+        foreach ($columns as $index => $colConfig) {
+            $colIndex = $index + 1;
+            $columnLetter = Coordinate::stringFromColumnIndex($colIndex);
+            $cellAddress = $columnLetter . $deputatRow;
+
+            $value = '';
+            $styleArray = [
+                'alignment' => ['horizontal' => $alignmentMap[$colConfig['align'] ?? 'left']],
+                'color' => ['argb' => 'FF000000'],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['argb' => 'FFE0E0E0'],
+                ],
+            ];
+
+            if ($index === 0) {
+                $value = 'Deputat:';
+                $styleArray = [
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
+                    'fill' => [
+                        'fillType' => Fill::FILL_SOLID,
+                        'startColor' => ['argb' => 'FFE0E0E0'],
+                    ],
+                ];
+            }
+            // 2. Ziel-Spalte: Hier z.B. die "Differenz"-Spalte (Index 6 in deinem vorherigen Array)
+            // ODER eine extra Spalte, die du dafür vorgesehen hast.
+            if ($index === 1) {
+                // HIER KANNST DU DEINE PRO-RATA-LOGIK EINBAUEN!
+                // Beispiel: Basis-Stunden minus Ermäßigung
+                $sollStunden = $soll;
+                $value = $sollStunden;
+                $styleArray = [
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]
+                ];
+            }
+
+            if ($index === 5) {
+                $value = 'Summe:';
+                $styleArray = [
+                    'font' => ['bold' => true],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
+                    'color' => ['argb' => 'FF000000'],
+                    'fill' => [
+                        'fillType' => Fill::FILL_SOLID,
+                        'startColor' => ['argb' => 'FFE0E0E0'],
+                    ],
+                ];
+            }
+
+            if ($index === 6) {
+                // HIER KANNST DU DEINE PRO-RATA-LOGIK EINBAUEN!
+                // Beispiel: Basis-Stunden minus Ermäßigung
+                $letter = Coordinate::stringFromColumnIndex(7);
+                $formula = sprintf('=IF(%s%d>=%s%d, %s%d-%s%d, 0)',
+                    $letter, $sumRow,
+                    $letter, $sumRow + 1,
+                    $letter, $sumRow,
+                    $letter, $sumRow + 1
+                );
+                $value = $formula;
+
+                $styleArray = [
+                    'font' => ['bold' => true],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]
+                ];
+                $result = $sum - $threshold;
+                if ($result > 0) {
+                    $styleArray = [
+                        'fill' => [
+                            'fillType' => Fill::FILL_SOLID,
+                            'startColor' => ['argb' => 'ffcdd2'],
+                        ],
+                    ];
+                    $hasOvertime = true;
+                }
+            }
+            $sheet->setCellValue($cellAddress, $value);
             $sheet->getStyle($cellAddress)->applyFromArray($styleArray);
         }
 

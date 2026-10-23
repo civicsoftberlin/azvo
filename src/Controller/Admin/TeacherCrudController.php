@@ -144,6 +144,7 @@ class TeacherCrudController extends AbstractCrudController
     #[AdminRoute(path: '/export-excel', name: 'export_excel')]
     public function exportExcel(AdminContext $context, Request $request): Response
     {
+        /** @var Teacher $teacher */
         $teacher = $context->getEntity()->getInstance();
         $debutatId = (int) $request->request->get('debutat');
         $deputat = $this->debutatRepository->findOneBy(['id' => $debutatId]);
@@ -191,6 +192,7 @@ class TeacherCrudController extends AbstractCrudController
                 return $this->redirect($referer);
             }
         }
+        $sum = 0;
         foreach ($entries as $entity) {
             /** @var OvertimeEntry $entity */
             $rows[] = [
@@ -206,10 +208,14 @@ class TeacherCrudController extends AbstractCrudController
                 $entity->getInvalidatedBy() ?: '',
                 $entity->getExpiresAt() ? $entity->getExpiresAt()->format('d.m.Y') : '',
                 $entity->getInvalidatedAt() ? $entity->getInvalidatedAt()->format('d.m.Y') : '',
+                $sum += $entity->getAmount() ?: '0',
             ];
             $teacherShortname = $entity->getTeacherShortname();
         }
         $filename = date('ymd'). "-$teacherShortname-Schuljahr-" . $validFrom->format("m-Y") . "-" . $invalidFrom->modify("-1 day")->format("m-Y")  . '.xlsx';
-        return $this->exportService->createXlsxResponse($columns, $rows, $filename);
+        $debutat = $teacher->getLastDeputat();
+        $threshold = $debutat->getThreshold();
+        $soll = $debutat->getDebutat();
+        return $this->exportService->createXlsxResponse($columns, $rows, $filename, $sum, $threshold, $soll);
     }
 }

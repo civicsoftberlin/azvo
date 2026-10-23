@@ -5,6 +5,8 @@ namespace App\Controller\Admin;
 use App\Entity\OvertimeEntry;
 use App\Filter\MonthFilter;
 use App\Filter\YearFilter;
+use App\Repository\OvertimeEntryRepository;
+use App\Repository\TeacherDebutatRepository;
 use App\Repository\TeacherRepository;
 use App\Service\ExcelExportService;
 use DateTime;
@@ -46,14 +48,16 @@ class OvertimeEntryCrudController extends AbstractCrudController
 
     private EntityRepository $eaEntityRepository;
     private TeacherRepository $teacherRepository;
+    private OvertimeEntryRepository $overtimeEntryRepository;
     private ExcelExportService $exportService;
     private FieldFactory $fieldFactory;
     private FilterFactory $filterFactory;
 
     // Service hier injizieren
-    public function __construct(EntityRepository $eaEntityRepository, TeacherRepository $teacherRepo, FieldFactory $fieldFactory, FilterFactory $filterFactory, ExcelExportService $exportService)
+    public function __construct(EntityRepository $eaEntityRepository, OvertimeEntryRepository $overtimeEntryRepository, TeacherRepository $teacherRepo, FieldFactory $fieldFactory, FilterFactory $filterFactory, ExcelExportService $exportService)
     {
         $this->eaEntityRepository = $eaEntityRepository;
+        $this->overtimeEntryRepository = $overtimeEntryRepository;
         $this->teacherRepository = $teacherRepo;
         $this->fieldFactory = $fieldFactory;
         $this->filterFactory = $filterFactory;
@@ -322,17 +326,17 @@ class OvertimeEntryCrudController extends AbstractCrudController
             ['header' => 'Untis-Kommentar', 'align' => 'left'],
             ['header' => 'Differenz', 'align' => 'right', 'sum' => true],
             ['header' => 'Systemkommentar', 'align' => 'left'],
-            ['header' => 'ID', 'align' => 'left'],
+            ['header' => 'ID', 'align' => 'right'],
             ['header' => 'ausgeglichen durch ID', 'align' => 'right'],
             ['header' => 'auszugleichen bis', 'align' => 'right'],
             ['header' => 'ausgeglichen am', 'align' => 'right'],
-
-
         ];
 
         // 7. Die Entity-Daten in das Rows-Array mappen
         $rows = [];
         $sum = 0;
+        $threshold = 0;
+        $soll = 0;
 
         $request = $this->getContext()->getRequest();
         $activeFilters = $request->query->all('filters') ?? [];
@@ -352,7 +356,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
                 return $this->redirect($referer);
             }
         }
-
+        $sum = 0;
         foreach ($entities as $entity) {
             /** @var OvertimeEntry $entity */
 
@@ -376,11 +380,14 @@ class OvertimeEntryCrudController extends AbstractCrudController
                 $entity->getInvalidatedBy() ?: '',
                 $entity->getExpiresAt() ? $entity->getExpiresAt()->format('d.m.Y') : '',
                 $entity->getInvalidatedAt() ? $entity->getInvalidatedAt()->format('d.m.Y') : '',
-
-
-
             ];
-            $sum += $entity->getAmount();
+            $sum += $entity->getAmount() ?: '0';
+            $teacher = $entity->getTeacher();
+            if ($teacher) {
+                $debutat = $teacher->getLastDeputat();
+                $soll = $debutat->getDebutat() - $debutat->getDiscount();
+                $threshold = $debutat->getThreshold();
+            }
             $teacherShortname = $entity->getTeacherShortname();
         }
 
@@ -395,8 +402,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
         }
 
         $filename = date('ymd'). "-$teacherName$forDate-Arbeitszeitkonto" . '.xlsx';
-
-        return $this->exportService->createXlsxResponse($columns, $rows, $filename);
+        return $this->exportService->createXlsxResponse($columns, $rows, $filename, $sum, $threshold, $soll);
     }
 
 

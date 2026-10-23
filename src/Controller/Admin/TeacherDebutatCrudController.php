@@ -295,7 +295,7 @@ class TeacherDebutatCrudController extends AbstractCrudController
             ['header' => 'Untis-Kommentar', 'align' => 'left'],
             ['header' => 'Differenz', 'align' => 'right', 'sum' => true],
             ['header' => 'Systemkommentar', 'align' => 'left'],
-            ['header' => 'ID', 'align' => 'left'],
+            ['header' => 'ID', 'align' => 'right'],
             ['header' => 'ausgeglichen durch ID', 'align' => 'right'],
             ['header' => 'auszugleichen bis', 'align' => 'right'],
             ['header' => 'ausgeglichen am', 'align' => 'right'],
