@@ -1,0 +1,38 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+
+
+
+{% block content_header %}
+    <div class="content-header-title">
+        <div class="title">
+            <div class="form-fieldset-header">
+                <div class="form-fieldset-title">
+                    <div class="not-collapsible form-fieldset-title-content fs-5 d-flex align-items-center">
+                        {% if icon is defined %}
+                            <span class="icon form-fieldset-icon">
+                                <i class="ti ti-{{ icon }}"></i>
+                            </span>
+                        {% endif %}
+                        {% block content_title %}{% endblock %}
+                        {% block content_help %}
+                            {% if has_help_message %}
+                                <a tabindex="0" class="content-header-help" data-bs-toggle="popover" data-bs-custom-class="ea-content-help-popover" data-bs-animation="true" data-bs-html="true" data-bs-placement="bottom" data-bs-trigger="focus" data-bs-content="{{ ea.crud.helpMessage|trans|e('html') }}">
+                                <twig:ea:Icon name="internal:circle-info" />
+                            </a>
+                            {% endif %}
+                        {% endblock %}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+
+    {% block page_actions_wrapper %}
+        <div class="page-actions">{% block page_actions %}{% endblock %}</div>
+    {% endblock %}
+{% endblock content_header %}
+

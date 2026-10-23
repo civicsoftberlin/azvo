@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\TeacherDebutat;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,20 +17,22 @@ class TeacherDebutatRepository extends ServiceEntityRepository
         parent::__construct($registry, TeacherDebutat::class);
     }
 
-//    /**
-//     * @return TeacherDebutat[] Returns an array of TeacherDebutat objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('t.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * Holt alle eindeutigen Startdaten (validFrom) absteigend sortiert.
+     *
+     * @return string[]
+     */
+    public function findDistinctValidFromDates(): array
+    {
+        $result = $this->createQueryBuilder('td')
+            ->select('DISTINCT td.validFrom')
+            ->orderBy('td.validFrom', 'DESC')
+            ->getQuery()
+            ->getScalarResult();
+
+        // array_column flacht das Array ab, sodass wir direkt ein Array aus DateTime-Objekten haben
+        return array_column($result, 'validFrom');
+    }
 
 //    public function findOneBySomeField($value): ?TeacherDebutat
 //    {

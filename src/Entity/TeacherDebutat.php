@@ -14,7 +14,7 @@ class TeacherDebutat
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(cascade: ['remove'], inversedBy: 'teacherDebutats')]
+    #[ORM\ManyToOne(inversedBy: 'teacherDebutats')]
     private ?Teacher $teacher = null;
 
     #[ORM\Column]
@@ -34,6 +34,12 @@ class TeacherDebutat
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $discountValidFrom = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $autoAppend = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $leaves = null;
 
     public function getId(): ?int
     {
@@ -120,6 +126,30 @@ class TeacherDebutat
     public function setDiscountValidFrom(?\DateTime $discountValidFrom): static
     {
         $this->discountValidFrom = $discountValidFrom;
+
+        return $this;
+    }
+
+    public function isAutoAppend(): ?bool
+    {
+        return $this->autoAppend;
+    }
+
+    public function setAutoAppend(?bool $autoAppend): static
+    {
+        $this->autoAppend = $autoAppend;
+
+        return $this;
+    }
+
+    public function isLeaves(): ?bool
+    {
+        return $this->leaves;
+    }
+
+    public function setLeaves(?bool $leaves): static
+    {
+        $this->leaves = $leaves;
 
         return $this;
     }

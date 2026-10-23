@@ -16,30 +16,29 @@
     .set('filters', filterParams)
 %}
 
-<div class="w-100">
-    <h4 class="h5 fw-bold">Erweiterter Export</h4>
-    <p class="text-muted">
-        Export aller Einträge für einen bestimmten Zeitraum.
-    </p>
-</div>
+
 
 
         {# Select mit Autocomplete #}
         <form class="w-100" action="{{ myActionUrl }}" method="post">
-            <h6>Schuljahr exportieren</h6>
             <div class="d-flex gap-3 align-items-center justify-content-between w-100">
-                <div class="d-flex gap-3 align-items-center">
-                    <div>
-                        <select id="debutat-select" class="form-select form-select-sm" name="debutat" required="required" data-placeholder="Schuljahr auswählen...">
-                            <option value="" selected>Schuljahr auswählen ...</option>
-                            {% for debutat in field.value %}
-                                <option value="{{ debutat.id }}">
-                                    {{ debutat.validFrom|date('d.m.Y') }} - {{ debutat.invalidFrom|date_modify('-1 day')|date('d.m.Y') }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                <div class="field-association form-group">
+                    <label class="form-control-label" for="export-select">Auszugleichen bis Ende des Monats</label>
+                    <div class="form-widget">
+                        <div class="d-flex gap-3 align-items-center">
+                            <div>
+                                <select id="export-select" class="form-select form-select-sm" name="debutat" required="required" data-placeholder="Schuljahr auswählen...">
+                                    <option value="" selected>Schuljahr auswählen ...</option>
+                                    {% for debutat in field.value %}
+                                        <option value="{{ debutat.id }}">
+                                            {{ debutat.validFrom|date('d.m.Y') }} - {{ debutat.invalidFrom|date_modify('-1 day')|date('d.m.Y') }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" id="" class="btn btn-secondary"><i class="ti ti-file-type-xls text-success"></i>Exportieren</button>
+                        </div>
                     </div>
-                    <button type="submit" id="" class="btn btn-secondary"><i class="ti ti-file-type-xls text-success"></i>Exportieren</button>
                 </div>
                 <div class="d-flex gap-3 align-items-center">
                     <label for="debutat-select" class="d-none"></label>
@@ -48,6 +47,5 @@
                 </div>
             </div>
         </form>
-<hr>
 
 

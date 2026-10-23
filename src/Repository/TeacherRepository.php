@@ -16,6 +16,22 @@ class TeacherRepository extends ServiceEntityRepository
         parent::__construct($registry, Teacher::class);
     }
 
+    /**
+     * Holt alle eindeutigen Lehrer, die einen TeacherDebutat-Eintrag
+     * für das gegebene validFrom-Datum haben.
+     */
+    public function findDistinctByTeacherDebutatValidFrom(\DateTime $validFrom): array
+    {
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.teacherDebutats', 'td')
+            ->where('td.validFrom = :validFrom')
+            ->setParameter('validFrom', $validFrom->format('Y-m-d'))
+            ->distinct()
+            ->orderBy('t.shortName', 'ASC') // Optional: direkt sortieren
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Teacher[] Returns an array of Teacher objects
 //     */

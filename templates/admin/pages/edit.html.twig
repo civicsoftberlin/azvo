@@ -1,5 +1,11 @@
 {% extends '@EasyAdmin/crud/new.html.twig' %}
 
+{% block content_title %}
+                <span class="icon form-fieldset-icon">
+                    <i class="ti ti-table-import"></i>
+                </span>
+                Import aus Untis (<span class="tk-text-primary">GPU014</span>)
+{% endblock %}
 
 {% block main %}
     <div class="row g-3">
@@ -9,8 +15,7 @@
             {% endblock new_form %}
         </div>
         <div class="col-lg-4">
-            <h4 class="title">Hinweise zum Export aus Untis</h4>
-            <div class="alert alert-warning">
+            <div class="alert alert-warning text-primary">
                 Nutzen Sie bitte nicht mehr das <b>UTF-8</b>-Encoding beim Export aus Untis. So werden künftig auch deutsche
                 Umlaute korrekt angezeigt.
                 <p>

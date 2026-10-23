@@ -12,6 +12,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
@@ -42,6 +44,9 @@ class UntisImportCrudController extends AbstractCrudController
             // ...
             // this will forbid to create or delete entities in the backend
             ->disable(Action::SAVE_AND_ADD_ANOTHER, Action::EDIT)
+            ->update(Crud::PAGE_NEW, Action::SAVE_AND_RETURN, function (Action $action) {
+                return $action->setLabel('Importieren');
+            })
             ;
     }
 
@@ -57,6 +62,7 @@ class UntisImportCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
+            FormField::addFieldset("Datei auswählen", "ti ti-file-type-csv"),
             TextField::new('uploadFile', 'GPUxxx.txt aus DIF-Export')
                 ->setFormType(VichFileType::class)
                 ->setFormTypeOptions([
@@ -66,6 +72,8 @@ class UntisImportCrudController extends AbstractCrudController
                 ])
                 ->setRequired(true)
                 ->setHelp('Bereits vorhandene Buchungen werden ignoriert.'),
+
+            FormField::addFieldset("Optionen", "ti ti-settings"),
             BooleanField::new('autoCreate')
         ];
     }

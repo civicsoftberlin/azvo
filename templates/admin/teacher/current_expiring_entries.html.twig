@@ -38,20 +38,23 @@
     .set('filters', filterParams)
 %}
 
-<div class=" w-100 mb-5">
-    <h6 class="">Auszugleichen bis Ende des Monats</h6>
+<div class="">
     <div class="d-flex gap-3 align-items-center justify-content-between">
-        <div class="d-flex gap-3 align-items-center">
-            <div>
-                <input id="debutat-select" class="form-control form-control-sm" name="debutat" readonly value="{{ field.value }}">
+        <div class="field-text form-group">
+            <label class="form-control-label" for="expiring-select">Auszugleichen bis Ende des Monats</label>
+            <div class="form-widget">
+                <div class="d-flex gap-3 align-items-center">
+                    <div>
+                        <input id="expiring-select" class="form-control form-control-sm" name="debutat" readonly value="{{ field.value }}">
+                    </div>
+                    <div class="btn-group">
+                        <a href="{{ myActionUrl }}" class="btn btn-secondary"><i class="ti ti-eye tk-text-primary"></i>Anzeigen</a>
+                        <a href="{{ exportActionUrl }}" class="btn btn-secondary"><i class="ti ti-file-type-xls text-success"></i>Exportieren</a>
+                    </div>
+                </div>
             </div>
-            <div class="btn-group">
-                <a href="{{ myActionUrl }}" class="btn btn-secondary"><i class="ti ti-eye tk-text-primary"></i>Anzeigen</a>
-                <a href="{{ exportActionUrl }}" class="btn btn-secondary"><i class="ti ti-file-type-xls text-success"></i>Exportieren</a>
+            <div class="d-flex gap-3 align-items-center">
             </div>
-        </div>
-        <div class="d-flex gap-3 align-items-center">
-
         </div>
     </div>
 </div>

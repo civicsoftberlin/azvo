@@ -195,7 +195,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
         if (Crud::PAGE_INDEX === $responseParameters->get('pageName')) {
             $responseParameters->set('teachers', $this->teacherRepository->findAll());
         }
-
+        $responseParameters->set('icon', 'table');
         return $responseParameters;
     }
 
@@ -257,7 +257,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
     {
         return $crud
             // Setzt die Anzahl der Einträge pro Seite auf 50
-            ->setPaginatorPageSize(50)
+            ->setPaginatorPageSize(100)
             ->overrideTemplates([
                 'crud/index' => 'admin/overtime_entries/index.html.twig',
             ])

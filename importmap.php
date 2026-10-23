@@ -28,4 +28,8 @@ return [
     '@hotwired/stimulus' => ['version' => '3.2.2'],
     '@symfony/stimulus-bundle' => ['path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js'],
     '@hotwired/turbo' => ['version' => '8.0.23'],
+    'gridjs' => ['version' => '6.2.0'],
+    'gridjs/dist/theme/mermaid.min.css' => ['version' => '6.2.0', 'type' => 'css'],
+    'tabulator-tables' => ['version' => '6.7.1'],
+    'tabulator-tables/dist/css/tabulator.min.css' => ['version' => '6.7.1', 'type' => 'css'],
 ];

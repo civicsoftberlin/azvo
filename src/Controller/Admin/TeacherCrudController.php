@@ -12,10 +12,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -46,12 +48,19 @@ class TeacherCrudController extends AbstractCrudController
         return Teacher::class;
     }
 
+    public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
+    {
+        $responseParameters->set('icon', 'school');
+        return $responseParameters;
+    }
+
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
+            ->setPaginatorPageSize(50)
             ->setDefaultSort(['shortName' => 'ASC'])
             ->overrideTemplate('crud/detail', 'admin/teacher/show.html.twig')
-            ->setPageTitle(Crud::PAGE_DETAIL, fn (Teacher $teacher) => 'Details für <span class="tk-text-primary">' . ($teacher->getShortName() ?? 'Unbekannt').'</span>')
+            ->setPageTitle(Crud::PAGE_DETAIL, fn (Teacher $teacher) => 'Details für <span class="ms-1 tk-text-primary">' . ($teacher->getShortName() ?? 'Unbekannt').'</span>')
             ->showEntityActionsInlined()
             ;
     }
@@ -100,6 +109,8 @@ class TeacherCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->onlyOnIndex(),
+
+            FormField::addFieldset("Mehr-/Minderstunden", "ti ti-clock")->onlyOnDetail(),
             TextField::new('shortName')->hideOnDetail(),
             Field::new('countCurrentMonthOvertimeEntries','')
                 ->setTemplatePath('admin/teacher/current_overtime_entries.html.twig')
@@ -107,9 +118,13 @@ class TeacherCrudController extends AbstractCrudController
             Field::new('countLastMonthOvertimeEntries','')
                 ->setTemplatePath('admin/teacher/last_overtime_entries.html.twig')
                 ->onlyOnDetail()->setLabel(false),
+
+            FormField::addFieldset("Diesen Monat ablaufende Mehrstunden", "ti ti-alert-triangle")->onlyOnDetail()->setCssClass("icon-warning"),
             Field::new('countCurrentExpiringEntries','')
                 ->setTemplatePath('admin/teacher/current_expiring_entries.html.twig')
                 ->onlyOnDetail()->setLabel(false),
+
+            FormField::addFieldset("erweiterter Export", "ti ti-table-export")->onlyOnDetail(),
             AssociationField::new('teacherDebutats')
                 ->setLabel("")
                 ->setTemplatePath('admin/teacher/debutats.html.twig')

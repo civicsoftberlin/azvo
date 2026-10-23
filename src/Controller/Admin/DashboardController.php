@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\EntryType;
 use App\Entity\UntisImport;
+use App\Repository\TeacherRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -16,37 +17,19 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[AdminDashboard(routePath: '/admin', routeName: 'admin_dashboard')]
 class DashboardController extends AbstractDashboardController
 {
+    private TeacherRepository $teacherRepository;
+
+    public function __construct(TeacherRepository $repository)
+    {
+        $this->teacherRepository = $repository;
+    }
+
     public function index(): Response
     {
-        //return parent::index();
-
-        // Option 1. You can make your dashboard redirect to some common page of your backend
-        //
-        // return $this->redirectToRoute('admin_user_index');
-
-        // Option 2. You can make your dashboard redirect to different pages depending on the user
-        //
-        // if ('jane' === $this->getUser()->getUsername()) {
-        //     return $this->redirectToRoute('...');
-        // }
-
-        // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
-        // (tip: it's easier if your template extends from @EasyAdmin/page/content.html.twig)
-        //
+        $teachers = $this->teacherRepository->findAll();
         return $this->render('admin/dashboard.html.twig',[
-            'my_own_data' => [
-                ['a' => 'abc', 'b' => 'def'],
-                ['a' => 'abc', 'b' => 'def'],
-                ['a' => 'abc', 'b' => 'def'],
-                ['a' => 'abc', 'b' => 'def'],
-                ['a' => 'abc', 'b' => 'def'],
-                ['a' => 'abc', 'b' => 'def'],
-                ['a' => 'abc', 'b' => 'def'],
-                ['a' => 'abc', 'b' => 'def'],
-                ['a' => 'abc', 'b' => 'def'],
-                ['a' => 'abc', 'b' => 'def'],
-                ['a' => 'abc', 'b' => 'def'],
-            ]
+            'icon' => "clock",
+            'teachers' => $teachers,
         ]);
     }
 
@@ -70,7 +53,7 @@ class DashboardController extends AbstractDashboardController
                     ]);
                 }
             }
-            $userMenu->addMenuItems([$subMenu]);
+            //$userMenu->addMenuItems([$subMenu]);
         }
 
         return $userMenu;
@@ -96,11 +79,10 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(OvertimeEntryCrudController::class, 'OvertimeEntry', 'ti ti-calendar');
 
         yield MenuItem::section('Settings', 'ti ti-settings');
-
         yield MenuItem::linkTo(TeacherDebutatCrudController::class, 'Debutats', 'ti ti-calendar');
-        yield MenuItem::linkTo(EntryTypeCrudController::class, 'Entry Types', 'ti ti-tag');
-        yield MenuItem::linkTo(UserCrudController::class, 'Users', 'ti ti-user');
-        yield MenuItem::linkTo(AzVoCrudController::class, 'AzVo', 'ti ti-section-sign');
+        //yield MenuItem::linkTo(EntryTypeCrudController::class, 'Entry Types', 'ti ti-tag');
+        //yield MenuItem::linkTo(UserCrudController::class, 'Users', 'ti ti-user');
+        //yield MenuItem::linkTo(AzVoCrudController::class, 'AzVo', 'ti ti-section-sign');
 
     }
 

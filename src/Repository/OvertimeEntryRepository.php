@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\OvertimeEntry;
+use App\Entity\Teacher;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,14 +17,18 @@ class OvertimeEntryRepository extends ServiceEntityRepository
         parent::__construct($registry, OvertimeEntry::class);
     }
 
-    public function sumAmountByPeriod(\DateTime $startDate, \DateTime $endDate): int
+    public function sumAmountByPeriod(\DateTime $startDate, \DateTime $endDate, Teacher $teacher): int
     {
         $result = $this->createQueryBuilder('e')
             ->select('SUM(e.amount) as totalAmount')
-            ->andWhere('e.incidentDate > :startDate')
+            ->andWhere('e.incidentDate >= :startDate')
             ->andWhere('e.incidentDate < :endDate')
+            ->andWhere('e.teacher = :teacher')
+            ->andWhere('e.comment != :comment OR e.comment IS NULL')
             ->setParameter('startDate', $startDate->format('Y-m-d'))
             ->setParameter('endDate', $endDate->format('Y-m-d'))
+            ->setParameter('teacher', $teacher)
+            ->setParameter('comment', "CARRYOVER")
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -93,6 +98,29 @@ class OvertimeEntryRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         return $count > 0;
+    }
+
+    /**
+     * @param Teacher $teacher
+     * @param string $fromDate
+     * @param string $toDate
+     * @return OvertimeEntry[]
+     */
+    public function getEntriesWithinPeriod(
+        Teacher $teacher,
+        string $fromDate,
+        string $toDate
+    ): array {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.teacher = :teacherId')
+            ->andWhere('e.incidentDate >= :fromDate')
+            ->andWhere('e.incidentDate < :toDate')
+            ->setParameter('teacherId', $teacher->getId())
+            ->setParameter('fromDate', $fromDate)
+            ->setParameter('toDate', $toDate)
+            ->orderBy('e.incidentDate', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
 

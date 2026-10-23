@@ -1,10 +1,11 @@
 /* === EASYADMIN 4: STICKY HEADER + SIDEBAR === */
 
 @import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
+@import url('https://unpkg.com/tabulator-tables/dist/css/tabulator_bootstrap5.min.css');
 
 thead {
     position: sticky!important;
-    top: 140px!important;
+    top: 130px!important;
     z-index: 1020!important;
 }
 
@@ -42,7 +43,7 @@ tbody > tr, tbody > tr > td {
 
 .content-header {
     position: sticky !important;
-    top: 57px !important; /* Höhe von .content-top - anpassen falls nötig */
+    top: 40px !important; /* Höhe von .content-top - anpassen falls nötig */
     z-index: 1025 !important;
     background-color: var(--body-bg, #fff) !important;
     margin-bottom: 1.5rem !important;
@@ -95,4 +96,63 @@ html, body {
     border-top: 2px solid var(--ea-primary)!important;
 }
 
+.tabulator-row:nth-child(even):not(:hover) {
+    background-color: transparent !important;
+}
 
+.is-critical > td, .is-critical {
+    background-color: #ffebee!important;
+}
+
+.is-critical:has(td:hover) > td, .is-critical:hover {
+    background-color: #ffcdd2 !important;
+}
+
+.is-neutral > td, .is-neutral {
+    background-color: #e8f5e9!important;
+}
+
+.is-neutral:has(td:hover) > td, .is-neutral:hover {
+    background-color: #c8e6c9 !important;
+}
+
+.is-warning > td {
+    background-color: #fff8e1!important;
+}
+
+.is-warning:has(td:hover) > td {
+    background-color: #ffecb3 !important;
+}
+
+.table-custom  th {
+    font-weight: normal;
+    box-shadow: inset 0 -2px 0 var(--table-cell-border-color);
+}
+
+.table-custom {
+    border-spacing: 0;
+    color: var(--table-cell-color);
+}
+
+.table-custom > thead  {
+    color: var(--table-thead-color);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-snug);
+    white-space: nowrap;
+}
+
+.icon-danger .icon {
+    color: var(--color-danger);
+}
+
+.icon-warning .icon {
+    color: var(--color-warning);
+}
+
+.icon-success .icon {
+    color: var(--color-success);
+}
+
+.icon-primary .icon {
+    color: var(--color-primary);
+}
