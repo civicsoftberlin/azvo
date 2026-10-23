@@ -243,13 +243,13 @@ class OvertimeEntryCrudController extends AbstractCrudController
             TextField::new('reason'),
             TextField::new('untisComment'),
             NumberField::new('amount'),
-            DateField::new('expiresAt'),
-            DateField::new('invalidatedAt'),
-            AssociationField::new('invalidatedBy'),
+            DateField::new('expiresAt')->formatValue(fn ($value) => $value instanceof \DateTime ? $value->format('d.m.Y') : ''),
+            DateField::new('invalidatedAt')->formatValue(fn ($value) => $value instanceof \DateTime ? $value->format('d.m.Y') : ''),
+            AssociationField::new('invalidatedBy')->formatValue(fn ($value) => $value ?? ''),
 
             //DateField::new('createdAt'),
             //AssociationField::new('createdBy'),
-            TextField::new('comment'),
+            TextField::new('comment')->formatValue(fn ($value) => $value ?? ''),
         ];
     }
 
@@ -267,7 +267,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
                 'class' => 'DESC',
                 'courseHour' => 'DESC',
             ])
-            ->setHelp('index', '...')
+            ->setHelp('index', 'Export ist für die Monatsansicht optimiert. Zeitspannen (Schuljahre) bitte über das Stundendeputat exportieren.')
             ;
     }
 
