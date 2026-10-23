@@ -9,8 +9,10 @@ use App\Repository\TeacherRepository;
 use App\Service\ExcelExportService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\ActionGroup;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -19,6 +21,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Event\AfterCrudActionEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\FieldFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\FilterFactory;
@@ -393,5 +397,24 @@ class OvertimeEntryCrudController extends AbstractCrudController
         $filename = date('ymd'). "-$teacherName$forDate-Arbeitszeitkonto" . '.xlsx';
 
         return $this->exportService->createXlsxResponse($columns, $rows, $filename);
+    }
+
+
+    public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
+    {
+        $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
+        $request = $this->getContext()->getRequest();
+        $query = $request->query->all();
+        $hasMonthFilter = isset($query['filters']['incidentDateMonth']);
+        $hasYearFilter = isset($query['filters']['incidentDateYear']);
+        if (!$hasMonthFilter && !$hasYearFilter) {
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->neq('entity.comment', ':carryover'),
+                    $qb->expr()->isNull('entity.comment')
+                )
+            )->setParameter('carryover', 'CARRYOVER');
+        }
+        return $qb;
     }
 }
