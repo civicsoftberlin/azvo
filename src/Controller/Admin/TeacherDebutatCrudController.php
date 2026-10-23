@@ -83,7 +83,7 @@ class TeacherDebutatCrudController extends AbstractCrudController
                     ->set('validFrom', $date)
                     ->generateUrl();
                 $exportActionGroup->addAction(
-                    Action::new("export_$year", "$year/" . ($year + 1))
+                    Action::new("export_$year", "$year/" . substr($year + 1, 2, 2) % 100)
                         ->linkToUrl($url)
                 );
             }

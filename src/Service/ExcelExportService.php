@@ -136,29 +136,6 @@ class ExcelExportService
                     ],
                 ];
 
-                // 1. Spalte: Beschriftung
-                if ($index === 0) {
-                    $value = 'Deputat:';
-                    $styleArray = [
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
-                        'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['argb' => 'FFE0E0E0'],
-                    ],
-                    ];
-                }
-                // 2. Ziel-Spalte: Hier z.B. die "Differenz"-Spalte (Index 6 in deinem vorherigen Array)
-                // ODER eine extra Spalte, die du dafür vorgesehen hast.
-                if ($index === 1) {
-                    // HIER KANNST DU DEINE PRO-RATA-LOGIK EINBAUEN!
-                    // Beispiel: Basis-Stunden minus Ermäßigung
-                    $sollStunden = $teacherDebutat->getDebutat() - $teacherDebutat->getDiscount();
-                    $value = $sollStunden;
-                    $styleArray = [
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]
-                    ];
-                }
-
                 if ($index === 5) {
                     $value = 'Pflichtstunden:';
                     $styleArray = [
@@ -203,6 +180,27 @@ class ExcelExportService
                     ],
                 ];
 
+                if ($index === 0) {
+                    $value = 'Deputat:';
+                    $styleArray = [
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
+                        'fill' => [
+                            'fillType' => Fill::FILL_SOLID,
+                            'startColor' => ['argb' => 'FFE0E0E0'],
+                        ],
+                    ];
+                }
+                // 2. Ziel-Spalte: Hier z.B. die "Differenz"-Spalte (Index 6 in deinem vorherigen Array)
+                // ODER eine extra Spalte, die du dafür vorgesehen hast.
+                if ($index === 1) {
+                    // HIER KANNST DU DEINE PRO-RATA-LOGIK EINBAUEN!
+                    // Beispiel: Basis-Stunden minus Ermäßigung
+                    $sollStunden = $teacherDebutat->getDebutat() - $teacherDebutat->getDiscount();
+                    $value = $sollStunden;
+                    $styleArray = [
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]
+                    ];
+                }
 
                 if ($index === 5) {
                     $value = 'Summe:';

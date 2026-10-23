@@ -2,13 +2,16 @@
 
 namespace App\Entity;
 
+use App\Constants\Debutat;
 use App\Repository\TeacherRepository;
 use DateMalformedStringException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use SortDirection;
 
 #[ORM\Entity(repositoryClass: TeacherRepository::class)]
 class Teacher
@@ -222,6 +225,15 @@ class Teacher
         ;
         $entries = $this->overtimeEntries->matching($criteria);
         return $entries->count();
+    }
+
+    public function getLastDeputat(): ?TeacherDebutat
+    {
+        $criteria = Criteria::create()
+            ->orderBy([
+                "validFrom" => SortDirection::Ascending,
+            ]);
+        return $this->teacherDebutats->matching($criteria)->last();
     }
 
     public function addOvertimeEntry(OvertimeEntry $overtimeEntry): static

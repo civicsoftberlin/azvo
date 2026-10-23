@@ -27,6 +27,7 @@ class TeacherDebutatRepository extends ServiceEntityRepository
         $result = $this->createQueryBuilder('td')
             ->select('DISTINCT td.validFrom')
             ->orderBy('td.validFrom', 'DESC')
+            ->setMaxResults(5)
             ->getQuery()
             ->getScalarResult();
 
