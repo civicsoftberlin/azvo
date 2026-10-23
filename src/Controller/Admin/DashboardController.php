@@ -62,7 +62,7 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Arbeitszeitkonten')
+            ->setTitle('<div class="d-flex align-items-center gap-2"><img src="/logo.svg" height="18px" alt="Logo"><span class="fw-bold tk-text-primary">LZM</span></div><div class="small text-muted">LehrZeitManagement</div>')
             ->setFaviconPath('logo.svg')
             ;
     }
@@ -77,9 +77,10 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Accounts', 'ti ti-clock-hour-4');
         yield MenuItem::linkTo(TeacherCrudController::class, 'Teachers', 'ti ti-school');
         yield MenuItem::linkTo(OvertimeEntryCrudController::class, 'OvertimeEntry', 'ti ti-calendar');
+        yield MenuItem::linkTo(TeacherDebutatCrudController::class, 'Debutat', 'ti ti-calendar');
 
-        yield MenuItem::section('Settings', 'ti ti-settings');
-        yield MenuItem::linkTo(TeacherDebutatCrudController::class, 'Debutats', 'ti ti-calendar');
+        //yield MenuItem::section('Settings', 'ti ti-settings');
+
         //yield MenuItem::linkTo(EntryTypeCrudController::class, 'Entry Types', 'ti ti-tag');
         //yield MenuItem::linkTo(UserCrudController::class, 'Users', 'ti ti-user');
         //yield MenuItem::linkTo(AzVoCrudController::class, 'AzVo', 'ti ti-section-sign');

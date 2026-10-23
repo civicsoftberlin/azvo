@@ -96,6 +96,7 @@ class TeacherCrudController extends AbstractCrudController
             ->remove(Crud::PAGE_INDEX, Action::BATCH_DELETE)
             ->remove(Crud::PAGE_INDEX, Action::DELETE)
             ->remove(Crud::PAGE_DETAIL, Action::DELETE)
+            ->remove(Crud::PAGE_DETAIL, Action::EDIT)
 
 
             //->add(Crud::PAGE_DETAIL, $showOvertimes)
