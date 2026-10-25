@@ -86,12 +86,18 @@ html, body {
 }
 
 .table-info {
-    border-top: 2px solid var(--color-primary)!important;
+    background-color: var(--body-bg) !important;
+    box-shadow: inset 0 2px 0 var(--table-cell-border-color);
+}
+
+.table-info tr {
+    border: none!important;
 }
 
 .table-info td {
     font-weight: bold;
-    border-top: 2px solid var(--color-primary)!important;
+    border: none!important;
+    box-shadow: none!important;
 }
 
 .tabulator-row:nth-child(even):not(:hover) {

@@ -56,7 +56,10 @@
 
 {% block table_body %}
     {{ parent() }}
+{% endblock %}
 
+{% block table_footer %}
+    <tfoot class="sticky-bottom table-info"  style="z-index: 100000; bottom:50px">
     {% if entities|length > 0 %}
         {% set totalOvertime = 0 %}
         {% set totalEntries = 0 %}
@@ -66,8 +69,7 @@
             {% set entry = entityDto.instance %}
             {% set totalOvertime = totalOvertime + entry.getAmount %}
         {% endfor %}
-
-        <tr class="table-info {{ totalOvertime > 0 ? 'is-warning' : (totalOvertime < 0 ? 'is-critical' : 'is-neutral') }}">
+        <tr class="{{ totalOvertime > 0 ? 'is-warning' : (totalOvertime < 0 ? 'is-critical' : 'is-neutral') }}">
             <td  class="text-start">Anzahl</td>
             <td>
                 <span class="">{{ entities|length }}</span>
@@ -82,4 +84,5 @@
             <td colspan="6" class="text-end"></td>
         </tr>
     {% endif %}
+    </tfoot>
 {% endblock %}
