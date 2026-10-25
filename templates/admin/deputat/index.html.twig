@@ -7,7 +7,7 @@
             {# Basis-URL ohne Teacher-Filter erstellen #}
             {% set baseUrl = ea_url().unset('filters[teacher]') %}
 
-            <select class="ms-2 form-select form-select-sm"
+            <select class="ms-2 form-select form-select-sm tk-border-primary rounded-3"
                     style="width: auto; min-width: 180px;"
                     onchange="if(this.value) { window.location.href = this.value; } else {
                         window.location.href = '{{ baseUrl }}';

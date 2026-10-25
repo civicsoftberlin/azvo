@@ -73,7 +73,8 @@ class TeacherDebutatCrudController extends AbstractCrudController
         $dates = $this->teacherDebutatRepository->findDistinctValidFromDates();
 
         if (!empty($dates)) {
-            $exportActionGroup = ActionGroup::new("batchExport","SchoolYear Export", "ti ti-table-export")
+            $exportActionGroup = ActionGroup::new("batchExport","SchoolYear Export", "ti ti-file-type-xls")
+                ->addCssClass('icon-success')
                 ->createAsGlobalActionGroup();
             foreach ($dates as $date) {
                 $year = (int) DateTime::createFromFormat("Y-m-d", $date)->format('Y');
@@ -95,7 +96,6 @@ class TeacherDebutatCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->showEntityActionsInlined()
             ->setPaginatorPageSize(100)
             ->setHelp(Crud::PAGE_INDEX, "Export gilt immer für alle Lehrkräfte im zutreffenden Zeitraum.")
             ->overrideTemplates([

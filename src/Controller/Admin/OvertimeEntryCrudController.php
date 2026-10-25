@@ -117,8 +117,14 @@ class OvertimeEntryCrudController extends AbstractCrudController
             $newDate = $date->modify(($direction > 0 ? '+' : '') . $direction . ' month');
 
             // 3. Neue Filter-Werte setzen
-            $filters['incidentDateMonth'] = (int) $newDate->format('n'); // ohne führende Null für EasyAdmin
-            $filters['incidentDateYear'] = (int) $newDate->format('Y');
+            if ($direction == 0 and
+                array_key_exists('incidentDateMonth', $filters) and
+                array_key_exists('incidentDateYear', $filters)) {
+                unset($filters['incidentDateMonth'], $filters['incidentDateYear']);
+            } else {
+                $filters['incidentDateMonth'] = (int) $newDate->format('n');
+                $filters['incidentDateYear'] = (int) $newDate->format('Y');
+            }
 
             // 4. Query-String neu aufbauen (behält ALLE anderen Filter wie 'teacher' bei!)
             $queryParams = $request->query->all();
@@ -162,9 +168,9 @@ class OvertimeEntryCrudController extends AbstractCrudController
             })
             ->createAsGlobalAction();
 
-        $exportAction = Action::new('export', 'Excel Export', 'ti ti-file-type-xls')
+        $exportAction = Action::new('export', 'Ansicht exportieren', 'ti ti-file-type-xls')
             ->linkToCrudAction('exportExcel')
-            ->setCssClass("btn-success")
+            ->setCssClass("icon-success")
             ->createAsGlobalAction();
 
         $teacherAction = Action::new('teacher', 'Teacher', 'fa fa-users')

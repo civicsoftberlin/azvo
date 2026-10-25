@@ -80,13 +80,18 @@ html, body {
     fill: var(--color-primary) !important;
 }
 
+.tk-border-primary {
+    border: 1px solid var(--color-primary) !important;
+    background-color: color-mix(in srgb, var(--color-primary) 20%, transparent) !important;
+}
+
 .table-info {
-    border-top: 2px solid var(--ea-primary)!important;
+    border-top: 2px solid var(--color-primary)!important;
 }
 
 .table-info td {
     font-weight: bold;
-    border-top: 2px solid var(--ea-primary)!important;
+    border-top: 2px solid var(--color-primary)!important;
 }
 
 .tabulator-row:nth-child(even):not(:hover) {
