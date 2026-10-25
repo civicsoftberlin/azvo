@@ -29,6 +29,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Event\AfterCrudActionEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\FieldFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\FilterFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
@@ -186,7 +187,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
         return $actions
             // ...
             // this will forbid to create or delete entities in the backend
-            ->disable(Action::SAVE_AND_ADD_ANOTHER, Action::EDIT, Action::DELETE, Action::NEW)
+            ->disable(Action::SAVE_AND_ADD_ANOTHER, Action::DELETE, Action::NEW)
 
             ->add(Crud::PAGE_INDEX, $exportAction)
             ->add(Crud::PAGE_INDEX, $nextYearAction)
@@ -268,6 +269,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
             //DateField::new('createdAt'),
             //AssociationField::new('createdBy'),
             TextField::new('comment')->formatValue(fn ($value) => $value ?? ''),
+            BooleanField::new('malus')->formatValue(fn ($value) => $value ?? '0'),
         ];
     }
 

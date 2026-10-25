@@ -73,6 +73,9 @@ class OvertimeEntry
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $untisComment = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $malus = null;
+
     public function __toString(): string
     {
         return (string) $this->id;
@@ -288,6 +291,18 @@ class OvertimeEntry
     public function setUntisComment(?string $untisComment): static
     {
         $this->untisComment = $untisComment;
+
+        return $this;
+    }
+
+    public function isMalus(): ?bool
+    {
+        return $this->malus;
+    }
+
+    public function setMalus(?bool $malus): static
+    {
+        $this->malus = $malus;
 
         return $this;
     }
