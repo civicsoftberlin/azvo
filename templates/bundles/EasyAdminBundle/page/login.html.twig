@@ -1,0 +1,24 @@
+{% extends '@!EasyAdmin/page/login.html.twig' %}
+
+
+{% block header_logo %}
+    <div class="d-flex align-items-center gap-2">
+        <img src="/logo.svg" height="18px" alt="Logo">
+        <span class="fw-bold tk-text-primary">LZM</span>
+    </div>
+    <div class="small text-muted">LehrZeitManagement</div>
+{% endblock %}
+
+
+{% block wrapper_wrapper %}
+    {{ parent() }}
+
+    {% if 'now'|date('Y') > 2026 %}
+        {% set current_date = '2026-' ~ 'now'|date('Y') %}
+    {% else %}
+        {% set current_date = '2026' %}
+    {% endif %}
+    <div class="login-footer-custom text-center mt-4">
+        <p>&copy;{{ current_date }} Benjamin Wagner. Alle Rechte vorbehalten.</p>
+    </div>
+{% endblock %}

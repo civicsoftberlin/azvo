@@ -21,7 +21,7 @@ class SecurityController extends AbstractController
             'last_username' => $lastUsername,
             'translation_domain' => 'admin',
             'favicon_path' => '/logo.svg',
-            'page_title' => '<div class="d-flex align-items-center gap-2"><img src="/logo.svg" height="18px" alt="Logo"><span class="fw-bold tk-text-primary">LZM</span></div><div class="small text-muted">LehrZeitManagement</div>',
+            'page_title' => 'Login | LZM',
             'csrf_token_intention' => 'authenticate',
             'action' => $this->generateUrl('login'),
             'target_path' => $this->generateUrl('admin_dashboard'),

@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -48,6 +49,15 @@ class UntisImportCrudController extends AbstractCrudController
                 return $action->setLabel('Importieren');
             })
             ;
+    }
+
+    public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
+    {
+        if (Crud::PAGE_NEW === $responseParameters->get('pageName')) {
+            $responseParameters->set('page_title', 'Daten aus Untis importieren');
+        }
+        $responseParameters->set('icon', 'table-import');
+        return $responseParameters;
     }
 
     public function configureCrud(Crud $crud): Crud

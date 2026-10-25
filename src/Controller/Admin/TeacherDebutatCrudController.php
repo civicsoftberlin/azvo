@@ -111,6 +111,23 @@ class TeacherDebutatCrudController extends AbstractCrudController
         // Daten nur auf der Index-Seite laden
         if (Crud::PAGE_INDEX === $responseParameters->get('pageName')) {
             $responseParameters->set('teachers', $this->teacherRepository->findAll());
+            $responseParameters->set('page_title', 'Stundendeputat');
+            $filters = $this->getContext()->getRequest()->query->all('filters');
+            if (!empty($filters['teacher'])) {
+                $teacher = $this->teacherRepository->find($filters['teacher']['value']);
+                $responseParameters->set('page_title', sprintf('Stundendeputat für %s', $teacher));
+            }
+        }
+        if (Crud::PAGE_DETAIL === $responseParameters->get('pageName')) {
+            $teacher = $this->getContext()->getEntity()->getInstance()->getTeacher();
+            $responseParameters->set('page_title', sprintf('Details für %s', $teacher));
+        }
+        if (Crud::PAGE_EDIT === $responseParameters->get('pageName')) {
+            $teacher = $this->getContext()->getEntity()->getInstance()->getTeacher();
+            $responseParameters->set('page_title', sprintf('Stundendeputat für %s bearbeiten', $teacher));
+        }
+        if (Crud::PAGE_NEW === $responseParameters->get('pageName')) {
+            $responseParameters->set('page_title', 'Neues Stundendeputat erzeugen');
         }
         $responseParameters->set('icon', 'calendar');
 

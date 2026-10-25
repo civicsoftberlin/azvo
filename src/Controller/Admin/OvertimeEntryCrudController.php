@@ -202,8 +202,18 @@ class OvertimeEntryCrudController extends AbstractCrudController
         // Daten nur auf der Index-Seite laden
         if (Crud::PAGE_INDEX === $responseParameters->get('pageName')) {
             $responseParameters->set('teachers', $this->teacherRepository->findAll());
+            $responseParameters->set('page_title', 'Stundenkonto');
+            $filters = $this->getContext()->getRequest()->query->all('filters');
+            if (!empty($filters['teacher'])) {
+                $teacher = $this->teacherRepository->find($filters['teacher']['value']);
+                $responseParameters->set('page_title', sprintf('Stundenkonto für %s', $teacher));
+            }
+        }
+        if (Crud::PAGE_DETAIL === $responseParameters->get('pageName')) {
+            $responseParameters->set('page_title', sprintf('Stundenkonto für %s', $responseParameters->get('name')));
         }
         $responseParameters->set('icon', 'table');
+
         return $responseParameters;
     }
 

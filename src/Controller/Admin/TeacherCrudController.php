@@ -33,14 +33,14 @@ class TeacherCrudController extends AbstractCrudController
     private TeacherDebutatRepository $debutatRepository;
 
     public function __construct(private readonly AdminUrlGenerator $urlGenerator,
-                                ExcelExportService $exportService,
-                                OvertimeEntryRepository $entryRepository,
-                                TeacherDebutatRepository $teacherRepository,
+                                ExcelExportService                 $exportService,
+                                OvertimeEntryRepository            $entryRepository,
+                                TeacherDebutatRepository           $teacherDebutatRepository
     )
     {
         $this->exportService = $exportService;
         $this->entryRepository = $entryRepository;
-        $this->debutatRepository = $teacherRepository;
+        $this->debutatRepository = $teacherDebutatRepository;
     }
 
     public static function getEntityFqcn(): string
@@ -50,6 +50,15 @@ class TeacherCrudController extends AbstractCrudController
 
     public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
     {
+        if (Crud::PAGE_INDEX === $responseParameters->get('pageName')) {
+            $responseParameters->set('page_title', 'Alle Lehrkräfte');
+        }
+        if (Crud::PAGE_DETAIL === $responseParameters->get('pageName')) {
+            $responseParameters->set('page_title', sprintf('Details für %s', $this->getContext()->getEntity()));
+        }
+        if (Crud::PAGE_NEW === $responseParameters->get('pageName')) {
+            $responseParameters->set('page_title', 'Neue Lehrkraft erzeugen');
+        }
         $responseParameters->set('icon', 'school');
         return $responseParameters;
     }

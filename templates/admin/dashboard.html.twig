@@ -1,5 +1,9 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
+{% block page_title %}
+    Stundenkonten <span class="ms-2 tk-text-primary">{{ "now"|format_datetime(date_format='none', time_format='none', locale='de', pattern='MMMM Y') }}</span>
+{% endblock %}
+
 {% block content_title %}
     Stundenkonten <span class="ms-2 tk-text-primary">{{ "now"|format_datetime(date_format='none', time_format='none', locale='de', pattern='MMMM Y') }}</span>
 {% endblock %}
@@ -11,68 +15,214 @@
 
 {% block main %}
     <div class="">
-        <table id="" class="table table-custom align-middle">
-            <thead>
-            <tr>
-                <th style="width: 100px">ID</th>
-                <th style="width: 200px">Lehrkraft</th>
-                <th style="width: 200px" class="text-end">Minder-/Mehrstunden</th>
-                <th style="width: 200px" class="text-end">Vormonat</th>
-                <th style="width: 200px" class="text-end">Auszugleichen</th>
-                <th class="text-end"></th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for teacher in teachers|sort((a, b) => a.countCurrentMonthOvertimeEntries <=> b.countCurrentMonthOvertimeEntries) %}
-                {% set diff = teacher.countCurrentMonthOvertimeEntries %}
-                {% set filterParams = {
-                    'teacher': {
-                        'comparison': '=',
-                        'value': teacher.id
-                    },
-                    'incidentDateMonth' : "now"|date('n'),
-                    'incidentDateYear' : "now"|date('Y'),
-                } %}
-                {% set viewUrl = ea_url()
-                    .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
-                    .setAction('index')
-                    .set('filters', filterParams)
-                %}
-                {% set detailUrl = ea_url()
-                    .setController('App\\Controller\\Admin\\TeacherCrudController')
-                    .setAction('detail')
-                    .set('entityId', teacher.id)
-                %}
-                {% set detailUrlB = ea_url()
-                    .setController('App\\Controller\\Admin\\TeacherCrudController')
-                    .setAction('detail')
-                    .set('entityId', teacher.id)
-                %}
-                {% set exportUrl = ea_url()
-                    .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
-                    .setAction('exportExcel')
-                    .set('filters', filterParams)
-                %}
-                {# 2. Klasse basierend auf dem Wert bestimmen #}
-                {% set rowClass = diff < 0 ? 'is-critical' : (diff == 0 ? 'is-neutral' : 'is-warning') %}
+        {% set successBadge = component('ea:Badge', { type: 'success', content: '4' }) %}
+        <twig:ea:Tabs>
+            <twig:ea:Tabs:Item paneId="tab-critical" label="Minderstunden" errorCount="{{ teachers|filter(e => e.countCurrentMonthOvertimeEntries < 0)|length }}" icon="ti ti-clock-down" active/>
+            <twig:ea:Tabs:Item paneId="tab-warning" label="Mehrstunden <span class='badge badge-warning'>{{ teachers|filter(e => e.countCurrentMonthOvertimeEntries > 0)|length }}</span>" icon="ti ti-clock-up"/>
+            <twig:ea:Tabs:Item paneId="tab-neutral" label="Ausgeglichen <span class='badge badge-success'>{{ teachers|filter(e => e.countCurrentMonthOvertimeEntries == 0)|length }}</span>" icon="ti ti-clock-check" />
+        </twig:ea:Tabs>
 
-                <tr class="{{ rowClass }}">
-                    <td>{{ teacher.id }}</td>
-                    <td class=""><a href="{{ detailUrl }}">{{ teacher.shortName }}</a></td>
-                    <td class="text-end">{{ diff }}</td>
-                    <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
-                    <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
-                    <td class="text-end actions">
-                        <a href="{{ detailUrlB }}" class="btn btn-secondary me-3"><i class="ti ti-school tk-text-primary"></i>
-                            <span class="btn-label"><span class="action-label">Details</span></span>
-                        </a>
-                        <a href="{{ viewUrl }}" class="btn btn-secondary"><i class="ti ti-table tk-text-primary"></i>Anzeigen</a>
-                        <a href="{{ exportUrl }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Exportieren</a>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab-critical">
+                <table id="" class="table table-custom align-middle">
+                    <thead>
+                    <tr>
+                        <th style="width: 100px">ID</th>
+                        <th style="width: 200px">Lehrkraft</th>
+                        <th style="width: 200px" class="text-end">Minder-/Mehrstunden</th>
+                        <th style="width: 200px" class="text-end">Vormonat</th>
+                        <th style="width: 200px" class="text-end">Auszugleichen</th>
+                        <th class="text-end"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for teacher in teachers|sort((a, b) => a.countCurrentMonthOvertimeEntries <=> b.countCurrentMonthOvertimeEntries) |filter(e => e.countCurrentMonthOvertimeEntries < 0)%}
+                        {% set diff = teacher.countCurrentMonthOvertimeEntries %}
+                        {% if diff > 0 %}
+                        {% endif %}
+                        {% set filterParams = {
+                            'teacher': {
+                                'comparison': '=',
+                                'value': teacher.id
+                            },
+                            'incidentDateMonth' : "now"|date('n'),
+                            'incidentDateYear' : "now"|date('Y'),
+                        } %}
+                        {% set viewUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+                            .setAction('index')
+                            .set('filters', filterParams)
+                        %}
+                        {% set detailUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\TeacherCrudController')
+                            .setAction('detail')
+                            .set('entityId', teacher.id)
+                        %}
+                        {% set detailUrlB = ea_url()
+                            .setController('App\\Controller\\Admin\\TeacherCrudController')
+                            .setAction('detail')
+                            .set('entityId', teacher.id)
+                        %}
+                        {% set exportUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+                            .setAction('exportExcel')
+                            .set('filters', filterParams)
+                        %}
+                        {# 2. Klasse basierend auf dem Wert bestimmen #}
+                        {% set rowClass = diff < 0 ? 'is-critical' : (diff == 0 ? 'is-neutral' : 'is-warning') %}
+
+                        <tr class="">
+                            <td>{{ teacher.id }}</td>
+                            <td class=""><a href="{{ detailUrl }}">{{ teacher.shortName }}</a></td>
+                            <td class="text-end">{{ diff }}</td>
+                            <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
+                            <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
+                            <td class="text-end actions">
+                                <a href="{{ detailUrlB }}" class="btn btn-secondary me-3"><i class="ti ti-school tk-text-primary"></i>
+                                    <span class="btn-label"><span class="action-label">Details</span></span>
+                                </a>
+                                <a href="{{ viewUrl }}" class="btn btn-secondary"><i class="ti ti-table tk-text-primary"></i>Anzeigen</a>
+                                <a href="{{ exportUrl }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Exportieren</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane" id="tab-warning">
+                <table id="" class="table table-custom align-middle">
+                    <thead>
+                    <tr>
+                        <th style="width: 100px">ID</th>
+                        <th style="width: 200px">Lehrkraft</th>
+                        <th style="width: 200px" class="text-end">Minder-/Mehrstunden</th>
+                        <th style="width: 200px" class="text-end">Vormonat</th>
+                        <th style="width: 200px" class="text-end">Auszugleichen</th>
+                        <th class="text-end"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for teacher in teachers|sort((a, b) => a.countCurrentMonthOvertimeEntries <=> b.countCurrentMonthOvertimeEntries) |filter(e => e.countCurrentMonthOvertimeEntries > 0)%}
+                        {% set diff = teacher.countCurrentMonthOvertimeEntries %}
+                        {% if diff > 0 %}
+                        {% endif %}
+                        {% set filterParams = {
+                            'teacher': {
+                                'comparison': '=',
+                                'value': teacher.id
+                            },
+                            'incidentDateMonth' : "now"|date('n'),
+                            'incidentDateYear' : "now"|date('Y'),
+                        } %}
+                        {% set viewUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+                            .setAction('index')
+                            .set('filters', filterParams)
+                        %}
+                        {% set detailUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\TeacherCrudController')
+                            .setAction('detail')
+                            .set('entityId', teacher.id)
+                        %}
+                        {% set detailUrlB = ea_url()
+                            .setController('App\\Controller\\Admin\\TeacherCrudController')
+                            .setAction('detail')
+                            .set('entityId', teacher.id)
+                        %}
+                        {% set exportUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+                            .setAction('exportExcel')
+                            .set('filters', filterParams)
+                        %}
+                        {# 2. Klasse basierend auf dem Wert bestimmen #}
+                        {% set rowClass = diff < 0 ? 'is-critical' : (diff == 0 ? 'is-neutral' : 'is-warning') %}
+
+                        <tr class="">
+                            <td>{{ teacher.id }}</td>
+                            <td class=""><a href="{{ detailUrl }}">{{ teacher.shortName }}</a></td>
+                            <td class="text-end">{{ diff }}</td>
+                            <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
+                            <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
+                            <td class="text-end actions">
+                                <a href="{{ detailUrlB }}" class="btn btn-secondary me-3"><i class="ti ti-school tk-text-primary"></i>
+                                    <span class="btn-label"><span class="action-label">Details</span></span>
+                                </a>
+                                <a href="{{ viewUrl }}" class="btn btn-secondary"><i class="ti ti-table tk-text-primary"></i>Anzeigen</a>
+                                <a href="{{ exportUrl }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Exportieren</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane" id="tab-neutral">
+                <table id="" class="table table-custom align-middle">
+                    <thead>
+                    <tr>
+                        <th style="width: 100px">ID</th>
+                        <th style="width: 200px">Lehrkraft</th>
+                        <th style="width: 200px" class="text-end">Minder-/Mehrstunden</th>
+                        <th style="width: 200px" class="text-end">Vormonat</th>
+                        <th style="width: 200px" class="text-end">Auszugleichen</th>
+                        <th class="text-end"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for teacher in teachers|sort((a, b) => a.countCurrentMonthOvertimeEntries <=> b.countCurrentMonthOvertimeEntries) |filter(e => e.countCurrentMonthOvertimeEntries == 0)%}
+                        {% set diff = teacher.countCurrentMonthOvertimeEntries %}
+                        {% if diff > 0 %}
+                        {% endif %}
+                        {% set filterParams = {
+                            'teacher': {
+                                'comparison': '=',
+                                'value': teacher.id
+                            },
+                            'incidentDateMonth' : "now"|date('n'),
+                            'incidentDateYear' : "now"|date('Y'),
+                        } %}
+                        {% set viewUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+                            .setAction('index')
+                            .set('filters', filterParams)
+                        %}
+                        {% set detailUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\TeacherCrudController')
+                            .setAction('detail')
+                            .set('entityId', teacher.id)
+                        %}
+                        {% set detailUrlB = ea_url()
+                            .setController('App\\Controller\\Admin\\TeacherCrudController')
+                            .setAction('detail')
+                            .set('entityId', teacher.id)
+                        %}
+                        {% set exportUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+                            .setAction('exportExcel')
+                            .set('filters', filterParams)
+                        %}
+                        {# 2. Klasse basierend auf dem Wert bestimmen #}
+                        {% set rowClass = diff < 0 ? 'is-critical' : (diff == 0 ? 'is-neutral' : 'is-warning') %}
+
+                        <tr class="">
+                            <td>{{ teacher.id }}</td>
+                            <td class=""><a href="{{ detailUrl }}">{{ teacher.shortName }}</a></td>
+                            <td class="text-end">{{ diff }}</td>
+                            <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
+                            <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
+                            <td class="text-end actions">
+                                <a href="{{ detailUrlB }}" class="btn btn-secondary me-3"><i class="ti ti-school tk-text-primary"></i>
+                                    <span class="btn-label"><span class="action-label">Details</span></span>
+                                </a>
+                                <a href="{{ viewUrl }}" class="btn btn-secondary"><i class="ti ti-table tk-text-primary"></i>Anzeigen</a>
+                                <a href="{{ exportUrl }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Exportieren</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 {% endblock %}
 

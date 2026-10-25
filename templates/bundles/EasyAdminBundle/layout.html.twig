@@ -1,6 +1,6 @@
 {% extends '@!EasyAdmin/layout.html.twig' %}
 
-
+{% block page_title %}{{ page_title|default('kein Titel') }}{% endblock %}
 
 {% block content_header %}
     <div class="content-header-title">
@@ -22,12 +22,8 @@
                             {% endif %}
                         {% endblock %}
                     </div>
-
                 </div>
-
             </div>
-
-
         </div>
     </div>
 
