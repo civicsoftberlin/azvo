@@ -18,7 +18,7 @@ thead {
 .content-panel-footer {
     position: sticky!important;
     bottom: 0!important;
-    z-index: 1020!important;
+    z-index: 900!important;
     background-color: var(--body-bg, #fff) !important;
     border-top: 1px solid var(--border-color, #e5e7eb) !important;
 }
@@ -104,6 +104,23 @@ html, body {
     background-color: transparent !important;
 }
 
+
+.ea-sidebar-item:not(.has-submenu):has(.parent-active) {
+    background: var(--sidebar-menu-active-item-bg);
+    color: var(--sidebar-menu-active-item-color)!important;
+
+    .ea-sidebar-item-link {
+        color: var(--sidebar-menu-active-item-color) !important;
+        .ea-sidebar-item-icon {
+            color: var(--sidebar-menu-active-item-color) !important;
+            fill: var(--sidebar-menu-active-item-color) !important;
+        }
+    }
+}
+
+.ea-sidebar-item-icon:has(.ti-folder-open) {
+    color: var(--color-warning) !important;
+}
 /* =========================================
    LIGHT & DARK MODE (via EasyAdmin Variablen)
    ========================================= */

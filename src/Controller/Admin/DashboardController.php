@@ -74,6 +74,7 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'ti ti-home');
+        yield MenuItem::linkToRoute('Hilfe-Center', 'fa fa-question-circle', 'admin_help');
 
         yield MenuItem::section('Import', 'ti ti-clock-hour-4');
         yield MenuItem::linkTo(UntisImportCrudController::class, 'UntisImport', 'ti ti-file-type-csv')->setAction('new');

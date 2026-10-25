@@ -82,6 +82,7 @@ class TeacherDebutatCrudController extends AbstractCrudController
                     ->setController(TeacherDebutatCrudController::class)
                     ->setAction('batchExport')
                     ->set('validFrom', $date)
+                    ->setDashboard(DashboardController::class)
                     ->generateUrl();
                 $exportActionGroup->addAction(
                     Action::new("export_$year", "$year/" . substr($year + 1, 2, 2) % 100)

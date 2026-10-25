@@ -1,0 +1,42 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% trans_default_domain 'help_center' %}
+
+{% block content_title %}
+    {{ currentPage|trans }}
+{% endblock %}
+
+{% block page_title %}
+    {{ currentPage|trans }} | Hilfe-Center
+{% endblock %}
+
+
+    {% block main %}
+        <style>
+            .help-content{
+                max-width: 800px!important;
+            }
+            .help-content img {
+                max-width: 100%;
+                height: auto;
+            }
+            .help-content pre {
+                background: var(--sidebar-bg);
+                padding: 1rem;
+                border-radius: 4px;
+                overflow-x: auto;
+            }
+            .help-content code {
+                background: var(--sidebar-bg);
+                padding: 2px 6px;
+                border-radius: 3px;
+                font-size: 0.9em;
+            }
+        </style>
+        <div class="help-content">
+            {{ content|raw }}
+        </div>
+    {% endblock %}
+
+
+
