@@ -24,7 +24,7 @@
 
         <div class="tab-content">
             <div class="tab-pane active" id="tab-critical">
-                <table id="" class="table table-custom align-middle">
+                <table id="" class="table table-custom datagrid align-middle">
                     <thead>
                     <tr>
                         <th style="width: 100px">ID</th>
@@ -58,6 +58,11 @@
                             .setAction('detail')
                             .set('entityId', teacher.id)
                         %}
+                        {% set detailRowUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\TeacherCrudController')
+                            .setAction('detail')
+                            .set('entityId', teacher.id)
+                        %}
                         {% set detailUrlB = ea_url()
                             .setController('App\\Controller\\Admin\\TeacherCrudController')
                             .setAction('detail')
@@ -71,7 +76,7 @@
                         {# 2. Klasse basierend auf dem Wert bestimmen #}
                         {% set rowClass = diff < 0 ? 'is-critical' : (diff == 0 ? 'is-neutral' : 'is-warning') %}
 
-                        <tr class="">
+                        <tr data-default-action-url="{{ detailRowUrl }}" role="link" tabindex="0" class="ea-clickable-row">
                             <td>{{ teacher.id }}</td>
                             <td class=""><a href="{{ detailUrl }}">{{ teacher.shortName }}</a></td>
                             <td class="text-end">{{ diff }}</td>
@@ -90,7 +95,7 @@
                 </table>
             </div>
             <div class="tab-pane" id="tab-warning">
-                <table id="" class="table table-custom align-middle">
+                <table id="" class="table table-custom datagrid align-middle">
                     <thead>
                     <tr>
                         <th style="width: 100px">ID</th>
@@ -124,6 +129,11 @@
                             .setAction('detail')
                             .set('entityId', teacher.id)
                         %}
+                        {% set detailRowUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\TeacherCrudController')
+                            .setAction('detail')
+                            .set('entityId', teacher.id)
+                        %}
                         {% set detailUrlB = ea_url()
                             .setController('App\\Controller\\Admin\\TeacherCrudController')
                             .setAction('detail')
@@ -137,7 +147,7 @@
                         {# 2. Klasse basierend auf dem Wert bestimmen #}
                         {% set rowClass = diff < 0 ? 'is-critical' : (diff == 0 ? 'is-neutral' : 'is-warning') %}
 
-                        <tr class="">
+                        <tr data-default-action-url="{{ detailRowUrl }}" role="link" tabindex="0" class="ea-clickable-row">
                             <td>{{ teacher.id }}</td>
                             <td class=""><a href="{{ detailUrl }}">{{ teacher.shortName }}</a></td>
                             <td class="text-end">{{ diff }}</td>
@@ -156,7 +166,7 @@
                 </table>
             </div>
             <div class="tab-pane" id="tab-neutral">
-                <table id="" class="table table-custom align-middle">
+                <table id="" class="table table-custom datagrid align-middle">
                     <thead>
                     <tr>
                         <th style="width: 100px">ID</th>
@@ -190,6 +200,11 @@
                             .setAction('detail')
                             .set('entityId', teacher.id)
                         %}
+                        {% set detailRowUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\TeacherCrudController')
+                            .setAction('detail')
+                            .set('entityId', teacher.id)
+                        %}
                         {% set detailUrlB = ea_url()
                             .setController('App\\Controller\\Admin\\TeacherCrudController')
                             .setAction('detail')
@@ -203,7 +218,7 @@
                         {# 2. Klasse basierend auf dem Wert bestimmen #}
                         {% set rowClass = diff < 0 ? 'is-critical' : (diff == 0 ? 'is-neutral' : 'is-warning') %}
 
-                        <tr class="">
+                        <tr data-default-action-url="{{ detailRowUrl }}" role="link" tabindex="0" class="ea-clickable-row">
                             <td>{{ teacher.id }}</td>
                             <td class=""><a href="{{ detailUrl }}">{{ teacher.shortName }}</a></td>
                             <td class="text-end">{{ diff }}</td>

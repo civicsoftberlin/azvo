@@ -64,7 +64,9 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('<div class="d-flex align-items-center gap-2"><img src="/logo.svg" height="18px" alt="Logo"><span class="fw-bold tk-text-primary">LZM</span></div><div class="small text-muted">LehrZeitManagement</div>')
+            ->setTitle('<div class="d-flex align-items-center gap-2"><svg class="text-primary" height="18" width="18">
+  <use xlink:href="#app-icon"></use>
+</svg><span class="fw-bold tk-text-primary">LZM</span></div><div class="small text-muted">LehrZeitManagement</div>')
             ->setFaviconPath('logo.svg')
             ;
     }

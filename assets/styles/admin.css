@@ -10,16 +10,8 @@ thead {
 }
 
 
-tbody > tr:hover > td {
-    background-color: #efefef!important;
-}
-
-tbody > tr {
-    background-color: #333333!important;
-}
-
-tbody > tr, tbody > tr > td {
-    background-color: #fafafa!important;
+.table-custom thead th {
+    padding: 12px 8px;
 }
 
 
@@ -83,8 +75,9 @@ html, body {
     height: 100% !important;
 }
 
-.tk-text-primary {
-    color: var(--ea-primary) !important;
+.tk-text-primary, .cls-3 {
+    color: var(--color-primary) !important;
+    fill: var(--color-primary) !important;
 }
 
 .table-info {
@@ -100,28 +93,38 @@ html, body {
     background-color: transparent !important;
 }
 
+/* =========================================
+   LIGHT & DARK MODE (via EasyAdmin Variablen)
+   ========================================= */
+
+/* --- CRITICAL --- */
 .is-critical > td, .is-critical {
-    background-color: #ffebee!important;
+    background-color: color-mix(in srgb, var(--color-danger) 10%, transparent) !important;
+    color: var(--bs-body-color) !important;
 }
-
 .is-critical:has(td:hover) > td, .is-critical:hover {
-    background-color: #ffcdd2 !important;
+    background-color: color-mix(in srgb, var(--color-danger) 20%, transparent) !important;
+    color: var(--bs-body-color) !important;
 }
 
+/* --- NEUTRAL --- */
 .is-neutral > td, .is-neutral {
-    background-color: #e8f5e9!important;
+    background-color: color-mix(in srgb, var(--color-success) 10%, transparent) !important;
+    color: var(--bs-body-color) !important;
 }
-
 .is-neutral:has(td:hover) > td, .is-neutral:hover {
-    background-color: #c8e6c9 !important;
+    background-color: color-mix(in srgb, var(--color-success) 20%, transparent) !important;
+    color: var(--bs-body-color) !important;
 }
 
+/* --- WARNING --- */
 .is-warning > td {
-    background-color: #fff8e1!important;
+    background-color: color-mix(in srgb, var(--color-warning) 10%, transparent) !important;
+    color: var(--bs-body-color) !important;
 }
-
 .is-warning:has(td:hover) > td {
-    background-color: #ffecb3 !important;
+    background-color: color-mix(in srgb, var(--color-warning) 20%, transparent) !important;
+    color: var(--bs-body-color) !important;
 }
 
 .table-custom  th {
