@@ -88,7 +88,20 @@ class TeacherDebutatCrudController extends AbstractCrudController
                         ->linkToUrl($url)
                 );
             }
-            $actions->add(Crud::PAGE_INDEX, $exportActionGroup);
+            $teacherSelectAction = Action::new("teacherSelect", "Details", 'ti ti-school')
+                ->linkToUrl(function ($entity) {
+                    return $this->adminUrlGenerator
+                        ->setController(TeacherCrudController::class)
+                        ->setAction(Action::DETAIL)
+                        ->setEntityId($entity->getTeacher()->getId())
+                        ->generateUrl();
+                })
+            ;
+
+            $actions
+                ->add(Crud::PAGE_INDEX, $exportActionGroup)
+                ->add(Crud::PAGE_INDEX, $teacherSelectAction)
+            ;
         }
         return $actions;
     }
@@ -96,6 +109,7 @@ class TeacherDebutatCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
+            ->setDefaultRowAction('teacherSelect')
             ->setPaginatorPageSize(100)
             ->setHelp(Crud::PAGE_INDEX, "Export gilt immer für alle Lehrkräfte im zutreffenden Zeitraum.")
             ->overrideTemplates([

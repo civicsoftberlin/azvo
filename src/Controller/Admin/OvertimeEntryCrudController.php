@@ -53,9 +53,10 @@ class OvertimeEntryCrudController extends AbstractCrudController
     private ExcelExportService $exportService;
     private FieldFactory $fieldFactory;
     private FilterFactory $filterFactory;
+    private AdminUrlGenerator $adminUrlGenerator;
 
     // Service hier injizieren
-    public function __construct(EntityRepository $eaEntityRepository, OvertimeEntryRepository $overtimeEntryRepository, TeacherRepository $teacherRepo, FieldFactory $fieldFactory, FilterFactory $filterFactory, ExcelExportService $exportService)
+    public function __construct(EntityRepository $eaEntityRepository, OvertimeEntryRepository $overtimeEntryRepository, TeacherRepository $teacherRepo, FieldFactory $fieldFactory, FilterFactory $filterFactory, ExcelExportService $exportService, AdminUrlGenerator $adminUrlGenerator)
     {
         $this->eaEntityRepository = $eaEntityRepository;
         $this->overtimeEntryRepository = $overtimeEntryRepository;
@@ -63,6 +64,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
         $this->fieldFactory = $fieldFactory;
         $this->filterFactory = $filterFactory;
         $this->exportService = $exportService;
+        $this->adminUrlGenerator = $adminUrlGenerator;
     }
 
     public static function getEntityFqcn(): string
@@ -138,6 +140,16 @@ class OvertimeEntryCrudController extends AbstractCrudController
 
         $dateActionGroup = ActionGroup::new("dateControl");
 
+        $teacherSelectAction = Action::new("teacherSelect", "Details", 'ti ti-school')
+            ->linkToUrl(function ($entity) {
+                return $this->adminUrlGenerator
+                    ->setController(TeacherCrudController::class)
+                    ->setAction(Action::DETAIL)
+                    ->setEntityId($entity->getTeacher()->getId())
+                    ->generateUrl();
+            })
+        ;
+
         $prevYearAction = Action::new('prevYear', "", 'ti ti-chevrons-left')
             ->linkToUrl(function () use ($buildMonthUrl) {
                 return $buildMonthUrl(-12);
@@ -201,6 +213,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, $currentMonthAction)
             ->add(Crud::PAGE_INDEX, $prevMonthAction)
             ->add(Crud::PAGE_INDEX, $prevYearAction)
+            ->add(Crud::PAGE_INDEX, $teacherSelectAction)
             ;
     }
 
@@ -282,7 +295,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            // Setzt die Anzahl der Einträge pro Seite auf 50
+            ->setDefaultRowAction('teacherSelect')
             ->setPaginatorPageSize(100)
             ->overrideTemplates([
                 'crud/index' => 'admin/overtime_entries/index.html.twig',
