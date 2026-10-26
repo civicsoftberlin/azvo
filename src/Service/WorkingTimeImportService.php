@@ -75,7 +75,7 @@ class WorkingTimeImportService
                     $dateString,
                     $courseHour,
                     -1,
-                    "Ausfall (vertreten durch {$updatedTeacher})",
+                    "Ausfall (vertr. d. {$updatedTeacher})",
                     $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
                 );
                 $amount = 1;
