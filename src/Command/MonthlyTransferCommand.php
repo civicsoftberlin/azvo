@@ -161,7 +161,7 @@ class MonthlyTransferCommand extends Command
                 $carryOverEntry->setCourseHour(0);
                 $carryOverEntry->setComment("DECAY");
                 $carryOverEntry->setExpiresAt(null);
-                $carryOverEntry->setReason("Verfall von Minderarbeit");
+                $carryOverEntry->setReason("Verfall von Minderstunden");
                 $this->entityManager->persist($carryOverEntry);
                 $this->entityManager->flush();
 
