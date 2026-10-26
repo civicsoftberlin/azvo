@@ -86,7 +86,7 @@ Statistikkennzeichen des betroffenen Vertretungsfachs
 
 #####  Feld 18
 - **Name**: Art (Bitfeld)
-- **Format**: Dezimalzahl > 0
+- **Format**: Dezimalzahl >= 0
 
 Das Feld kann ein oder mehrere gesetzte Bits enthalten, die im Dezimalformat vorliegen.
 
