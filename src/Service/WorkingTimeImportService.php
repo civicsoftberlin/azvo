@@ -78,6 +78,10 @@ class WorkingTimeImportService
                     "Ausfall (vertreten durch {$updatedTeacher})",
                     $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
                 );
+                $amount = 1;
+                if (!str_contains($gpuCount, '+')) {
+                    $amount = 0;
+                }
 
                 // B) Vertretungslehrer bekommt die Stunde (+1)
                 $this->createEntry(
@@ -85,7 +89,7 @@ class WorkingTimeImportService
                     $updatedTeacher,
                     $dateString,
                     $courseHour,
-                    1,
+                    $amount,
                     "Vertretung für {$plannedTeacher}",
                     $updatedSubject ?: $plannedSubject, $classes, $updatedRoom ?: $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
                 );
