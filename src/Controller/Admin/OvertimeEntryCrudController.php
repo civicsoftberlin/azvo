@@ -243,6 +243,9 @@ class OvertimeEntryCrudController extends AbstractCrudController
                 if ($otherOvertimeEntry) {
                     $entries[] = $otherOvertimeEntry;
                 }
+                if ($id = $overtimeEntry->getInvalidatedBy()) {
+                    $entries[] = $this->overtimeEntryRepository->find($id);
+                }
             } else {
                 $refEntries = $this->overtimeEntryRepository->findBy(
                     ['invalidatedBy' => $overtimeEntry->getId()],

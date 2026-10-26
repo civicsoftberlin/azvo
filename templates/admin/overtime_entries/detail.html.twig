@@ -48,11 +48,20 @@
                 .setAction('detail')
                 .set('entityId', ote.teacher.id)
             %}
+            {% if loop.index == 1 %}
             {% set detailRowUrl = ea_url()
                 .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
                 .setAction('index')
                 .set('filters', filterParams)
             %}
+            {% else %}
+                {% set detailRowUrl = ea_url()
+                    .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+                    .setAction('detail')
+                    .set('entityId', ote.id)
+                    .set('filters', filterParams)
+                %}
+            {% endif %}
             {% set detailUrlB = ea_url()
                 .setController('App\\Controller\\Admin\\TeacherCrudController')
                 .setAction('detail')
