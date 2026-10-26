@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Service\DocumentationRenderer;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -16,13 +17,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Twig\Error\LoaderError;
+use Twig\Error\SyntaxError;
 
 #[AdminDashboard(routePath: '/admin/help', routeName: 'admin_help')]
 class HelpDashboardController extends AbstractDashboardController
 {
     private string $projectDir;
     public function __construct(
-        private readonly RequestStack $requestStack
+        private readonly RequestStack $requestStack,
+        private DocumentationRenderer $docRenderer
     ) {
     }
 
@@ -40,11 +44,18 @@ class HelpDashboardController extends AbstractDashboardController
         $this->projectDir = $this->getParameter('kernel.project_dir');
         $page = $this->requestStack->getCurrentRequest()->query->get('page', 'index');
 
-        return $this->render('admin/help/index.html.twig', [
-            'currentPage' => $page,
-            'content'     => $this->renderMarkdown($page),
-            'structure'   => $this->getDocsStructure(),
-        ]);
+        try {
+            $htmlContent = $this->docRenderer->render($this->getFileName("/docs/$page"), [
+
+            ]);
+            return $this->render('admin/help/index.html.twig', [
+                'currentPage' => $page,
+                'content'     => $htmlContent,
+            ]);
+        }
+        catch (CommonMarkException|LoaderError|SyntaxError $e) {
+
+        }
     }
 
     public function configureDashboard(): Dashboard
@@ -52,7 +63,7 @@ class HelpDashboardController extends AbstractDashboardController
         return Dashboard::new()
             ->setTitle('<div class="d-flex align-items-center gap-2"><svg class="text-primary" height="18" width="18">
   <use xlink:href="#app-icon"></use>
-</svg><span class="fw-bold tk-text-primary">LZM</span></div><div class="small text-muted">Hilfe-Center</div>')
+</svg><span class="fw-bold tk-text-primary">Hilfe-Center</span></div><div class="small text-muted">LehrZeitManagement</div>')
             ->setFaviconPath('logo.svg')
             ->setTranslationDomain('help_center')
             ;
@@ -140,23 +151,8 @@ class HelpDashboardController extends AbstractDashboardController
         return $structure;
     }
 
-    /**
-     * @throws CommonMarkException
-     */
-    private function renderMarkdown(string $page): string
+    private function getFileName(string $page): string
     {
-        $docsPath = $this->getDocsPath();
-        $parts = explode('/', $page);
-        $file = $docsPath . '/' . implode('/', $parts) . '.md';
-        $realPath = realpath($file);
-        $realDocsPath = realpath($docsPath);
-        if (!$realPath || !$realDocsPath || !str_starts_with($realPath, $realDocsPath)) {
-            return '<div class="alert alert-danger">Document not found or access denied.</div>';
-        }
-        if (!file_exists($realPath)) {
-            return '<div class="alert alert-warning">Document not found: ' . htmlspecialchars($page) . '</div>';
-        }
-        $converter = new CommonMarkConverter();
-        return $converter->convert(file_get_contents($realPath))->getContent();
+        return $page . '.md';
     }
 }

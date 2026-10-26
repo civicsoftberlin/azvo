@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\Entity\Teacher;
 use App\Entity\OvertimeEntry;
+use App\Enum\GpuSubstitutionFlag;
+use App\Enum\GpuSubstitutionType;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -49,6 +51,12 @@ class WorkingTimeImportService
 
             $classes = str_replace('~', ', ', trim($data[14]));
             $message = trim($data[16]);
+            $bit = trim($data[17]);
+            $type = trim($data[19]);
+            $gpuBit = GpuSubstitutionFlag::getActiveFlags($bit);
+            $gpuBit = implode(', ', $gpuBit);
+            $gpuType = GpuSubstitutionType::tryFromChar($type)?->value;
+            $gpuCount = trim($data[21]);
 
             // 2. Logik bestimmen
             $isSubstitution = (trim($data[19]) === 'S' || (trim($data[19]) === '' and $updatedTeacher !== '') || trim($data[19]) === '~') ||
@@ -68,7 +76,7 @@ class WorkingTimeImportService
                     $courseHour,
                     -1,
                     "Ausfall (vertreten durch {$updatedTeacher})",
-                    $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message
+                    $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
                 );
 
                 // B) Vertretungslehrer bekommt die Stunde (+1)
@@ -79,7 +87,7 @@ class WorkingTimeImportService
                     $courseHour,
                     1,
                     "Vertretung für {$plannedTeacher}",
-                    $updatedSubject ?: $plannedSubject, $classes, $updatedRoom ?: $plannedRoom, $currentUser, $autoCreate, $message
+                    $updatedSubject ?: $plannedSubject, $classes, $updatedRoom ?: $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
                 );
                 $importCount += 2;
             }
@@ -92,7 +100,7 @@ class WorkingTimeImportService
                     $courseHour,
                     -1,
                     "Ausfall",
-                    $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message
+                    $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
                 );
                 $importCount++;
             }
@@ -121,7 +129,10 @@ class WorkingTimeImportService
         ?string $room,
         ?UserInterface $currentUser,
         bool $autoCreate,
-        ?string $message
+        ?string $message,
+        ?string $gpuBit,
+        ?string $gpuType,
+        ?string $gpuCount
     ): void {
         // 1. Lehrer finden
         $teacher = $this->em->getRepository(Teacher::class)->findOneBy(['shortName' => $teacherKuerzel]);
@@ -150,6 +161,9 @@ class WorkingTimeImportService
         // 3. Neuen Eintrag bauen
         $entry = new OvertimeEntry();
         $entry->setUntisId($uniqueUntisRef);
+        $entry->setUntisBit($gpuBit);
+        $entry->setUntisType($gpuType);
+        $entry->setUntiCount($gpuCount);
         $entry->setTeacher($teacher);
         $entry->setTeacherShortname($teacherKuerzel);
         $entry->setIncidentDate(\DateTime::createFromFormat('Ymd', $dateString));

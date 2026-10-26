@@ -140,13 +140,19 @@ class OvertimeEntryRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?OvertimeEntry
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findOneByUntisId(?string $untisId): ?OvertimeEntry
+    {
+        if ($untisId == null) {
+            return null;
+        }
+        $idPart = explode('_', $untisId)[0];
+        return $this->createQueryBuilder('o')
+            ->andWhere('o.untisId != :val')
+            ->andWhere('o.untisId LIKE :valLike')
+            ->setParameter('val', $untisId)
+            ->setParameter('valLike', "$idPart%")
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

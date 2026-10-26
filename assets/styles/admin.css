@@ -121,6 +121,11 @@ html, body {
 .ea-sidebar-item-icon:has(.ti-folder-open) {
     color: var(--color-warning) !important;
 }
+
+.img-thumbnail {
+    display: block;
+    margin: 1rem 0 .5rem 0;
+}
 /* =========================================
    LIGHT & DARK MODE (via EasyAdmin Variablen)
    ========================================= */
@@ -156,6 +161,11 @@ html, body {
 }
 
 .table-custom  th {
+    font-weight: normal;
+    box-shadow: inset 0 -2px 0 var(--table-cell-border-color);
+}
+
+.row-custom  th, .row-custom  td {
     font-weight: normal;
     box-shadow: inset 0 -2px 0 var(--table-cell-border-color);
 }

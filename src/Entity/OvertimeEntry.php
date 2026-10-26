@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\GpuSubstitutionType;
 use App\Repository\OvertimeEntryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -75,6 +76,15 @@ class OvertimeEntry
 
     #[ORM\Column(nullable: true)]
     private ?bool $malus = null;
+
+    #[ORM\Column(length: 255,nullable: true)]
+    private ?string $untisBit = null;
+
+    #[ORM\Column(length: 1, nullable: true)]
+    private ?string $untisType = null;
+
+    #[ORM\Column(length: 5, nullable: true)]
+    private ?string $untiCount = null;
 
     public function __toString(): string
     {
@@ -303,6 +313,47 @@ class OvertimeEntry
     public function setMalus(?bool $malus): static
     {
         $this->malus = $malus;
+
+        return $this;
+    }
+
+    public function getUntisBit(): ?string
+    {
+        return $this->untisBit;
+    }
+
+    public function setUntisBit(?string $untisBit): static
+    {
+        $this->untisBit = $untisBit;
+
+        return $this;
+    }
+
+    public function getUntisType(): ?string
+    {
+        return $this->untisType;
+    }
+
+    public function setUntisType(?string $untisType): static
+    {
+        $this->untisType = $untisType;
+
+        return $this;
+    }
+
+    public function getUntisTypeAsLabel(): ?string
+    {
+        return GpuSubstitutionType::tryFromChar($this->untisType)->getGermanLabel();
+    }
+
+    public function getUntiCount(): ?string
+    {
+        return $this->untiCount;
+    }
+
+    public function setUntiCount(?string $untiCount): static
+    {
+        $this->untiCount = $untiCount;
 
         return $this;
     }

@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\OvertimeEntry;
+use App\Enum\GpuSubstitutionFlag;
+use App\Enum\GpuSubstitutionType;
 use App\Filter\MonthFilter;
 use App\Filter\YearFilter;
 use App\Repository\OvertimeEntryRepository;
@@ -21,6 +23,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\SortOrder;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
@@ -206,7 +209,8 @@ class OvertimeEntryCrudController extends AbstractCrudController
             // ...
             // this will forbid to create or delete entities in the backend
             ->disable(Action::SAVE_AND_ADD_ANOTHER, Action::DELETE, Action::NEW)
-
+            ->remove(Crud::PAGE_DETAIL, Action::EDIT)
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->add(Crud::PAGE_INDEX, $exportAction)
             ->add(Crud::PAGE_INDEX, $nextYearAction)
             ->add(Crud::PAGE_INDEX, $nextMonthAction)
@@ -228,12 +232,28 @@ class OvertimeEntryCrudController extends AbstractCrudController
                 $teacher = $this->teacherRepository->find($filters['teacher']['value']);
                 $responseParameters->set('page_title', sprintf('Stundenkonto für %s', $teacher));
             }
+            $responseParameters->set('icon', 'table');
         }
         if (Crud::PAGE_DETAIL === $responseParameters->get('pageName')) {
-            $responseParameters->set('page_title', sprintf('Stundenkonto für %s', $responseParameters->get('name')));
+            $entries = [];
+            $overtimeEntry = $this->getContext()->getEntity()->getInstance();
+            $entries[] = $overtimeEntry;
+            if ($overtimeEntry->getUntisId()) {
+                $otherOvertimeEntry = $this->overtimeEntryRepository->findOneByUntisId($overtimeEntry->getUntisId());
+                if ($otherOvertimeEntry) {
+                    $entries[] = $otherOvertimeEntry;
+                }
+            } else {
+                $refEntries = $this->overtimeEntryRepository->findBy(
+                    ['invalidatedBy' => $overtimeEntry->getId()],
+                    ['incidentDate' => SortOrder::ASC, 'class' => SortOrder::ASC]
+                );
+                $entries = array_merge($entries, $refEntries);
+            }
+            $responseParameters->set('other_entry', $entries);
+            $responseParameters->set('page_title', sprintf('Referenzbuchungen für %s', $overtimeEntry->getTeacher()));
+            $responseParameters->set('icon', 'table-row');
         }
-        $responseParameters->set('icon', 'table');
-
         return $responseParameters;
     }
 
@@ -279,7 +299,10 @@ class OvertimeEntryCrudController extends AbstractCrudController
             //TextField::new('room'),
             //TextField::new('untisId'),
             TextField::new('reason'),
+            TextField::new('untisId')->onlyOnDetail(),
             TextField::new('untisComment'),
+            TextField::new('untisBit'),
+            TextField::new('untiCount')->formatValue(fn ($value) => $value ?? ' '),
             NumberField::new('amount'),
             DateField::new('expiresAt')->formatValue(fn ($value) => $value instanceof \DateTime ? $value->format('d.m.Y') : ''),
             DateField::new('invalidatedAt')->formatValue(fn ($value) => $value instanceof \DateTime ? $value->format('d.m.Y') : ''),
@@ -295,10 +318,11 @@ class OvertimeEntryCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setDefaultRowAction('teacherSelect')
+            ->setDefaultRowAction(Crud::PAGE_DETAIL)
             ->setPaginatorPageSize(100)
             ->overrideTemplates([
                 'crud/index' => 'admin/overtime_entries/index.html.twig',
+                'crud/detail' => 'admin/overtime_entries/detail.html.twig',
             ])
             ->setDefaultSort([
                 'teacher.shortName' => 'ASC',
