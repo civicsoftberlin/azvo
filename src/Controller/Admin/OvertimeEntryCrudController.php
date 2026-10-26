@@ -305,6 +305,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
             TextField::new('untisId')->onlyOnDetail(),
             TextField::new('untisComment'),
             TextField::new('untisBit'),
+            TextField::new('untisType'),
             TextField::new('untiCount')->formatValue(fn ($value) => $value ?? ' '),
             NumberField::new('amount'),
             DateField::new('expiresAt')->formatValue(fn ($value) => $value instanceof \DateTime ? $value->format('d.m.Y') : ''),

@@ -79,7 +79,7 @@ class WorkingTimeImportService
                     $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
                 );
                 $amount = 1;
-                if (!str_contains($gpuCount, '+')) {
+                if ($gpuCount != '' and !str_contains($gpuCount, '+') or $gpuType == GpuSubstitutionType::Supervision->value) {
                     $amount = 0;
                 }
 

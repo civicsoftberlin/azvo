@@ -20,11 +20,12 @@
             <th class="text-end">Schulstunde</th>
             <th class="">Grund</th>
             <th class="">Untis-Kommentar</th>
+            <th class="">Untis-Zeichen</th>
+            <th class="">Untis-Zähler</th>
             <th class="text-end">Stundendifferenz</th>
             <th class="text-end">Auszugleichen bis</th>
             <th class="text-end">Ausgeglichen am</th>
             <th class="text-end">Ausgeglichen durch ID</th>
-            <th class="">Systemkommentar</th>
             <th class="text-end"></th>
         </tr>
         </thead>
@@ -82,23 +83,24 @@
                 <td class="text-end">{{ ote.courseHour }}</td>
                 <td class="">{{ ote.reason }}</td>
                 <td class="">{{ ote.untisComment }}</td>
+                <td class="">{{ ote.untisBit }}</td>
+                <td class="">{{ ote.untiCount }}</td>
                 <td class="text-end">{{ ote.amount }}</td>
                 <td class="text-end">{{ ote.expiresAt ? ote.expiresAt|date('d.m.Y') : '' }}</td>
                 <td class="text-end">{{ ote.invalidatedAt ? ote.invalidatedAt|date('d.m.Y') : '' }}</td>
                 <td class="text-end">{{ ote.invalidatedBy }}</td>
-                <td class="">{{ ote.comment }}</td>
                 <td class="text-end actions">
                     <a href="{{ detailUrlB }}" class="btn btn-secondary "><i class="ti ti-school tk-text-primary"></i>
                         <span class="btn-label"><span class="action-label">Details</span></span>
                     </a>
                     <a href="{{ viewUrl }}" class="btn btn-secondary"><i class="ti ti-table tk-text-primary"></i>Stundenkonto</a>
-                    <a href="{{ exportUrl }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Monatsansicht exportieren</a>
+{#                    <a href="{{ exportUrl }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Monatsansicht exportieren</a>#}
                 </td>
             </tr>
             {% if loop.index == 1 and other_entry|length > 1 %}
             <tr class="row-custom">
                 <td  class="text-center text-muted" style="background-color: var(--body-bg)"></td>
-                <td colspan="12" class="text-muted" style="background-color: var(--body-bg)"><i class="ti ti-arrow-big-down-lines me-2 tk-text-primary"></i>verknüpft mit folgenden Buchungen</td>
+                <td colspan="14" class="text-muted" style="background-color: var(--body-bg)"><i class="ti ti-arrow-big-down-lines me-2 tk-text-primary"></i>verknüpft mit folgenden Buchungen</td>
             </tr>
             {% endif %}
         {% endfor %}
