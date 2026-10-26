@@ -20,6 +20,3 @@
 
 [Alle Stundenkonten anzeigen]({{ crud_url('untis_import/new') }}){.btn .btn-primary target="_blank"}
 
-![GPU-Datei exportieren]({{ asset('/img/img_9.png') }}){.img-fluid}
-
-Wieso das?
