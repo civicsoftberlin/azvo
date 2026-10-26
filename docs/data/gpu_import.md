@@ -2,7 +2,92 @@
 
 #### GPU014
 
-#####  Feld 18 Art (Bitfeld)
+##### Feld 01
+- **Name**:   Vertretungsnummer
+- **Format**: Ganze Zahl > 0
+
+##### Feld 02
+- **Name**: Datum
+- **Format**: YYYYMMDD
+
+##### Feld 03
+- **Name**: Stunde
+- **Format**: Ganze Zahl >= 0 oder ``null``
+
+##### Feld 04
+- **Name**: Absenznummer
+- **Format**: Ganze Zahl >= 0
+
+##### Feld 05
+- **Name**: Unterrichtsnummer
+- **Format**: Ganze Zahl >= 0
+
+ID der im System hinterlegten Unterrichtseinheit.
+
+##### Feld 06
+- **Name**: Absente Lehrkraft
+- **Format**: Zeichenkette
+
+Kürzel der absenten Lehrkraft
+
+##### Feld 07
+- **Name**: Vertretende Lehrkraft
+- **Format**: Zeichenkette
+
+Kürzel der vertretenden Lehrkraft
+
+##### Feld 08
+- **Name**: Fach
+- **Format**: Zeichenkette oder ``(leer)``
+
+Kürzel des betroffenen Fachs
+
+##### Feld 09
+- **Name**: Statistikkennzeichen des Fachs
+- **Format**: Zeichenkette oder ``(leer)``
+
+Statistikkennzeichen des betroffenen Fachs
+
+##### Feld 10
+- **Name**: Vertretungsfach
+- **Format**: Zeichenkette oder ``(leer)``
+
+Kürzel des betroffenen Vertretungsfachs
+
+##### Feld 11
+- **Name**: Statistikkennzeichen des Vertretungsfachs
+- **Format**: Zeichenkette oder ``(leer)``
+
+Statistikkennzeichen des betroffenen Vertretungsfachs
+
+##### Feld 12
+- **Name**: Raum
+- **Format**: Zeichenkette oder ``(leer)``
+
+##### Feld 13
+- **Name**: Vertretungsraum
+- **Format**: Zeichenkette oder ``(leer)``
+
+##### Feld 14
+- **Name**: Statistik-Kennzeichen
+- **Format**: Zeichenkette oder ``(leer)``
+
+##### Feld 15
+- **Name**: Klasse(n) (mit ``~`` getrennt)
+- **Format**: Zeichenkette oder ``(leer)``
+
+##### Feld 16
+- **Name**: Absenzgrund
+- **Format**: Zeichenkette oder ``(leer)``
+
+##### Feld 17
+- **Name**: Text zur Vertretung
+- **Format**: Zeichenkette oder ``(leer)``
+
+#####  Feld 18
+- **Name**: Art (Bitfeld)
+- **Format**: Dezimalzahl > 0
+
 Das Feld kann ein oder mehrere gesetzte Bits enthalten, die im Dezimalformat vorliegen.
 
 **Beispiel**:
@@ -117,9 +202,13 @@ Das ergibt: Bit 1 und Bit 21, also *Betreuung* und *Kennzeichen neu*
     </tbody>
 </table>
 
+##### Feld 19
+- **Name**: Vertretungsklasse(n) (mit ``~`` getrennt)
+- **Format**: Zeichenkette oder ``(leer)``
 
-
-##### Feld 20 Vertretungsart
+##### Feld 20
+- **Name**: Vertretungsart
+- **Format**: Zeichen, ``~`` oder ``(leer)``
 
 <table class="table table-striped mb-3">
     <thead>
@@ -197,3 +286,12 @@ Das ergibt: Bit 1 und Bit 21, also *Betreuung* und *Kennzeichen neu*
         </tr>
     </tbody>
 </table>
+
+
+##### Feld 21
+- **Name**: Zeit der letzten Änderung
+- **Format**: YYYYMMDDHHMM
+
+##### Feld 22
+- **Name**: Vertretungen/Entfälle zählen
+- **Format**: ``+``, ``-``, ``+~-`` oder ``(leer)``

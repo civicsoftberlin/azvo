@@ -18,5 +18,3 @@
   }) }}){target="_blank"}
 
 
-[Alle Stundenkonten anzeigen]({{ crud_url('untis_import/new') }}){.btn .btn-primary target="_blank"}
-

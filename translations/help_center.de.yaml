@@ -9,6 +9,6 @@ process/teacher_management: Lehrkräfte verwalten
 teachers: Lehrkräfte
 teachers/index: Alle Lehrkräfte
 
-view: Ansichten
-view/overview: Übersicht
-view/gpu_import: GPU-Import
+data: Datenstrukturen
+data/overview: Übersicht
+data/gpu_import: GPU-Import
