@@ -68,8 +68,10 @@ class DebutatCopyCommand extends Command
                 $newDeputat->setInvalidFrom($newInvalidFrom);
                 $newDeputat->setDiscountValidFrom($deputat->getInvalidFrom());
                 $newDeputat->setAutoAppend($deputat->isAutoAppend());
+                $deputat->setAutoAppend(false);
                 $newDeputat->setLeaves($deputat->isLeaves());
                 $this->entityManager->persist($newDeputat);
+                $this->entityManager->persist($deputat);
             }
             $this->entityManager->flush();
             return Command::SUCCESS;
