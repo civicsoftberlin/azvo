@@ -7,20 +7,21 @@ namespace App\Enum;
  */
 enum GpuSubstitutionFlag: int
 {
-    case Unused             = -1;
-    case Cancellation        = 0x0;            // Bit  0 = Entfall (Hinweis: 0x0 bedeutet technisch "kein Bit gesetzt")
-    case Supervision         = 0x1;            // Bit  1 = Betreuung
-    case SpecialDuty         = 0x2;            // Bit  2 = Sondereinsatz
-    case ShiftedFrom         = 0x4;            // Bit  3 = Wegverlegung
-    case Release             = 0x8;            // Bit  4 = Freisetzung
-    case PlusAsStandIn       = 0x10;           // Bit  5 = Plus als Vertreter
-    case PartialStandIn      = 0x20;           // Bit  6 = Teilvertretung
-    case ShiftedTo           = 0x40;           // Bit  7 = Hinverlegung
-    case RoomExchange        = 0x8000;         // Bit 16 = Raumvertretung
-    case SupervisionExchange = 0x10000;        // Bit 17 = Pausenaufsichtsvertretung
-    case NoLesson            = 0x20000;        // Bit 18 = Stunde ist unterrichtsfrei
-    case DoNotPrintFlag      = 0x80000;        // Bit 20 = Kennzeichen nicht drucken
-    case NewFlag             = 0x1000000;      // Bit 21 = Kennzeichen neu
+    case Unused             = -1;            // Hilfsweise für nulls/leer
+    case Cancellation       = 0x1;           // Bit  0 = Entfall (1)
+    case Supervision        = 0x2;           // Bit  1 = Betreuung (2)
+    case SpecialDuty        = 0x4;           // Bit  2 = Sondereinsatz (4)
+    case ShiftedFrom        = 0x8;           // Bit  3 = Wegverlegung (8)
+    case Release            = 0x10;          // Bit  4 = Freisetzung (16)
+    case PlusAsStandIn      = 0x20;          // Bit  5 = Plus als Vertreter (32)
+    case PartialStandIn     = 0x40;          // Bit  6 = Teilvertretung (64)
+    case ShiftedTo          = 0x80;          // Bit  7 = Hinverlegung (128)
+    case RoomExchange       = 0x10000;       // Bit 16 = Raumvertretung (65.536)
+    case SupervisionExchange= 0x20000;       // Bit 17 = Pausenaufsichtsvertretung (131.072)
+    case NoLesson           = 0x40000;       // Bit 18 = Stunde ist unterrichtsfrei (262.144)
+    // Bit 19 (0x80000 = 524.288) fehlt in der Doku, wird übersprungen
+    case DoNotPrintFlag     = 0x100000;      // Bit 20 = Kennzeichen nicht drucken (1.048.576)
+    case NewFlag            = 0x200000;      // Bit 21 = Kennzeichen neu (2.097.152)
 
     public function getGermanLabel(): string
     {
