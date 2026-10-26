@@ -29,8 +29,9 @@
                     <tr>
                         <th style="width: 100px">ID</th>
                         <th style="width: 200px">Lehrkraft</th>
-                        <th style="width: 200px" class="text-end">Minder-/Mehrstunden</th>
-                        <th style="width: 200px" class="text-end">Vormonat</th>
+                        <th style="width: 200px" class="text-end">+/- Stunden (brutto)</th>
+                        <th style="width: 200px" class="text-end">+/- Stunden (netto)</th>
+                        <th style="width: 200px" class="text-end">Vormonat (brutto)</th>
                         <th style="width: 200px" class="text-end">Auszugleichen</th>
                         <th class="text-end"></th>
                     </tr>
@@ -80,6 +81,7 @@
                             <td>{{ teacher.id }}</td>
                             <td class=""><a href="{{ detailUrl }}">{{ teacher.shortName }}</a></td>
                             <td class="text-end">{{ diff }}</td>
+                            <td class="text-end text-muted">{{ diff >= teacher.LastDeputat.threshold ? diff - teacher.LastDeputat.threshold : 0 }}</td>
                             <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
                             <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
                             <td class="text-end actions">
@@ -100,8 +102,9 @@
                     <tr>
                         <th style="width: 100px">ID</th>
                         <th style="width: 200px">Lehrkraft</th>
-                        <th style="width: 200px" class="text-end">Minder-/Mehrstunden</th>
-                        <th style="width: 200px" class="text-end">Vormonat</th>
+                        <th style="width: 200px" class="text-end">+/- Stunden (brutto)</th>
+                        <th style="width: 200px" class="text-end">+/- Stunden (netto)</th>
+                        <th style="width: 200px" class="text-end">Vormonat (brutto)</th>
                         <th style="width: 200px" class="text-end">Auszugleichen</th>
                         <th class="text-end"></th>
                     </tr>
@@ -151,6 +154,7 @@
                             <td>{{ teacher.id }}</td>
                             <td class=""><a href="{{ detailUrl }}">{{ teacher.shortName }}</a></td>
                             <td class="text-end">{{ diff }}</td>
+                            <td class="text-end text-muted">{{ diff >= teacher.LastDeputat.threshold ? diff - teacher.LastDeputat.threshold : 0 }}</td>
                             <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
                             <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
                             <td class="text-end actions">
@@ -171,8 +175,9 @@
                     <tr>
                         <th style="width: 100px">ID</th>
                         <th style="width: 200px">Lehrkraft</th>
-                        <th style="width: 200px" class="text-end">Minder-/Mehrstunden</th>
-                        <th style="width: 200px" class="text-end">Vormonat</th>
+                        <th style="width: 200px" class="text-end">+/- Stunden (brutto)</th>
+                        <th style="width: 200px" class="text-end">+/- Stunden (netto)</th>
+                        <th style="width: 200px" class="text-end">Vormonat (brutto)</th>
                         <th style="width: 200px" class="text-end">Auszugleichen</th>
                         <th class="text-end"></th>
                     </tr>
@@ -222,6 +227,7 @@
                             <td>{{ teacher.id }}</td>
                             <td class=""><a href="{{ detailUrl }}">{{ teacher.shortName }}</a></td>
                             <td class="text-end">{{ diff }}</td>
+                            <td class="text-end text-muted">{{ diff >= teacher.LastDeputat.threshold ? diff - teacher.LastDeputat.threshold : 0 }}</td>
                             <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
                             <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
                             <td class="text-end actions">
