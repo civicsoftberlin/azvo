@@ -83,7 +83,7 @@ class WorkingTimeImportService
                     $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
                 );
                 $amount = 0;
-                if (str_contains($gpuCount, '+')) {
+                if (str_contains($gpuCount, '+') || $message == '') {
                     $amount = 1;
                 }
 
