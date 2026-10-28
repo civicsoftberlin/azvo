@@ -1,0 +1,40 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+{% set allQueryParams = app.request.query.all() %}
+{% set currentFilters = allQueryParams['filters'] ?? {} %}
+{% if currentFilters['incidentDateDay'] is defined  %}
+    {% set enabled = true %}
+    {% set filterParams = currentFilters
+        | filter((value, key) => key != 'incidentDateDay')
+        | merge({
+        'incidentDateMonth' : field.value|date('n'),
+        'incidentDateYear' : field.value|date('Y'),
+    }) %}
+{% else %}
+    {% set enabled = false %}
+{% set filterParams = currentFilters|merge({
+    'incidentDateDay' : field.value|date('j'),
+    'incidentDateMonth' : field.value|date('n'),
+    'incidentDateYear' : field.value|date('Y'),
+}) %}
+{% endif %}
+{% set viewUrl = ea_url()
+    .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+    .setAction('index')
+    .set('filters', filterParams)
+%}
+
+<div class="d-flex align-items-center justify-content-between row-action-wrapper">
+    <time datetime="{{ field.value|date('c') }}" title="{{ field.value|date('r') }}">{{ field.formattedValue }}</time>
+    {% if not enabled %}
+    <div class="row-action-buttons">
+        <a href="{{ viewUrl }}" class="btn btn-sm btn-secondary"><i class="ti ti-filter tk-text-primary"></i></a>
+    </div>
+    {% else %}
+    <div class="row-action-buttons">
+        <a href="{{ viewUrl }}" class="btn btn-sm btn-secondary"><i class="ti ti-filter-off text-danger"></i></a>
+    </div>
+    {% endif %}
+</div>
+

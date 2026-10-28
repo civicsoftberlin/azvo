@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\OvertimeEntry;
 use App\Enum\GpuSubstitutionFlag;
 use App\Enum\GpuSubstitutionType;
+use App\Filter\DayFilter;
 use App\Filter\MonthFilter;
 use App\Filter\YearFilter;
 use App\Repository\OvertimeEntryRepository;
@@ -77,6 +78,12 @@ class OvertimeEntryCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
+        $currentDay  = function () {
+            $request = $this->getContext()->getRequest();
+            $filters = $request->query->all('filters') ?? [];
+            return $filters['incidentDateDay'] ?? date('j');
+        };
+
         $currentMonth  = function ($monthNames) {
             $request = $this->getContext()->getRequest();
             $filters = $request->query->all('filters') ?? [];
@@ -116,6 +123,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
             $filters = $request->query->all('filters') ?? [];
             $currentMonth = (int) ($filters['incidentDateMonth'] ?? date('n'));
             $currentYear = (int) ($filters['incidentDateYear'] ?? date('Y'));
+            $currentDay = (int) ($filters['incidentDateDay'] ?? date('d'));
 
             // 2. Datum berechnen (DateTimeImmutable macht die Jahreswechsel automatisch richtig!)
             $date = new \DateTimeImmutable(sprintf('%04d-%02d-01', $currentYear, $currentMonth));
@@ -125,10 +133,11 @@ class OvertimeEntryCrudController extends AbstractCrudController
             if ($direction == 0 and
                 array_key_exists('incidentDateMonth', $filters) and
                 array_key_exists('incidentDateYear', $filters)) {
-                unset($filters['incidentDateMonth'], $filters['incidentDateYear']);
+                unset($filters['incidentDateMonth'], $filters['incidentDateYear'], $filters['incidentDateDay']);
             } else {
                 $filters['incidentDateMonth'] = (int) $newDate->format('n');
                 $filters['incidentDateYear'] = (int) $newDate->format('Y');
+                unset($filters['incidentDateDay']);
             }
 
             // 4. Query-String neu aufbauen (behält ALLE anderen Filter wie 'teacher' bei!)
@@ -264,9 +273,8 @@ class OvertimeEntryCrudController extends AbstractCrudController
     {
         return $filters
             // Filter nach Lehrkraft (Dropdown mit allen Lehrern)
-            ->add(EntityFilter::new('teacher', 'Lehrkraft')
-
-            )
+            ->add(EntityFilter::new('teacher', 'Lehrkraft'))
+            ->add(DayFilter::new('incidentDateDay', 'Tag'))
             ->add(MonthFilter::new('incidentDateMonth', 'Monat'))
             ->add(YearFilter::new('incidentDateYear', 'Jahr'))
             ;
@@ -275,8 +283,9 @@ class OvertimeEntryCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('ID')->hideOnForm(),
-            TextField::new('teacher.shortName', 'Lehrkraft')
+            //IdField::new('ID')->hideOnForm(),
+            AssociationField::new('teacher', 'Lehrkraft')
+                ->setTemplatePath('admin/overtime_entries/teacher.html.twig')
                 ->setSortable(true) // Sortiert jetzt perfekt A-Z nach dem Kürzel
                 ->formatValue(function ($value, $entity) {
                     $teacher = $entity->getTeacher();
@@ -295,7 +304,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
                     return sprintf('<a href="%s">%s</a>', $url, $value);
                 })
                 ->renderAsHtml(),
-            DateField::new('incidentDate'),
+            DateField::new('incidentDate')->setTemplatePath('admin/overtime_entries/incident_date.html.twig'),
             TextField::new('class'),
             NumberField::new('courseHour'),
             //TextField::new('subject'),
@@ -470,15 +479,21 @@ class OvertimeEntryCrudController extends AbstractCrudController
         $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
         $request = $this->getContext()->getRequest();
         $query = $request->query->all();
+        $hasDayFilter = !empty($query['filters']['incidentDateDay']);
         $hasMonthFilter = isset($query['filters']['incidentDateMonth']);
         $hasYearFilter = isset($query['filters']['incidentDateYear']);
-        if (!$hasMonthFilter && !$hasYearFilter) {
+        if (!$hasMonthFilter && !$hasYearFilter && !$hasDayFilter) {
             $qb->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->neq('entity.comment', ':carryover'),
                     $qb->expr()->isNull('entity.comment')
                 )
             )->setParameter('carryover', 'CARRYOVER');
+        }
+        if ($hasDayFilter && $hasMonthFilter && $hasYearFilter) {
+            $dateString = sprintf("%s.%s.%s", $query['filters']['incidentDateDay'], $query['filters']['incidentDateMonth'], $query['filters']['incidentDateYear']);
+            $date = DateTime::createFromFormat('d.n.Y', $dateString)->format('Y-m-d');
+            $qb->andWhere('entity.incidentDate = :incidentDate')->setParameter('incidentDate', $date);
         }
         return $qb;
     }

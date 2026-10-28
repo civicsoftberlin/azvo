@@ -22,7 +22,7 @@ final class MonthFilter implements FilterInterface
             9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Dezember'
         ];
 
-        return (new self())
+        return new self()
             ->setFilterFqcn(__CLASS__)
             ->setProperty($propertyName)
             ->setLabel($label)

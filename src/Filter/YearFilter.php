@@ -24,7 +24,7 @@ final class YearFilter implements FilterInterface
             $years[$y] = $y;
         }
 
-        return (new self())
+        return new self()
             ->setFilterFqcn(__CLASS__)
             ->setProperty($propertyName)
             ->setLabel($label)

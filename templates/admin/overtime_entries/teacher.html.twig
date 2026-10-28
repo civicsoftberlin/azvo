@@ -1,0 +1,39 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+{% set allQueryParams = app.request.query.all() %}
+{% set currentFilters = allQueryParams['filters'] ?? {} %}
+{% if currentFilters['teacher'] is defined  %}
+    {% set enabled = true %}
+    {% set filterParams = currentFilters
+        | filter((value, key) => key != 'teacher')
+        | merge({
+    }) %}
+{% else %}
+    {% set enabled = false %}
+{% set filterParams = currentFilters|merge({
+    'teacher' : {
+        'comparison': '=',
+        'value': field.value.id
+    }
+}) %}
+{% endif %}
+{% set viewUrl = ea_url()
+    .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+    .setAction('index')
+    .set('filters', filterParams)
+%}
+
+<div class="d-flex align-items-center justify-content-between row-action-wrapper">
+    <span title="{{ field.value }}">{{ field.formattedValue|raw }}</span>
+    {% if not enabled %}
+    <div class="row-action-buttons">
+        <a href="{{ viewUrl }}" class="btn btn-sm btn-secondary"><i class="ti ti-user tk-text-primary"></i></a>
+    </div>
+    {% else %}
+    <div class="row-action-buttons">
+        <a href="{{ viewUrl }}" class="btn btn-sm btn-secondary"><i class="ti ti-user-off text-danger"></i></a>
+    </div>
+    {% endif %}
+</div>
+
