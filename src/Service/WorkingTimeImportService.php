@@ -69,7 +69,6 @@ class WorkingTimeImportService
             if (str_contains($gpuCount, '-')) {
                 $amount = -1;
             }
-
             // 3. Einträge erzeugen
             if ($isSubstitution || $isPropagation) {
                 // A) Ursprünglicher Lehrer verliert die Stunde (-1)
@@ -82,11 +81,12 @@ class WorkingTimeImportService
                     "Ausfall (vertr. d. {$updatedTeacher})",
                     $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
                 );
+
+
                 $amount = 0;
-                if (str_contains($gpuCount, '+') || $message == '') {
+                if (str_contains($gpuCount, '+')) {
                     $amount = 1;
                 }
-
                 // B) Vertretungslehrer bekommt die Stunde (+1)
                 $this->createEntry(
                     $untisId . '_vert',
