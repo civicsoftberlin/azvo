@@ -241,6 +241,13 @@ class OvertimeEntryCrudController extends AbstractCrudController
                 $teacher = $this->teacherRepository->find($filters['teacher']['value']);
                 $responseParameters->set('page_title', sprintf('Stundenkonto für %s', $teacher));
             }
+            if (!empty($filters['incidentDateDay'])) {
+                $day = $filters['incidentDateDay'];
+                $month = $filters['incidentDateMonth'];
+                $year = $filters['incidentDateYear'];
+                $currentDate = DateTime::createFromFormat('Y-n-j', $year . '-' . $month . '-' . $day);
+                $responseParameters->set('current_date', $currentDate);
+            }
             $responseParameters->set('icon', 'table');
         }
         if (Crud::PAGE_DETAIL === $responseParameters->get('pageName')) {

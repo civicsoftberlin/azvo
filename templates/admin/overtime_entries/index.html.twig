@@ -2,9 +2,18 @@
 
 {% block content_title %}
     Stundenkonto
-    <div class="ms-2 d-inline-block me-auto">
+    <div class="ms-3 d-inline-block">
         <label>
             {# Basis-URL ohne Teacher-Filter erstellen #}
+            {% set allQueryParams = app.request.query.all() %}
+            {% set currentFilters = allQueryParams['filters'] ?? {} %}
+            {% set filterParams = currentFilters
+                | filter((value, key) => key != 'teacher')%}
+            {% set viewUrl = ea_url()
+                .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+                .setAction('index')
+                .set('filters', filterParams)
+            %}
             {% set baseUrl = ea_url().unset('filters[teacher]') %}
 
             <select class="form-select form-select-sm tk-border-primary rounded-3"
@@ -14,7 +23,7 @@
                         }">
 
                 {# Option "Alle Lehrkräfte" (Reset) - nutzt die saubere Basis-URL #}
-                <option disabled value=""
+                <option value="{{ viewUrl }}"
                         {% if app.request.query.all('filters')['teacher'] is not defined %}selected{% endif %}>
                     Alle Lehrkräfte
                 </option>
@@ -28,6 +37,26 @@
                 {% endfor %}
             </select>
         </label>
+    </div>
+    <div class="ms-2 d-inline-block me-auto tk-text-primary d-flex align-items-center">
+        {% if current_date is defined %}
+            {% set allQueryParams = app.request.query.all() %}
+            {% set currentFilters = allQueryParams['filters'] ?? {} %}
+            {% set filterParams = currentFilters
+                | filter((value, key) => key != 'incidentDateDay')
+                 %}
+            {% set viewUrl = ea_url()
+                .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+                .setAction('index')
+                .set('filters', filterParams)
+            %}
+            <div class="input-group input-group-sm">
+                <input type="text" readonly class="form-control tk-border-primary rounded-start-3" value="{{ current_date|default(0) ? current_date|date('d.m.Y') : '' }}">
+                <a href="{{ viewUrl }}" class="rounded-start-0 btn btn-primary tk-border-primary"><i class="ti ti-x text-primary"></i></a>
+            </div>
+
+
+        {% endif %}
     </div>
 {% endblock %}
 
@@ -74,7 +103,7 @@
             <td>
                 <span class="">{{ entities|length }}</span>
             </td>
-            <td colspan="7" class=""></td>
+            <td colspan="6" class=""></td>
             <td  class="text-end">Virtuelles IST</td>
             <td>
                 <span>

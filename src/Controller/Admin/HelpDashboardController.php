@@ -83,12 +83,23 @@ class HelpDashboardController extends AbstractDashboardController
 
         $query = $this->requestStack->getCurrentRequest()->query->get('page', 'index');
 
+        // Starteintrag / Index
+        $item = MenuItem::linkToRoute(
+            'index',
+            'ti ti-file',
+            'admin_help',
+            ['page' => 'index']
+        );
+        if ($query == 'index') {
+            $item->setCssClass('parent-active');
+        }
+        yield $item;
+
         // Dynamische MenuItems aus docs-Struktur
         foreach ($this->getDocsStructure() as $dir => $subDir) {
             if (is_array($subDir)) {
                 $subItems = [];
                 foreach ($subDir as $file) {
-
                     $subItem = MenuItem::linkToRoute(
                         "$dir/$file",
                         'ti ti-file',
@@ -103,18 +114,6 @@ class HelpDashboardController extends AbstractDashboardController
                     $dir,
                     'ti ti-folder-open'
                 )->setSubItems($subItems)->keepOpen();
-            } else {
-                // Direkte Datei
-                $item = MenuItem::linkToRoute(
-                    $dir,
-                    'ti ti-file',
-                    'admin_help',
-                    ['page' => $dir]
-                );
-                if ($query == $dir) {
-                    $item->setCssClass('parent-active');
-                }
-                yield $item;
             }
         }
     }
