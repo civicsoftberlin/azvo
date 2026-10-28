@@ -100,13 +100,18 @@ class WorkingTimeImportService
                 $importCount += 2;
             }
             elseif ($isCancellation) {
+
+                $amount = 0;
+                if (str_contains($gpuCount, '-')) {
+                    $amount = -1;
+                }
                 // C) Reiner Ausfall ohne Vertretung (-1)
                 $this->createEntry(
                     $untisId,
                     $plannedTeacher,
                     $dateString,
                     $courseHour,
-                    -1,
+                    $amount,
                     "Ausfall",
                     $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
                 );
