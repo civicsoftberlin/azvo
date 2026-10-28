@@ -335,7 +335,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
             DateField::new('incidentDate')->setTemplatePath('admin/overtime_entries/incident_date.html.twig'),
             TextField::new('class'),
             NumberField::new('courseHour'),
-            //TextField::new('subject'),
+            TextField::new('subject'),
             //TextField::new('room'),
             //TextField::new('untisId'),
             TextField::new('reason'),

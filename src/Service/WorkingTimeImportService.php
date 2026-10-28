@@ -65,6 +65,10 @@ class WorkingTimeImportService
             $isPropagation  = trim($data[19]) === 'P'; // Propagation
 
             // $isRoomChangeOnly = ($plannedTeacher === $updatedTeacher) && ($plannedRoom !== $updatedRoom);
+            $amount = 0;
+            if (str_contains($gpuCount, '-')) {
+                $amount = -1;
+            }
 
             // 3. Einträge erzeugen
             if ($isSubstitution || $isPropagation) {
@@ -74,13 +78,13 @@ class WorkingTimeImportService
                     $plannedTeacher,
                     $dateString,
                     $courseHour,
-                    -1,
+                    $amount,
                     "Ausfall (vertr. d. {$updatedTeacher})",
                     $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
                 );
-                $amount = 1;
-                if ($gpuCount != '' and !str_contains($gpuCount, '+') or $gpuType == GpuSubstitutionType::Supervision->value) {
-                    $amount = 0;
+                $amount = 0;
+                if (str_contains($gpuCount, '+')) {
+                    $amount = 1;
                 }
 
                 // B) Vertretungslehrer bekommt die Stunde (+1)

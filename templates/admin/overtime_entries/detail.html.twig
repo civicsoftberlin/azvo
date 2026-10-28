@@ -18,6 +18,7 @@
             <th class="">Ereignisdatum</th>
             <th class="">Klasse</th>
             <th class="text-end">Schulstunde</th>
+            <th>Fach</th>
             <th class="">Grund</th>
             <th class="">Untis-Kommentar</th>
             <th class="">Untis-Zeichen</th>
@@ -81,6 +82,7 @@
                 <td class="">{{ ote.incidentDate|date('d.m.Y') }}</td>
                 <td class="">{{ ote.class }}</td>
                 <td class="text-end">{{ ote.courseHour }}</td>
+                <td>{{ ote.subject }}</td>
                 <td class="">{{ ote.reason }}</td>
                 <td class="">{{ ote.untisComment }}</td>
                 <td class="">{{ ote.untisBit }}</td>
@@ -100,7 +102,7 @@
             {% if loop.index == 1 and other_entry|length > 1 %}
             <tr class="row-custom">
                 <td  class="text-center text-muted" style="background-color: var(--body-bg)"></td>
-                <td colspan="14" class="text-muted" style="background-color: var(--body-bg)"><i class="ti ti-arrow-big-down-lines me-2 tk-text-primary"></i>verknüpft mit folgenden Buchungen</td>
+                <td colspan="15" class="text-muted" style="background-color: var(--body-bg)"><i class="ti ti-arrow-big-down-lines me-2 tk-text-primary"></i>verknüpft mit folgenden Buchungen</td>
             </tr>
             {% endif %}
         {% endfor %}
