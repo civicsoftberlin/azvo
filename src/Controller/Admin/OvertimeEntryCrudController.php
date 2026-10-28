@@ -51,22 +51,19 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class OvertimeEntryCrudController extends AbstractCrudController
 {
 
-    private EntityRepository $eaEntityRepository;
     private TeacherRepository $teacherRepository;
+
+    private TeacherDebutatRepository $teacherDebutatRepository;
     private OvertimeEntryRepository $overtimeEntryRepository;
     private ExcelExportService $exportService;
-    private FieldFactory $fieldFactory;
-    private FilterFactory $filterFactory;
     private AdminUrlGenerator $adminUrlGenerator;
 
     // Service hier injizieren
-    public function __construct(EntityRepository $eaEntityRepository, OvertimeEntryRepository $overtimeEntryRepository, TeacherRepository $teacherRepo, FieldFactory $fieldFactory, FilterFactory $filterFactory, ExcelExportService $exportService, AdminUrlGenerator $adminUrlGenerator)
+    public function __construct(OvertimeEntryRepository $overtimeEntryRepository, TeacherRepository $teacherRepo, ExcelExportService $exportService, AdminUrlGenerator $adminUrlGenerator, TeacherDebutatRepository $teacherDebutatRepository)
     {
-        $this->eaEntityRepository = $eaEntityRepository;
         $this->overtimeEntryRepository = $overtimeEntryRepository;
         $this->teacherRepository = $teacherRepo;
-        $this->fieldFactory = $fieldFactory;
-        $this->filterFactory = $filterFactory;
+        $this->teacherDebutatRepository = $teacherDebutatRepository;
         $this->exportService = $exportService;
         $this->adminUrlGenerator = $adminUrlGenerator;
     }
@@ -212,6 +209,30 @@ class OvertimeEntryCrudController extends AbstractCrudController
             ->addAction($prevYearAction)
             ->createAsGlobalActionGroup()
         ;
+
+        $dates = $this->teacherDebutatRepository->findDistinctValidFromDates();
+
+        if (!empty($dates)) {
+            $exportActionGroup = ActionGroup::new("batchExport","SchoolYear Export", "ti ti-file-type-xls")
+                ->addCssClass('icon-success')
+                ->createAsGlobalActionGroup();
+            foreach ($dates as $date) {
+                $year = (int) DateTime::createFromFormat("Y-m-d", $date)->format('Y');
+                $url = $this->adminUrlGenerator
+                    ->setController(TeacherDebutatCrudController::class)
+                    ->setAction('batchExport')
+                    ->set('validFrom', $date)
+                    ->setDashboard(DashboardController::class)
+                    ->generateUrl();
+                $exportActionGroup->addAction(
+                    Action::new("export_$year", "$year/" . substr($year + 1, 2, 2) % 100)
+                        ->linkToUrl($url)
+                );
+            }
+
+            $actions->add(Crud::PAGE_INDEX, $exportActionGroup)
+            ;
+        }
 
 
         return $actions
