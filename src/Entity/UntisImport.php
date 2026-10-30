@@ -30,6 +30,12 @@ class UntisImport
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $refreshData = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $makeBackup = null;
+
     public function __toString(): string
     {
         return $this->getFilename() ?? "kein Dateiname vorhanden";
@@ -90,5 +96,29 @@ class UntisImport
 
     public function isAutoCreate(): bool { return $this->autoCreate; }
     public function setAutoCreate(bool $autoCreate): self { $this->autoCreate = $autoCreate; return $this; }
+
+    public function isRefreshData(): ?bool
+    {
+        return $this->refreshData;
+    }
+
+    public function setRefreshData(?bool $refreshData): static
+    {
+        $this->refreshData = $refreshData;
+
+        return $this;
+    }
+
+    public function isMakeBackup(): ?bool
+    {
+        return $this->makeBackup;
+    }
+
+    public function setMakeBackup(?bool $makeBackup): static
+    {
+        $this->makeBackup = $makeBackup;
+
+        return $this;
+    }
 
 }

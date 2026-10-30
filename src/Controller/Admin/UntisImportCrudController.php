@@ -84,7 +84,11 @@ class UntisImportCrudController extends AbstractCrudController
                 ->setHelp('Bereits vorhandene Buchungen werden ignoriert.'),
 
             FormField::addFieldset("Optionen", "ti ti-settings"),
-            BooleanField::new('autoCreate')
+            BooleanField::new('autoCreate'),
+            BooleanField::new('makeBackup')
+            ->setHelp("Backup wird vor dem Löschen erstellt."),
+            BooleanField::new('refreshData')
+            ->setHelp('<span class="badge badge-danger">in Planung</span><br><b class="text-danger">Warnung</b>: löscht den gesamten Datenbestand!'),
         ];
     }
 
@@ -93,7 +97,7 @@ class UntisImportCrudController extends AbstractCrudController
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        $result = $this->workingTimeImportService->importFromCsv($entityInstance->getUploadFile(), $this->getUser(), $entityInstance->isAutoCreate());
+        $result = $this->workingTimeImportService->importFromCsv($entityInstance->getUploadFile(), $this->getUser(), $entityInstance->isAutoCreate(), $entityInstance->isMakeBackup());
         if(array_key_exists('missing', $result)) {
             $this->addFlash('warning', sprintf("Folgende Lehrkräfte fehlen im System: %s", implode(', ', $result['missing'])));
         }

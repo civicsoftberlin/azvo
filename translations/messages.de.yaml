@@ -1,67 +1,86 @@
-Administration: Verwaltung
-Dashboard: Übersicht
-Settings: Einstellungen
 Accounts: Zeitkonten
-
-Entry Types: Eintragsarten
-EntryType: Eintragsart
-
-Users: Benutzer
-User: Benutzer
-
+Administration: Verwaltung
+Amount: Stundendifferenz
+Auto Append: Kommendes Schuljahr automatisch erzeugen
+Auto Create: Fehlende Lehrkräfte automatisch erzeugen
 AzVo: AZVO
-Debutat: Stundendeputat
-Valid From: gültig ab
-Invalid From: ungültig ab
-
-Teachers: Lehrkräfte
-Teacher: Lehrkraft
-
-Username: Benutzername
-Password: Passwort
-Short Name: Kürzel
-ID: ID
-Untis Code: Untis Code
-Label: Bezeichnung
-Effects Total: Zahlt auf Konto ein
-Factor: Summand
 Birthdate: Geburtsdatum
-TeacherDebutat: Deputat
-Debutats: Deputate
-Discount: Pflichtstundenermäßigung
-Discount Valid From: Ermäßigung gültig ab
-Threshold: Vergütungsfreie Mehrarbeit
-OvertimeEntry: Stundenkonto
-Malus: Fehlerhaft
-Overtime Entries: Stundeneinträge
+Class: Klasse
+Comment: Systemkommentar
 Count Current Month Overtime Entries: Mehrstunden in diesem Monat
 Count Last Month Overtime Entries: Letzter Monat
-UntisImport: GPU-Upload
-Untis Comment: Untis-Kommentar
-Untis Bit: Untis-Zeichen
-Untis Type: Untis-Typ
-Unti Count: Untis-Zähler
-Comment: Systemkommentar
-Incident Date: Ereignisdatum
-Untis Id:  	Untis-ID
-Teacher Short Name: Lehrkraft-Kürzel
-Teacher Shortname: Lehrkraft-Kürzel
-Reason: Grund
-Amount: Stundendifferenz
 Course Hour: Schulstunde
-Class: Klasse
-Subject: Fach
-Rooom: Raum
-Expires At: Auszugleichen bis
-Invalidated By: Ausgeglichen durch ID
-Invalidated At: Ausgeglichen am
 Created At: Erstellt am
 Created By: Erstellt durch
-Room: Raum
-validRange: Schuljahr
+Dashboard: Übersicht
+Debutat: Stundendeputat
+Debutats: Deputate
+Discount Valid From: Ermäßigung gültig ab
+Discount: Pflichtstundenermäßigung
+Effects Total: Zahlt auf Konto ein
+Entry Types: Eintragsarten
+EntryType: Eintragsart
+Expires At: Auszugleichen bis
+Factor: Summand
+ID: ID
 Import: Import
-hours: Stunden
-Auto Create: Fehlende Lehrkräfte automatisch erzeugen
-Auto Append: Kommendes Schuljahr automatisch erzeugen
+Incident Date: Ereignisdatum
+Invalid From: ungültig ab
+Invalidated At: Ausgeglichen am
+Invalidated By: Ausgeglichen durch ID
+Label: Bezeichnung
 Leaves: Scheidet mit Ablauf aus
+Make Backup: Backup vorhandener Daten erstellen
+Malus: Fehlerhaft
+Overtime Entries: Stundeneinträge
+OvertimeEntry: Stundenkonto
+Password: Passwort
+Reason: Grund
+Refresh Data: Vorhandene Daten löschen und neu berechnen
+Room: Raum
+Rooom: Raum
 SchoolYear Export: Schuljahr exportieren
+Settings: Einstellungen
+Short Name: Kürzel
+Subject: Fach
+Teacher Short Name: Lehrkraft-Kürzel
+Teacher Shortname: Lehrkraft-Kürzel
+Teacher: Lehrkraft
+TeacherDebutat: Deputat
+Teachers: Lehrkräfte
+Threshold: Vergütungsfreie Mehrarbeit
+Unti Count: Untis-Zähler
+Untis Bit: Untis-Zeichen
+Untis Code: Untis Code
+Untis Comment: Untis-Kommentar
+Untis Id: Untis-ID
+Untis Type: Untis-Typ
+UntisImport: GPU-Upload
+User: Benutzer
+Username: Benutzername
+Users: Benutzer
+Valid From: gültig ab
+hours: Stunden
+validRange: Schuljahr
+
+Substitution Id: ID
+Hour: Stunde
+Absence Id: Absenz-ID
+Class Id: Stunden-ID
+Absent Teacher: Lehrkraft
+Substitution Teacher: Lehrkraft neu
+Absent Course: Fach
+Substitution Course: Fach neu
+Absent Course Statistics: Statistik
+Substitution Course Statistics: Statistik
+Absent Room: Raum
+Substitution Room: Raum neu
+Statistics: Statistik
+Absent Classes: Klassen
+Substitution Classes: Klassen neu
+Absence Reason: Grund
+Absence Comment: Kommentar
+Bit: Bit
+Substitution Type: Typ
+Updated At: Erstellt
+Absence Count: Zähler

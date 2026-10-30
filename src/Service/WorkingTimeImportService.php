@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\BackupBag;
+use App\Entity\BackupItem;
 use App\Entity\Teacher;
 use App\Entity\OvertimeEntry;
 use App\Enum\GpuSubstitutionFlag;
@@ -25,7 +27,7 @@ class WorkingTimeImportService
     /**
      * @throws DateMalformedStringException
      */
-    public function importFromCsv(File $file, UserInterface $currentUser, bool $autoCreate): array
+    public function importFromCsv(File $file, UserInterface $currentUser, bool $autoCreate, bool $makeBackup): array
     {
         $handle  = fopen($file->getPathname(), "r");
         if ($handle === false) {
@@ -34,29 +36,72 @@ class WorkingTimeImportService
 
         $importCount = 0;
 
+        if ($makeBackup) {
+            $backupBag = new BackupBag();
+            $this->em->persist($backupBag);
+        }
+
+
+        $batchSize = 500; // Alle 500 Zeilen speichern und Speicher freigeben
+        $count = 0;
+
         while (($data = fgetcsv($handle, 10000, ',')) !== false) {
             // 1. Felder exakt nach deinem Beispiel mappen
             $untisId = trim($data[0]);
             $dateString = trim($data[1]); // Format: "20260914"
             $courseHour = (int)trim($data[2]);
-
+            $absenceId = (int)trim($data[3]);
+            $courseId = (int)trim($data[4]);
             $plannedTeacher = trim($data[5]);
             $updatedTeacher = trim($data[6]);
-
             $plannedSubject = trim($data[7]);
+            $plannedSubjectComment = trim($data[8]);
             $updatedSubject = trim($data[9]);
-
+            $updatedSubjectComment = trim($data[10]);
             $plannedRoom = str_replace('~', ', ', trim($data[11]));
             $updatedRoom = str_replace('~', ', ', trim($data[12]));
-
+            $statistics = trim($data[13]);
             $classes = str_replace('~', ', ', trim($data[14]));
+            $absenceReason = trim($data[15]);
             $message = trim($data[16]);
             $bit = trim($data[17]);
+            $updatedClasses = trim($data[18]);
             $type = trim($data[19]);
+            $updatedAt  = trim($data[20]);
             $gpuBit = GpuSubstitutionFlag::getActiveFlags($bit);
             $gpuBit = implode(', ', $gpuBit);
             $gpuType = GpuSubstitutionType::tryFromChar($type)?->value;
             $gpuCount = trim($data[21]);
+
+            // BackupItem anlegen
+            if ($makeBackup) {
+                $backupItem = new BackupItem();
+                $backupItem
+                    ->setSubstitutionId($untisId)
+                    ->setIncidentDate(\DateTimeImmutable::createFromFormat('Ymd', $dateString))
+                    ->setHour($courseHour)
+                    ->setAbsenceId($absenceId)
+                    ->setClassId($courseId)
+                    ->setAbsentTeacher($plannedTeacher)
+                    ->setSubstitutionTeacher($updatedTeacher)
+                    ->setAbsentCourse($plannedSubject)
+                    ->setAbsentCourseStatistics($plannedSubjectComment)
+                    ->setSubstitutionCourse($updatedSubject)
+                    ->setSubstitutionCourseStatistics($updatedSubjectComment)
+                    ->setAbsentRoom($plannedRoom)
+                    ->setSubstitutionRoom($plannedRoom)
+                    ->setStatistics($statistics)
+                    ->setAbsentClasses($classes)
+                    ->setAbsenceReason($absenceReason)
+                    ->setAbsenceComment($message)
+                    ->setBit((int)$bit)
+                    ->setSubstitutionClasses($updatedClasses)
+                    ->setSubstitutionType($gpuType)
+                    ->setUpdatedAt(\DateTimeImmutable::createFromFormat('YmdHi', $updatedAt))
+                    ->setAbsenceCount($gpuCount)
+                    ->setBackupBag($backupBag);
+                $this->em->persist($backupItem);
+            }
 
             // 2. Logik bestimmen
             $isSubstitution = (trim($data[19]) === 'S' || (trim($data[19]) === '' and $updatedTeacher !== '') || trim($data[19]) === '~') ||
@@ -117,6 +162,8 @@ class WorkingTimeImportService
                 );
                 $importCount++;
             }
+
+            $count++;
             // Raumänderungen ($isRoomChangeOnly) werden für das Arbeitszeitkonto ignoriert.
         }
 
