@@ -27,7 +27,7 @@ class WorkingTimeImportService
     /**
      * @throws DateMalformedStringException
      */
-    public function importFromCsv(File $file, UserInterface $currentUser, bool $autoCreate, bool $makeBackup): array
+    public function importFromCsv(File $file, ?UserInterface $currentUser, bool $autoCreate, bool $makeBackup): array
     {
         $handle  = fopen($file->getPathname(), "r");
         if ($handle === false) {

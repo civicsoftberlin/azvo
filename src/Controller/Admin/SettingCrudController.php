@@ -14,13 +14,20 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use PhpOffice\PhpSpreadsheet\Calculation\TextData\Search;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class SettingCrudController extends AbstractCrudController
 {
+    private string $gpuPath;
+
+    public function __construct(#[Autowire(env: 'GPU_PATH')] string $gpuPath)
+    {
+        $this->gpuPath = $gpuPath ?: 'GPU_PATH is not set!';
+    }
+
     public static function getEntityFqcn(): string
     {
         return Setting::class;
@@ -74,7 +81,7 @@ class SettingCrudController extends AbstractCrudController
     {
         return [
             FormField::addFieldset("Automatischer Import der GPU014-Daten", "ti ti-settings"),
-            BooleanField::new('autoImportActive')->setHelp('Import immer täglich 00:00 Uhr oder stündlich?'),
+            BooleanField::new('autoImportActive')->setHelp('Import derzeit immer täglich 00:00 Uhr'),
             TextField::new('autoImportUrl')->setHelp('Z. B. https://www.domain.local'),
 
             FormField::addFieldset("Report", "ti ti-info-circle"),

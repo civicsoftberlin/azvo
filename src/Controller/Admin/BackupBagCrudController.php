@@ -20,7 +20,9 @@ class BackupBagCrudController extends AbstractCrudController
 {
     private AdminUrlGenerator $adminUrlGenerator;
 
-    public function __construct(AdminUrlGenerator $adminUrlGenerator)
+    public function __construct(
+        AdminUrlGenerator $adminUrlGenerator
+    )
     {
         $this->adminUrlGenerator = $adminUrlGenerator;
     }
