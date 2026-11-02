@@ -58,6 +58,7 @@ class SettingCrudController extends AbstractCrudController
     public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
     {
         $responseParameters->set('icon', 'ti ti-table-import');
+        $responseParameters->set('page_title', 'Automatischer Import');
         return $responseParameters;
     }
 

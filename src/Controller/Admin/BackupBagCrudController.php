@@ -63,6 +63,7 @@ class BackupBagCrudController extends AbstractCrudController
     public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
     {
         $responseParameters->set('icon', 'ti ti-restore');
+        $responseParameters->set('page_title', 'Backup wiederherstellen');
         return $responseParameters;
     }
 
