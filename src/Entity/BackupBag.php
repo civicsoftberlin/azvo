@@ -27,6 +27,10 @@ class BackupBag
     #[ORM\OneToMany(targetEntity: BackupItem::class, mappedBy: 'backupBag', cascade: ['remove'])]
     private Collection $backupItems;
 
+    private ?\DateTimeImmutable $startDate = null;
+    private ?\DateTimeImmutable $endDate = null;
+    private bool $datesCalculated = false;
+
     public function __construct()
     {
         $this->backupItems = new ArrayCollection();
@@ -45,6 +49,17 @@ class BackupBag
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
+    }
+    public function getStartDate(): ?\DateTimeImmutable
+    {
+        $this->calculateDateBoundaries();
+        return $this->startDate;
+    }
+
+    public function getEndDate(): ?\DateTimeImmutable
+    {
+        $this->calculateDateBoundaries();
+        return $this->endDate;
     }
 
     /**
@@ -75,5 +90,25 @@ class BackupBag
         }
 
         return $this;
+    }
+
+    private function calculateDateBoundaries(): void
+    {
+        if ($this->datesCalculated) {
+            return;
+        }
+
+        foreach ($this->getBackupItems() as $item) {
+            $date = $item->getIncidentDate();
+            if ($date === null) continue;
+
+            if ($this->startDate === null || $date < $this->startDate) {
+                $this->startDate = $date;
+            }
+            if ($this->endDate === null || $date > $this->endDate) {
+                $this->endDate = $date;
+            }
+        }
+        $this->datesCalculated = true;
     }
 }

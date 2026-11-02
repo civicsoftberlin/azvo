@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\EntryType;
 use App\Entity\UntisImport;
+use App\Repository\SettingRepository;
 use App\Repository\TeacherRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -20,10 +21,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class DashboardController extends AbstractDashboardController
 {
     private TeacherRepository $teacherRepository;
+    private SettingRepository $settingRepository;
 
-    public function __construct(TeacherRepository $repository)
+    public function __construct(TeacherRepository $repository, SettingRepository $settingRepository)
     {
         $this->teacherRepository = $repository;
+        $this->settingRepository = $settingRepository;
     }
 
     public function index(): Response
@@ -77,9 +80,21 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToRoute('Hilfe-Center', 'fa fa-question-circle', 'admin_help');
 
         yield MenuItem::section('Import', 'ti ti-clock-hour-4');
-        yield MenuItem::linkTo(UntisImportCrudController::class, 'UntisImport', 'ti ti-file-type-csv')->setAction('new');
-        yield MenuItem::linkTo(BackupBagCrudController::class, 'Backups <span class="ms-1 badge badge-danger text-uppercase">in Planung</span>', 'ti ti-database');
-        yield MenuItem::linkTo(BackupItemCrudController::class, 'BackupItems <span class="ms-1 badge badge-danger text-uppercase">in Planung</span>', 'ti ti-database-export');
+        yield MenuItem::linkTo(UntisImportCrudController::class, 'UntisImport', 'ti ti-file-type-csv')
+            ->setAction('new');
+
+        $setting = $this->settingRepository->findOneBy([]);
+        if ($setting) {
+            yield MenuItem::linkTo(SettingCrudController::class, 'Auto Import', 'ti ti-table-import')
+                ->setAction('edit')->setEntityId($setting->getId());
+        } else {
+            yield MenuItem::linkTo(SettingCrudController::class, 'Auto Import', 'ti ti-table-import')
+                ->setAction('new');
+        }
+
+
+        yield MenuItem::linkTo(BackupBagCrudController::class, 'Backups', 'ti ti-restore');
+        //yield MenuItem::linkTo(BackupItemCrudController::class, 'BackupItems <span class="ms-1 badge badge-danger text-uppercase">in Planung</span>', 'ti ti-database-export');
 
         yield MenuItem::section('Accounts', 'ti ti-clock-hour-4');
         yield MenuItem::linkTo(TeacherCrudController::class, 'Teachers', 'ti ti-school');

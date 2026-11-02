@@ -84,3 +84,12 @@ Bit: Bit
 Substitution Type: Typ
 Updated At: Erstellt
 Absence Count: Zähler
+Start Date: Vom
+End Date: Bis einschließlich
+Count: Menge
+Elements: Elemente
+BackupBag: Wiederherstellen
+Backups: Wiederherstellen
+Restore Backup: Backup wiederherstellen
+Auto Import Active: Automatischen Import aktivieren
+Auto Import Url: URL des Quellservers
