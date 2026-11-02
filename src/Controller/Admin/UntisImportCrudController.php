@@ -63,6 +63,7 @@ class UntisImportCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
+            ->setSearchFields(null)
             ->overrideTemplates([
                 'crud/new' => 'admin/pages/edit.html.twig',
             ])

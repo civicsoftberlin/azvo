@@ -14,6 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use PhpOffice\PhpSpreadsheet\Calculation\TextData\Search;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -64,6 +65,7 @@ class SettingCrudController extends AbstractCrudController
     {
         $crud->setPageTitle(Crud::PAGE_NEW, 'Auto Import');
         $crud->setPageTitle(Crud::PAGE_EDIT, 'Auto Import');
+        $crud->setSearchFields(null);
         return $crud;
     }
 
