@@ -19,6 +19,12 @@ class Setting
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $autoImportUrl = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $lastImportDate = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $lastImportMessage = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,6 +50,30 @@ class Setting
     public function setAutoImportUrl(?string $autoImportUrl): static
     {
         $this->autoImportUrl = $autoImportUrl;
+
+        return $this;
+    }
+
+    public function getLastImportDate(): ?\DateTimeImmutable
+    {
+        return $this->lastImportDate;
+    }
+
+    public function setLastImportDate(?\DateTimeImmutable $lastImportDate): static
+    {
+        $this->lastImportDate = $lastImportDate;
+
+        return $this;
+    }
+
+    public function getLastImportMessage(): ?string
+    {
+        return $this->lastImportMessage;
+    }
+
+    public function setLastImportMessage(?string $lastImportMessage): static
+    {
+        $this->lastImportMessage = $lastImportMessage;
 
         return $this;
     }

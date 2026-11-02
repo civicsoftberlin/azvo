@@ -10,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
@@ -72,6 +73,10 @@ class SettingCrudController extends AbstractCrudController
             FormField::addFieldset("Automatischer Import der GPU014-Daten", "ti ti-settings"),
             BooleanField::new('autoImportActive')->setHelp('Import immer täglich 00:00 Uhr oder stündlich?'),
             TextField::new('autoImportUrl')->setHelp('Z. B. https://www.domain.local'),
+
+            FormField::addFieldset("Report", "ti ti-info-circle"),
+            DateTimeField::new('lastImportDate')->setDisabled(),
+            TextField::new('lastImportMessage')->setDisabled(),
         ];
     }
 
