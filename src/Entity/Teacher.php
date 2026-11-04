@@ -233,7 +233,7 @@ class Teacher
             ->orderBy([
                 "validFrom" => SortDirection::Ascending,
             ]);
-        return $this->teacherDebutats->matching($criteria)->last();
+        return $this->teacherDebutats->matching($criteria)->last() ?: null;
     }
 
     public function addOvertimeEntry(OvertimeEntry $overtimeEntry): static
