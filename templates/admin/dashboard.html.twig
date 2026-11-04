@@ -81,7 +81,7 @@
                             <td>{{ teacher.id }}</td>
                             <td class=""><a href="{{ detailUrl }}">{{ teacher.shortName }}</a></td>
                             <td class="text-end">{{ diff }}</td>
-                            <td class="text-end text-muted">{{ diff >= teacher.LastDeputat.threshold ? diff - teacher.LastDeputat.threshold : 0 }}</td>
+                            <td class="text-end text-muted">{{ teacher.LastDeputat != null and diff >= teacher.LastDeputat.threshold ? diff - teacher.LastDeputat.threshold : 0 }}</td>
                             <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
                             <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
                             <td class="text-end actions">
@@ -227,7 +227,7 @@
                             <td>{{ teacher.id }}</td>
                             <td class=""><a href="{{ detailUrl }}">{{ teacher.shortName }}</a></td>
                             <td class="text-end">{{ diff }}</td>
-                            <td class="text-end text-muted">{{ diff >= teacher.LastDeputat.threshold ? diff - teacher.LastDeputat.threshold : 0 }}</td>
+                            <td class="text-end text-muted">{{ teacher.LastDeputat != null and diff >= teacher.LastDeputat.threshold ? diff - teacher.LastDeputat.threshold : 0 }}</td>
                             <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
                             <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
                             <td class="text-end actions">
