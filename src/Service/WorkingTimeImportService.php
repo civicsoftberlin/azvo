@@ -45,11 +45,19 @@ class WorkingTimeImportService
             // 1. Felder exakt nach deinem Beispiel mappen
 
             $toUtf8 = function (?string $value): string {
-                if ($value === null) {
+                if ($value === null || $value === '') {
                     return '';
                 }
-                // Erst trimmen, dann von Windows-1252 (ANSI) nach UTF-8 konvertieren
-                return mb_convert_encoding(trim($value), 'UTF-8', 'Windows-1252');
+
+                $trimmed = trim($value);
+
+                // Prüfen: Ist der String bereits valides UTF-8?
+                if (mb_check_encoding($trimmed, 'UTF-8')) {
+                    return $trimmed; // Ja -> nichts tun
+                }
+
+                // Nein -> Wahrscheinlich Windows-1252 (ANSI), also konvertieren
+                return mb_convert_encoding($trimmed, 'UTF-8', 'Windows-1252');
             };
 
             $untisId = trim($data[0]);
