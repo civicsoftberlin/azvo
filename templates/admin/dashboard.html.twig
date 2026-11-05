@@ -20,6 +20,7 @@
             <twig:ea:Tabs:Item paneId="tab-critical" label="Minderstunden" errorCount="{{ teachers|filter(e => e.countCurrentMonthOvertimeEntries < 0)|length }}" icon="ti ti-clock-down" active/>
             <twig:ea:Tabs:Item paneId="tab-warning" label="Mehrstunden <span class='badge badge-warning'>{{ teachers|filter(e => e.countCurrentMonthOvertimeEntries > 0)|length }}</span>" icon="ti ti-clock-up"/>
             <twig:ea:Tabs:Item paneId="tab-neutral" label="Ausgeglichen <span class='badge badge-success'>{{ teachers|filter(e => e.countCurrentMonthOvertimeEntries == 0)|length }}</span>" icon="ti ti-clock-check" />
+            <twig:ea:Tabs:Item paneId="tab-decay" label="Bis {{ 'last day of this month'|date('d.m.Y')}} auszugleichen <span class='badge badge-info'>{{ teachers|filter(e => e.countCurrentExpiringEntries > 0)|length }}</span>" icon="ti ti-alert-circle" />
         </twig:ea:Tabs>
 
         <div class="tab-content">
@@ -237,6 +238,84 @@
                                 <a href="{{ viewUrl }}" class="btn btn-secondary"><i class="ti ti-table tk-text-primary"></i>Stundenkonto</a>
                                 <a href="{{ exportUrl }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Monatsansicht exportieren</a>
                             </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane" id="tab-decay">
+                <table id="" class="table table-custom datagrid align-middle">
+                    <thead>
+                    <tr>
+                        <th style="width: 100px">ID</th>
+                        <th style="width: 200px">Lehrkraft</th>
+                        <th style="width: 200px" class="text-end">+/- Stunden (brutto)</th>
+                        <th style="width: 200px" class="text-end">+/- Stunden (netto)</th>
+                        <th style="width: 200px" class="text-end">Vormonat (brutto)</th>
+                        <th style="width: 200px" class="text-end">Auszugleichen</th>
+                        <th class="text-end"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for teacher in teachers|sort((a, b) => a.countCurrentExpiringEntries <=> b.countCurrentExpiringEntries) |filter(e => e.countCurrentExpiringEntries > 0)%}
+                        {% set diff = teacher.countCurrentMonthOvertimeEntries %}
+                        {% if diff > 0 %}
+                        {% endif %}
+                        {% set filterParams = {
+                            'teacher': {
+                                'comparison': '=',
+                                'value': teacher.id
+                            },
+                            'incidentDateMonth' : "now"|date('n'),
+                            'incidentDateYear' : "now"|date('Y'),
+                        } %}
+                        {% set viewUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+                            .setAction('index')
+                            .set('filters', filterParams)
+                        %}
+                        {% set detailUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\TeacherCrudController')
+                            .setAction('detail')
+                            .set('entityId', teacher.id)
+                        %}
+                        {% set detailRowUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+                            .setAction('index')
+                            .set('filters', filterParams)
+                        %}
+                        {% set detailUrlB = ea_url()
+                            .setController('App\\Controller\\Admin\\TeacherCrudController')
+                            .setAction('detail')
+                            .set('entityId', teacher.id)
+                        %}
+                        {% set exportUrl = ea_url()
+                            .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+                            .setAction('exportExcel')
+                            .set('filters', filterParams)
+                        %}
+                        {# 2. Klasse basierend auf dem Wert bestimmen #}
+                        {% set rowClass = diff < 0 ? 'is-critical' : (diff == 0 ? 'is-neutral' : 'is-warning') %}
+
+                        <tr data-default-action-url="{{ detailRowUrl }}" role="link" tabindex="0" class="ea-clickable-row">
+                            <td>{{ teacher.id }}</td>
+                            <td class=""><a href="{{ detailUrl }}">{{ teacher.shortName }}</a></td>
+                            <td class="text-end">{{ diff }}</td>
+                            <td class="text-end text-muted">{{ teacher.LastDeputat != null and diff >= teacher.LastDeputat.threshold ? diff - teacher.LastDeputat.threshold : 0 }}</td>
+                            <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
+                            <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
+                            <td class="text-end actions">
+                                <a href="{{ detailUrlB }}" class="btn btn-secondary "><i class="ti ti-school tk-text-primary"></i>
+                                    <span class="btn-label"><span class="action-label">Details</span></span>
+                                </a>
+                                <a href="{{ viewUrl }}" class="btn btn-secondary"><i class="ti ti-table tk-text-primary"></i>Stundenkonto</a>
+                                <a href="{{ exportUrl }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Monatsansicht exportieren</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Keine Einträge vorhanden</td>
+                            <td></td>
                         </tr>
                     {% endfor %}
                     </tbody>

@@ -213,9 +213,6 @@ class Teacher
         return $totalAmount;
     }
 
-    /**
-     * @throws DateMalformedStringException
-     */
     public function countCurrentExpiringEntries(): int
     {
         $criteria = Criteria::create()
