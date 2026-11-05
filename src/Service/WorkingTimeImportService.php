@@ -10,11 +10,7 @@ use App\Enum\GpuSubstitutionFlag;
 use App\Enum\GpuSubstitutionType;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class WorkingTimeImportService
@@ -45,7 +41,7 @@ class WorkingTimeImportService
         $batchSize = 500; // Alle 500 Zeilen speichern und Speicher freigeben
         $count = 0;
 
-        while (($data = fgetcsv($handle, 10000, ',')) !== false) {
+        while (($data = fgetcsv($handle, 10000, ',', '"', '')) !== false) {
             // 1. Felder exakt nach deinem Beispiel mappen
             $untisId = trim($data[0]);
             $dateString = trim($data[1]); // Format: "20260914"
