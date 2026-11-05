@@ -81,7 +81,7 @@ class SettingCrudController extends AbstractCrudController
     {
         return [
             FormField::addFieldset("Automatischer Import der GPU014-Daten", "ti ti-settings"),
-            BooleanField::new('autoImportActive')->setHelp('Import derzeit immer täglich 00:00 Uhr'),
+            BooleanField::new('autoImportActive')->setHelp('Import derzeit immer täglich 00:00 Uhr und 12:00 Uhr.'),
             TextField::new('autoImportUrl')->setHelp('Z. B. https://www.domain.local'),
 
             FormField::addFieldset("Report", "ti ti-info-circle"),
