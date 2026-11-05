@@ -41,27 +41,36 @@ class WorkingTimeImportService
         $batchSize = 500; // Alle 500 Zeilen speichern und Speicher freigeben
         $count = 0;
 
-        while (($data = fgetcsv($handle, 10000, ',', '"', '')) !== false) {
+        while (($data = fgetcsv($handle, 10000, ',', '"', "")) !== false) {
             // 1. Felder exakt nach deinem Beispiel mappen
+
+            $toUtf8 = function (?string $value): string {
+                if ($value === null) {
+                    return '';
+                }
+                // Erst trimmen, dann von Windows-1252 (ANSI) nach UTF-8 konvertieren
+                return mb_convert_encoding(trim($value), 'UTF-8', 'Windows-1252');
+            };
+
             $untisId = trim($data[0]);
             $dateString = trim($data[1]); // Format: "20260914"
             $courseHour = (int)trim($data[2]);
             $absenceId = (int)trim($data[3]);
             $courseId = (int)trim($data[4]);
-            $plannedTeacher = trim($data[5]);
-            $updatedTeacher = trim($data[6]);
-            $plannedSubject = trim($data[7]);
+            $plannedTeacher = $toUtf8($data[5]);
+            $updatedTeacher = $toUtf8($data[6]);
+            $plannedSubject = $toUtf8($data[7]);
             $plannedSubjectComment = trim($data[8]);
-            $updatedSubject = trim($data[9]);
+            $updatedSubject = $toUtf8($data[9]);
             $updatedSubjectComment = trim($data[10]);
             $plannedRoom = str_replace('~', ', ', trim($data[11]));
             $updatedRoom = str_replace('~', ', ', trim($data[12]));
             $statistics = trim($data[13]);
-            $classes = str_replace('~', ', ', trim($data[14]));
-            $absenceReason = trim($data[15]);
-            $message = trim($data[16]);
+            $classes = $toUtf8(str_replace('~', ', ', trim($data[14])));
+            $absenceReason = $toUtf8($data[15]);
+            $message = $toUtf8($data[16]);
             $bit = trim($data[17]);
-            $updatedClasses = trim($data[18]);
+            $updatedClasses = $toUtf8($data[18]);
             $type = trim($data[19]);
             $updatedAt  = trim($data[20]);
             $gpuBit = GpuSubstitutionFlag::getActiveFlags($bit);
@@ -179,7 +188,7 @@ class WorkingTimeImportService
         string $dateString,
         int $courseHour,
         int $amount,
-        string $reason,
+        ?string $reason,
         ?string $subject,
         ?string $className,
         ?string $room,

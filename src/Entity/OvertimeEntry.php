@@ -36,7 +36,7 @@ class OvertimeEntry
     #[ORM\Column]
     private ?int $amount = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $reason = null;
 
     #[ORM\Column(length: 255, nullable: true)]

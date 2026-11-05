@@ -21,9 +21,9 @@ class GpuImportCommand extends Command
 {
 
     public function __construct(
-        private EntityManagerInterface                       $entityManager,
+        private readonly EntityManagerInterface              $entityManager,
         private readonly SettingRepository                   $settingRepository,
-        private WorkingTimeImportService                     $workingTimeImportService,
+        private readonly WorkingTimeImportService            $workingTimeImportService,
         #[Autowire(env: 'GPU_PATH')] private readonly string $gpuPath,
     )
     {
@@ -64,8 +64,10 @@ class GpuImportCommand extends Command
                 unlink($tempFile);
             }
         }
-        $this->entityManager->persist($importSetting);
-        $this->entityManager->flush();
+        if ($this->entityManager->isOpen()) {
+            $this->entityManager->persist($importSetting);
+            $this->entityManager->flush();
+        }
         return Command::SUCCESS;
     }
 
