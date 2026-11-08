@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fd453ce6d94a36c34555113a5fe4a81a",
+    "content-hash": "6b5c403959407d44d63aa7d1f24b776b",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1036,21 +1036,21 @@
         },
         {
             "name": "btinet/untis-bundle",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/btinet/untis-bundle.git",
-                "reference": "37137a68192efbf7156852bafa7e370da92f00ea"
+                "reference": "f6379f246e6731018a027b2aa3766abe3a69d9a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/btinet/untis-bundle/zipball/37137a68192efbf7156852bafa7e370da92f00ea",
-                "reference": "37137a68192efbf7156852bafa7e370da92f00ea",
+                "url": "https://api.github.com/repos/btinet/untis-bundle/zipball/f6379f246e6731018a027b2aa3766abe3a69d9a4",
+                "reference": "f6379f246e6731018a027b2aa3766abe3a69d9a4",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
-                "php": ">=8.4"
+                "php": ">=8.3"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
@@ -1065,9 +1065,9 @@
             "description": "Import GPU-Files from Untis.",
             "support": {
                 "issues": "https://github.com/btinet/untis-bundle/issues",
-                "source": "https://github.com/btinet/untis-bundle/tree/1.0.1"
+                "source": "https://github.com/btinet/untis-bundle/tree/1.0.2"
             },
-            "time": "2026-11-08T14:32:43+00:00"
+            "time": "2026-11-08T17:32:18+00:00"
         },
         {
             "name": "composer/pcre",
