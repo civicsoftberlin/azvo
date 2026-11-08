@@ -7,7 +7,10 @@
     position: sticky!important;
     top: 78px!important;
     z-index: 900!important;
-    padding-top: .25rem!important;
+}
+
+.table-custom thead, .table thead th {
+    padding-top: 2px!important;
 }
 
 .form-fieldset-header {
