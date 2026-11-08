@@ -371,7 +371,6 @@ class OvertimeEntryCrudController extends AbstractCrudController
                 'class' => 'DESC',
                 'courseHour' => 'DESC',
             ])
-            ->setHelp('index', 'Export ist für die Monatsansicht optimiert. Zeitspannen (Schuljahre) bitte über das Stundendeputat exportieren.')
             ;
     }
 

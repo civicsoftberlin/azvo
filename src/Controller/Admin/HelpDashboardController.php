@@ -9,6 +9,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Menu\SubMenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\Font;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\GrayScale;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Theme;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use League\CommonMark\CommonMarkConverter;
@@ -66,7 +69,12 @@ class HelpDashboardController extends AbstractDashboardController
 </svg><span class="fw-bold tk-text-primary">Hilfe-Center</span></div><div class="small text-muted">LehrZeitManagement</div>')
             ->setFaviconPath('logo.svg')
             ->setTranslationDomain('help_center')
-            ;
+            ->setTheme(Theme::new()
+                ->primaryColor('hsl(230, 61%, 58%)', dark: 'hsl(224, 84%, 49%)')
+                ->grays(GrayScale::SLATE, dark: GrayScale::NEUTRAL)
+                ->radius('lg')
+                ->spacing('sm')
+            );
     }
 
     public function configureAssets(): Assets

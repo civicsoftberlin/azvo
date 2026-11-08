@@ -12,8 +12,13 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\Font;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\FontFeature;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\GrayScale;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Theme;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use PSpell\Config;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -71,6 +76,14 @@ class DashboardController extends AbstractDashboardController
   <use xlink:href="#app-icon"></use>
 </svg><span class="fw-bold tk-text-primary">LZM</span></div><div class="small text-muted">LehrZeitManagement</div>')
             ->setFaviconPath('logo.svg')
+            ->setTheme(Theme::new()
+                ->primaryColor('hsl(230, 61%, 58%)', dark: 'hsl(224, 84%, 49%)')
+                ->grays(GrayScale::SLATE, dark: GrayScale::NEUTRAL)
+                ->radius('lg')
+                ->spacing('sm')
+                ->font(features: [FontFeature::TabularNumbers])
+            )
+            ->renderContentMaximized()
             ;
     }
 

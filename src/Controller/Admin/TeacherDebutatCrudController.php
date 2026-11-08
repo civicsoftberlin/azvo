@@ -112,7 +112,6 @@ class TeacherDebutatCrudController extends AbstractCrudController
         return $crud
             ->setDefaultRowAction('teacherSelect')
             ->setPaginatorPageSize(100)
-            ->setHelp(Crud::PAGE_INDEX, "Export gilt immer für alle Lehrkräfte im zutreffenden Zeitraum.")
             ->overrideTemplates([
                 'crud/index' => 'admin/deputat/index.html.twig',
             ])

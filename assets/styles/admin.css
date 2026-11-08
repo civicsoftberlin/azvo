@@ -3,10 +3,14 @@
 @import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
 @import url('https://unpkg.com/tabulator-tables/dist/css/tabulator_bootstrap5.min.css');
 
-thead {
+.table-custom thead, .table thead {
     position: sticky!important;
-    top: 130px!important;
-    z-index: 1020!important;
+    top: 0!important;
+    z-index: 900!important;
+}
+
+.datagrid-scroll {
+    overflow-x: initial !important;
 }
 
 
@@ -15,31 +19,8 @@ thead {
 }
 
 
-.content-panel-footer {
-    position: sticky!important;
-    bottom: 0!important;
-    z-index: 900!important;
-    background-color: var(--body-bg, #fff) !important;
-    border-top: 1px solid var(--border-color, #e5e7eb) !important;
-}
 
-/* Oberste Leiste sticky */
-.content-top {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 1030 !important;
-    background-color: var(--body-bg, #fff) !important;
-    border-bottom: 1px solid var(--border-color, #e5e7eb) !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
-}
 
-.content-header {
-    position: sticky !important;
-    top: 40px !important; /* Höhe von .content-top - anpassen falls nötig */
-    z-index: 1025 !important;
-    background-color: var(--body-bg, #fff) !important;
-    margin-bottom: 1.5rem !important;
-}
 
 /* Sidebar sticky */
 .ea-sidebar {

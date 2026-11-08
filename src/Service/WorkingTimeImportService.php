@@ -8,6 +8,7 @@ use App\Entity\Teacher;
 use App\Entity\OvertimeEntry;
 use App\Enum\GpuSubstitutionFlag;
 use App\Enum\GpuSubstitutionType;
+use Btinet\Untis\Model\UntisSubstitutionModel;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\File;
@@ -16,9 +17,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class WorkingTimeImportService
 {
     private array $errors = [];
+    private UntisSubstitutionModel $substitutionModel;
     public function __construct(
         private readonly EntityManagerInterface $em,
-    ) {}
+    ) {
+        $this->substitutionModel = new UntisSubstitutionModel();
+    }
 
     /**
      * @throws DateMalformedStringException
@@ -31,153 +35,35 @@ class WorkingTimeImportService
         }
 
         $importCount = 0;
-
-        if ($makeBackup) {
-            $backupBag = new BackupBag();
-            $this->em->persist($backupBag);
-        }
-
-
-        $batchSize = 500; // Alle 500 Zeilen speichern und Speicher freigeben
-        $count = 0;
-
         while (($data = fgetcsv($handle, 10000, ',', '"', "")) !== false) {
-            // 1. Felder exakt nach deinem Beispiel mappen
+            $this->substitutionModel->setData($data);
+            $rows = $this->substitutionModel->getSplitter()->getSubstitutionRows();
 
-            $toUtf8 = function (?string $value): string {
-                if ($value === null || $value === '') {
-                    return '';
-                }
+            foreach ($rows as $row) {
+                $classes = implode(", ", $row->getClasses());
+                $bitArray = array_map(fn($item) => $item->getGermanLabel(), $row->getBits());
+                $bits = implode(", ", $bitArray);
+                $counts = implode(", ", $row->getCount());
 
-                $trimmed = trim($value);
-
-                // Prüfen: Ist der String bereits valides UTF-8?
-                if (mb_check_encoding($trimmed, 'UTF-8')) {
-                    return $trimmed; // Ja -> nichts tun
-                }
-
-                // Nein -> Wahrscheinlich Windows-1252 (ANSI), also konvertieren
-                return mb_convert_encoding($trimmed, 'UTF-8', 'Windows-1252');
-            };
-
-            $untisId = trim($data[0]);
-            $dateString = trim($data[1]); // Format: "20260914"
-            $courseHour = (int)trim($data[2]);
-            $absenceId = (int)trim($data[3]);
-            $courseId = (int)trim($data[4]);
-            $plannedTeacher = $toUtf8($data[5]);
-            $updatedTeacher = $toUtf8($data[6]);
-            $plannedSubject = $toUtf8($data[7]);
-            $plannedSubjectComment = trim($data[8]);
-            $updatedSubject = $toUtf8($data[9]);
-            $updatedSubjectComment = trim($data[10]);
-            $plannedRoom = str_replace('~', ', ', trim($data[11]));
-            $updatedRoom = str_replace('~', ', ', trim($data[12]));
-            $statistics = trim($data[13]);
-            $classes = $toUtf8(str_replace('~', ', ', trim($data[14])));
-            $absenceReason = $toUtf8($data[15]);
-            $message = $toUtf8($data[16]);
-            $bit = trim($data[17]);
-            $updatedClasses = $toUtf8($data[18]);
-            $type = trim($data[19]);
-            $updatedAt  = trim($data[20]);
-            $gpuBit = GpuSubstitutionFlag::getActiveFlags($bit);
-            $gpuBit = implode(', ', $gpuBit);
-            $gpuType = GpuSubstitutionType::tryFromChar($type)?->value;
-            $gpuCount = trim($data[21]);
-
-            // BackupItem anlegen
-            if ($makeBackup) {
-                $backupItem = new BackupItem();
-                $backupItem
-                    ->setSubstitutionId($untisId)
-                    ->setIncidentDate(\DateTimeImmutable::createFromFormat('Ymd', $dateString))
-                    ->setHour($courseHour)
-                    ->setAbsenceId($absenceId)
-                    ->setClassId($courseId)
-                    ->setAbsentTeacher($plannedTeacher)
-                    ->setSubstitutionTeacher($updatedTeacher)
-                    ->setAbsentCourse($plannedSubject)
-                    ->setAbsentCourseStatistics($plannedSubjectComment)
-                    ->setSubstitutionCourse($updatedSubject)
-                    ->setSubstitutionCourseStatistics($updatedSubjectComment)
-                    ->setAbsentRoom($plannedRoom)
-                    ->setSubstitutionRoom($plannedRoom)
-                    ->setStatistics($statistics)
-                    ->setAbsentClasses($classes)
-                    ->setAbsenceReason($absenceReason)
-                    ->setAbsenceComment($message)
-                    ->setBit((int)$bit)
-                    ->setSubstitutionClasses($updatedClasses)
-                    ->setSubstitutionType($gpuType)
-                    ->setUpdatedAt(\DateTimeImmutable::createFromFormat('YmdHi', $updatedAt))
-                    ->setAbsenceCount($gpuCount)
-                    ->setBackupBag($backupBag);
-                $this->em->persist($backupItem);
-            }
-
-            // 2. Logik bestimmen
-            $isSubstitution = (trim($data[19]) === 'S' || (trim($data[19]) === '' and $updatedTeacher !== '') || trim($data[19]) === '~') ||
-                trim($data[19]) === 'A' && ($plannedTeacher !== '' and $updatedTeacher !== '' and $plannedTeacher !== $updatedTeacher and $updatedSubject !== ''); // Substitution
-            $isCancellation = trim($data[19]) === 'C' || trim($data[19]) === 'L' || (trim($data[19]) === '' and $updatedTeacher === '');; // Cancellation
-            $isPropagation  = trim($data[19]) === 'P'; // Propagation
-
-            // $isRoomChangeOnly = ($plannedTeacher === $updatedTeacher) && ($plannedRoom !== $updatedRoom);
-            $amount = 0;
-            if (str_contains($gpuCount, '-')) {
-                $amount = -1;
-            }
-            // 3. Einträge erzeugen
-            if ($isSubstitution || $isPropagation) {
-                // A) Ursprünglicher Lehrer verliert die Stunde (-1)
                 $this->createEntry(
-                    $untisId . '_orig',
-                    $plannedTeacher,
-                    $dateString,
-                    $courseHour,
-                    $amount,
-                    "Ausfall (vertr. d. {$updatedTeacher})",
-                    $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
-                );
-
-
-                $amount = 0;
-                if (str_contains($gpuCount, '+')) {
-                    $amount = 1;
-                }
-                // B) Vertretungslehrer bekommt die Stunde (+1)
-                $this->createEntry(
-                    $untisId . '_vert',
-                    $updatedTeacher,
-                    $dateString,
-                    $courseHour,
-                    $amount,
-                    "Vertretung für {$plannedTeacher}",
-                    $updatedSubject ?: $plannedSubject, $classes, $updatedRoom ?: $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
-                );
-                $importCount += 2;
-            }
-            elseif ($isCancellation) {
-
-                $amount = 0;
-                if (str_contains($gpuCount, '-')) {
-                    $amount = -1;
-                }
-                // C) Reiner Ausfall ohne Vertretung (-1)
-                $this->createEntry(
-                    $untisId,
-                    $plannedTeacher,
-                    $dateString,
-                    $courseHour,
-                    $amount,
-                    "Ausfall",
-                    $plannedSubject, $classes, $plannedRoom, $currentUser, $autoCreate, $message, $gpuBit, $gpuType, $gpuCount
+                    uniqueUntisRef: $row->getUntisId(),
+                    teacherKuerzel: $row->getTeacher(),
+                    dateString: $row->getDate()->format('Ymd'),
+                    courseHour: $row->getCourseHour(),
+                    amount: $row->getAmount(),
+                    reason: $row->getReason(),
+                    subject: $row->getSubject(),
+                    className: $classes,
+                    room: $row->getRoom(),
+                    currentUser: $currentUser,
+                    autoCreate: $autoCreate,
+                    message: $row->getMessage(),
+                    gpuBit: $bits,
+                    gpuType: $row->getType()?->value,
+                    gpuCount: $counts,
                 );
                 $importCount++;
             }
-
-            $count++;
-            // Raumänderungen ($isRoomChangeOnly) werden für das Arbeitszeitkonto ignoriert.
         }
 
         fclose($handle);
@@ -259,7 +145,6 @@ class WorkingTimeImportService
             } else {
                 $entry->setExpiresAt(null);
             }
-
         }
         $this->em->persist($entry);
     }
