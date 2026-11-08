@@ -77,7 +77,7 @@ class DashboardController extends AbstractDashboardController
 </svg><span class="fw-bold tk-text-primary">LZM</span></div><div class="small text-muted">LehrZeitManagement</div>')
             ->setFaviconPath('logo.svg')
             ->setTheme(Theme::new()
-                ->primaryColor('hsl(230, 61%, 58%)', dark: 'hsl(224, 84%, 49%)')
+                ->primaryColor('#3475A0')
                 ->grays(GrayScale::SLATE, dark: GrayScale::NEUTRAL)
                 ->radius('lg')
                 ->spacing('sm')

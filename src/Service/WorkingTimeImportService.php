@@ -46,21 +46,11 @@ class WorkingTimeImportService
                 $counts = implode(", ", $row->getCount());
 
                 $this->createEntry(
-                    uniqueUntisRef: $row->getUntisId(),
-                    teacherKuerzel: $row->getTeacher(),
-                    dateString: $row->getDate()->format('Ymd'),
-                    courseHour: $row->getCourseHour(),
-                    amount: $row->getAmount(),
-                    reason: $row->getReason(),
-                    subject: $row->getSubject(),
-                    className: $classes,
-                    room: $row->getRoom(),
-                    currentUser: $currentUser,
-                    autoCreate: $autoCreate,
-                    message: $row->getMessage(),
-                    gpuBit: $bits,
-                    gpuType: $row->getType()?->value,
-                    gpuCount: $counts,
+                    uniqueUntisRef: $row->getUntisId(), teacherKuerzel: $row->getTeacher(),
+                    dateString: $row->getDate()->format('Ymd'), courseHour: $row->getCourseHour(),
+                    amount: $row->getAmount(), reason: $row->getReason(), subject: $row->getSubject(),
+                    className: $classes, room: $row->getRoom(), currentUser: $currentUser, autoCreate: $autoCreate,
+                    message: $row->getMessage(), gpuBit: $bits, gpuType: $row->getType()?->value, gpuCount: $counts,
                 );
                 $importCount++;
             }

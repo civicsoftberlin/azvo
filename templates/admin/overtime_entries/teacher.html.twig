@@ -28,11 +28,11 @@
     <span title="{{ field.value }}">{{ field.formattedValue|raw }}</span>
     {% if not enabled %}
     <div class="row-action-buttons">
-        <a href="{{ viewUrl }}" class="btn btn-sm btn-secondary"><i class="ti ti-user tk-text-primary"></i></a>
+        <a href="{{ viewUrl }}" class="btn btn-sm btn-secondary"><i class="fa-regular fa-user tk-text-primary"></i></a>
     </div>
     {% else %}
     <div class="row-action-buttons">
-        <a href="{{ viewUrl }}" class="btn btn-sm btn-secondary"><i class="ti ti-user-off text-danger"></i></a>
+        <a href="{{ viewUrl }}" class="btn btn-sm btn-secondary"><i class="fas fa-user text-danger"></i></a>
     </div>
     {% endif %}
 </div>

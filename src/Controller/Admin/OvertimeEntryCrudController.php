@@ -159,13 +159,13 @@ class OvertimeEntryCrudController extends AbstractCrudController
             })
         ;
 
-        $prevYearAction = Action::new('prevYear', "", 'ti ti-chevrons-left')
+        $prevYearAction = Action::new('prevYear', "", 'fa fa-angles-left')
             ->linkToUrl(function () use ($buildMonthUrl) {
                 return $buildMonthUrl(-12);
             })
             ->createAsGlobalAction();
 
-        $prevMonthAction = Action::new('prevMonth', "", 'ti ti-chevron-left')
+        $prevMonthAction = Action::new('prevMonth', "", 'fa fa-chevron-left')
             ->linkToUrl(function () use ($buildMonthUrl) {
                 return $buildMonthUrl(-1);
             })
@@ -177,13 +177,13 @@ class OvertimeEntryCrudController extends AbstractCrudController
             ->setTemplatePath('admin/overtime_entries/today_button.html.twig')
             ->createAsGlobalAction();
 
-        $nextMonthAction = Action::new('nextMonth', "", 'ti ti-chevron-right')
+        $nextMonthAction = Action::new('nextMonth', "", 'fa fa-chevron-right')
             ->linkToUrl(function () use ($buildMonthUrl) {
                 return $buildMonthUrl(1);
             })
             ->createAsGlobalAction();
 
-        $nextYearAction = Action::new('nextYear', "", 'ti ti-chevrons-right')
+        $nextYearAction = Action::new('nextYear', "", 'fa fa-angles-right')
             ->linkToUrl(function () use ($buildMonthUrl) {
                 return $buildMonthUrl(12);
             })
