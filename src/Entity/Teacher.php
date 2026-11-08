@@ -54,7 +54,7 @@ class Teacher
 
     public function __toString(): string
     {
-        return $this->shortName;
+        return $this->getShortName() ?? '';
     }
 
     public function getId(): ?int
@@ -64,7 +64,7 @@ class Teacher
 
     public function getShortName(): ?string
     {
-        return $this->shortName;
+        return strtoupper($this->shortName);
     }
 
     public function setShortName(string $shortName): static
