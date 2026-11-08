@@ -54,7 +54,7 @@ enum GpuSubstitutionFlag: int
     public static function tryFromBit(?int $bit): ?self
     {
         if ($bit === null) {
-            return self::tryFrom(-1);
+            return self::tryFrom(0);
         }
         return self::tryFrom($bit);
     }

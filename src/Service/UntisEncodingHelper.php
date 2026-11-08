@@ -11,12 +11,11 @@ class UntisEncodingHelper
      * - Windows-1252 → konvertiert
      * - entfernt UTF-8 BOM
      */
-    public static function toSafeUtf8(?string $value): string
+    public static function convert(?string $value): string
     {
         if ($value === null || $value === '') {
             return '';
         }
-
         $trimmed = trim($value);
 
         // UTF-8 BOM entfernen

@@ -119,7 +119,7 @@ class WorkingTimeImportService
             // 2. Logik bestimmen
             $isSubstitution = (trim($data[19]) === 'S' || (trim($data[19]) === '' and $updatedTeacher !== '') || trim($data[19]) === '~') ||
                 trim($data[19]) === 'A' && ($plannedTeacher !== '' and $updatedTeacher !== '' and $plannedTeacher !== $updatedTeacher and $updatedSubject !== ''); // Substitution
-            $isCancellation = trim($data[19]) === 'C' || (trim($data[19]) === '' and $updatedTeacher === '');; // Cancellation
+            $isCancellation = trim($data[19]) === 'C' || trim($data[19]) === 'L' || (trim($data[19]) === '' and $updatedTeacher === '');; // Cancellation
             $isPropagation  = trim($data[19]) === 'P'; // Propagation
 
             // $isRoomChangeOnly = ($plannedTeacher === $updatedTeacher) && ($plannedRoom !== $updatedRoom);
