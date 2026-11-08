@@ -7,6 +7,11 @@
     position: sticky!important;
     top: 78px!important;
     z-index: 900!important;
+    padding-top: .25rem!important;
+}
+
+.form-fieldset-header {
+    padding-left: 0!important;
 }
 
 .datagrid-scroll {
@@ -26,9 +31,13 @@
     background-color: var(--body-bg) !important;
 }
 
-
 .table-custom thead th {
-    padding: 12px 8px;
+    color: var(--table-thead-color);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-snug);
+    padding: var(--ea-sp-4);
+    white-space: nowrap;
 }
 
 
