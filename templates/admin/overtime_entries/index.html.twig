@@ -16,7 +16,7 @@
             %}
             {% set baseUrl = ea_url().unset('filters[teacher]') %}
 
-            <select class="form-select form-select-sm tk-border-primary rounded-3"
+            <select class="form-select form-select-sm tk-border-primary rounded-4"
                     style="width: auto; min-width: 180px;"
                     onchange="if(this.value) { window.location.href = this.value; } else {
                         window.location.href = '{{ baseUrl }}';
@@ -51,7 +51,7 @@
                 .set('filters', filterParams)
             %}
             <div class="input-group input-group-sm">
-                <input type="text" readonly class="form-control tk-border-primary rounded-start-3" value="{{ current_date|default(0) ? current_date|date('d.m.Y') : '' }}">
+                <input type="text" readonly class="form-control tk-border-primary rounded-start-4" value="{{ current_date|default(0) ? current_date|date('d.m.Y') : '' }}">
                 <a href="{{ viewUrl }}" class="rounded-start-0 btn btn-primary tk-border-primary"><i class="fa fa-xmark text-secondary"></i></a>
             </div>
 
