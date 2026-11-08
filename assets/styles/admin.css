@@ -16,7 +16,7 @@
 .content-header {
     position: sticky!important;
     top: 0!important;
-    z-index: 900!important;
+    z-index: 910!important;
 }
 
 .content-panel-footer {
