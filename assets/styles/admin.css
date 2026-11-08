@@ -3,6 +3,10 @@
 @import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
 @import url('https://unpkg.com/tabulator-tables/dist/css/tabulator_bootstrap5.min.css');
 
+.content-header {
+    align-items: center;
+}
+
 .table-custom thead, .table thead {
     position: sticky!important;
     top: 78px!important;
