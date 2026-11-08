@@ -5,12 +5,25 @@
 
 .table-custom thead, .table thead {
     position: sticky!important;
-    top: 0!important;
+    top: 78px!important;
     z-index: 900!important;
 }
 
 .datagrid-scroll {
     overflow-x: initial !important;
+}
+
+.content-header {
+    position: sticky!important;
+    top: 0!important;
+    z-index: 900!important;
+}
+
+.content-panel-footer {
+    position: sticky!important;
+    bottom: 0!important;
+    z-index: 900!important;
+    background-color: var(--body-bg) !important;
 }
 
 
