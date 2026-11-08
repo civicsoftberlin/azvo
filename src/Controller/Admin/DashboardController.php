@@ -81,7 +81,7 @@ class DashboardController extends AbstractDashboardController
                 ->grays(GrayScale::SLATE, dark: GrayScale::NEUTRAL)
                 ->radius('lg')
                 ->spacing('sm')
-                ->font(features: [FontFeature::TabularNumbers])
+                ->font(base: Font::Inter, baseWeight: 400, features: [FontFeature::TabularNumbers])
             )
             ->renderContentMaximized()
             ;
