@@ -12,6 +12,7 @@ use App\Repository\OvertimeEntryRepository;
 use App\Repository\TeacherDebutatRepository;
 use App\Repository\TeacherRepository;
 use App\Service\ExcelExportService;
+use Btinet\Untis\Enum\Substitution\UntisType;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
@@ -308,6 +309,8 @@ class OvertimeEntryCrudController extends AbstractCrudController
             ;
     }
 
+
+
     public function configureFields(string $pageName): iterable
     {
         return [
@@ -504,11 +507,29 @@ class OvertimeEntryCrudController extends AbstractCrudController
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
     {
         $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
+
+        $searchQuery = $searchDto->getQuery();
+        if ($searchQuery) {
+            $matchedChars = [];
+            foreach (GpuSubstitutionType::cases() as $type) {
+                if (stripos($type->getGermanLabel(), $searchQuery) !== false) {
+                    $matchedChars[] = $type->value;
+                }
+            }
+            if (!empty($matchedChars)) {
+                $qb->orWhere(
+                    $qb->expr()->in('entity.untisType', ':matched_chars')
+                );
+                $qb->setParameter('matched_chars', $matchedChars);
+            }
+        }
         $request = $this->getContext()->getRequest();
         $query = $request->query->all();
+
         $hasDayFilter = !empty($query['filters']['incidentDateDay']);
         $hasMonthFilter = isset($query['filters']['incidentDateMonth']);
         $hasYearFilter = isset($query['filters']['incidentDateYear']);
+
         if (!$hasMonthFilter && !$hasYearFilter && !$hasDayFilter) {
             $qb->andWhere(
                 $qb->expr()->orX(
@@ -517,11 +538,13 @@ class OvertimeEntryCrudController extends AbstractCrudController
                 )
             )->setParameter('carryover', 'CARRYOVER');
         }
+
         if ($hasDayFilter && $hasMonthFilter && $hasYearFilter) {
             $dateString = sprintf("%s.%s.%s", $query['filters']['incidentDateDay'], $query['filters']['incidentDateMonth'], $query['filters']['incidentDateYear']);
             $date = DateTime::createFromFormat('d.n.Y', $dateString)->format('Y-m-d');
             $qb->andWhere('entity.incidentDate = :incidentDate')->setParameter('incidentDate', $date);
         }
+
         return $qb;
     }
 }
