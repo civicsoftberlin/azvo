@@ -8,9 +8,11 @@ use App\Entity\Teacher;
 use App\Entity\OvertimeEntry;
 use App\Enum\GpuSubstitutionFlag;
 use App\Enum\GpuSubstitutionType;
+use App\Repository\OvertimeEntryRepository;
 use Btinet\Untis\Model\UntisSubstitutionModel;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -20,6 +22,7 @@ class WorkingTimeImportService
     private UntisSubstitutionModel $substitutionModel;
     public function __construct(
         private readonly EntityManagerInterface $em,
+        private readonly OvertimeEntryRepository $overtimeEntryRepository,
     ) {
         $this->substitutionModel = new UntisSubstitutionModel();
     }
@@ -33,6 +36,12 @@ class WorkingTimeImportService
         if ($handle === false) {
             throw new \RuntimeException('CSV-Datei konnte nicht geöffnet werden.');
         }
+
+        $entries = $this->overtimeEntryRepository->findAllFromToday();
+        foreach ($entries as $entry) {
+            $this->em->remove($entry);
+        }
+        $this->em->flush();
 
         $importCount = 0;
         while (($data = fgetcsv($handle, 10000, ',', '"', "")) !== false) {

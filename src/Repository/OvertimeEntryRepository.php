@@ -67,6 +67,17 @@ class OvertimeEntryRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function findAllFromToday(): array
+    {
+        $now = new \DateTimeImmutable();
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.incidentDate >= :today')
+            ->andWhere('e.comment IS NULL')
+            ->setParameter('today', $now->format('Y-m-d'))
+            ->getQuery()
+            ->getResult();
+    }
+
     public function getCarryOverForTeacherAndDate(
         int $teacherId,
         \DateTime $incidentDate,
