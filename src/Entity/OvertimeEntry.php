@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: OvertimeEntryRepository::class)]
-#[ORM\UniqueConstraint(name: 'unique_untis_teacher', columns: ['untis_id', 'teacher_id'])]
+#[ORM\UniqueConstraint(name: 'unique_untis_teacher', columns: ['untis_id', 'incident_date', 'teacher_id'])]
 class OvertimeEntry
 {
     #[ORM\Id]
