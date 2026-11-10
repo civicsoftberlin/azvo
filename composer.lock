@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6b5c403959407d44d63aa7d1f24b776b",
+    "content-hash": "1a32a64fae5a6a4dfd190b84d3ee87eb",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1036,16 +1036,16 @@
         },
         {
             "name": "btinet/untis-bundle",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/btinet/untis-bundle.git",
-                "reference": "f6379f246e6731018a027b2aa3766abe3a69d9a4"
+                "reference": "09137bc2de1df1b10d35fdd8088b9f763b869a67"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/btinet/untis-bundle/zipball/f6379f246e6731018a027b2aa3766abe3a69d9a4",
-                "reference": "f6379f246e6731018a027b2aa3766abe3a69d9a4",
+                "url": "https://api.github.com/repos/btinet/untis-bundle/zipball/09137bc2de1df1b10d35fdd8088b9f763b869a67",
+                "reference": "09137bc2de1df1b10d35fdd8088b9f763b869a67",
                 "shasum": ""
             },
             "require": {
@@ -1065,9 +1065,9 @@
             "description": "Import GPU-Files from Untis.",
             "support": {
                 "issues": "https://github.com/btinet/untis-bundle/issues",
-                "source": "https://github.com/btinet/untis-bundle/tree/1.0.2"
+                "source": "https://github.com/btinet/untis-bundle/tree/1.0.3"
             },
-            "time": "2026-11-08T17:32:18+00:00"
+            "time": "2026-11-10T08:25:20+00:00"
         },
         {
             "name": "composer/pcre",

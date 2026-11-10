@@ -9,7 +9,7 @@
         "ext-iconv": "*",
         "amphp/http-client": "5",
         "beberlei/doctrineextensions": "^1.5",
-        "btinet/untis-bundle": "^1.0.2",
+        "btinet/untis-bundle": "^1.0.3",
         "doctrine/doctrine-bundle": "^3.3.4",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.7.6",
