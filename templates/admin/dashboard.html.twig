@@ -453,7 +453,23 @@
                     type: 'line',
                     symbolSize: 8,
                     data: mehrstunden,
-                    color: '#c69c2c'
+                    color: 'rgb(255, 191, 0)',
+                    areaStyle: {
+                        opacity: 0.3,
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {
+                                offset: 0,
+                                color: 'rgb(255, 191, 0)'
+                            },
+                            {
+                                offset: 1,
+                                color: 'rgb(255, 191, 0)'
+                            }
+                        ])
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
                 },
                 {
                     name: 'Minderstunden',
@@ -462,7 +478,23 @@
                     yAxisIndex: 1,
                     symbolSize: 8,
                     data: minderstunden,
-                    color: '#d03148'
+                    color: 'rgb(224, 62, 76)',
+                    areaStyle: {
+                        opacity: 0.3,
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {
+                                offset: 0,
+                                color: 'rgb(224, 62, 76)'
+                            },
+                            {
+                                offset: 1,
+                                color: 'rgb(224, 62, 76)'
+                            }
+                        ])
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
                 }
 
             ]
@@ -498,16 +530,17 @@
                         {
                             value: {{ stat_real_decays }},
                             itemStyle: {
-                                color: '#d03148'
-                            }
+                                color: 'rgb(224, 62, 76)',
+                            },
                         },
                         {
                             value: {{ stat_real_carryovers }},
                             itemStyle: {
-                                color: '#c69c2c'
-                            }
+                                color: 'rgb(255, 191, 0)',
+                            },
                         },
                     ],
+
                     type: 'bar',
                     barWidth: '40%',
                 }
@@ -519,21 +552,43 @@
 
         heatMap.setOption({
             tooltip: {
-                position: 'top'
+                position: 'top',
+                formatter: function (params) {
+                    // params.value ist [x, y, value]
+                    const days = ['Mo', 'Di', 'Mi', 'Do', 'Fr'];
+                    // Dynamische Stunden-Beschriftung basierend auf y-Index
+                    const hours = Array.from({length: 10}, (_, i) => `${i}. Stunde`);
+                    return `${days[params.value[0]]}, ${hours[params.value[1]]}<br/>Ausfälle: <b>${params.value[2]}</b>`;
+                }
             },
             matrix: {
                 x: {
                     data: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
+                    itemStyle: {
+                        borderWidth: 0,
+                    }
                 },
                 y: {
                     data: Array.from({length: 10}, (_, i) => {
                         return (i) + '. Stunde';
-                    })
+                    }),
+                    itemStyle: {
+                        borderWidth: 0,
+                    }
                 },
                 top: 5,
                 bottom: 5,
                 left: 0,
                 right: 80,
+                backgroundStyle: {
+                    borderWidth: 0,
+                },
+                body: {
+                    itemStyle: {
+                        borderWidth: 1,
+                        borderColor: 'transparent', // gegen den Sub-Pixel-Artefakt-Trick
+                    },
+                },
             },
             visualMap: {
                 type: 'continuous',
@@ -547,9 +602,9 @@
                 inRange: {
                     // ECharts verteilt diese Farben gleichmäßig über den Wertebereich (0 bis max)
                     color: [
-                        '#1ed379', // 25% (Grün)
-                        '#ddd316', // 50% (Gelb)
-                        '#d03148'  // 100% (Dunkelrot)
+                        'rgb(30, 211, 121)', // 25% (Grün)
+                        'rgb(255, 191, 0)', // 50% (Gelb)
+                        'rgb(224, 62, 76)'  // 100% (Dunkelrot)
                     ]
                 }
             },
@@ -559,6 +614,16 @@
                 data: heatMapData,
                 label: {
                     show: false,
+                },
+                itemStyle: {
+                    borderWidth: 0,
+                    borderColor: 'transparent',
+                },
+                emphasis: {
+                    itemStyle: {
+                        borderWidth: 0,
+                        borderColor: 'transparent',
+                    }
                 }
             }
         });
