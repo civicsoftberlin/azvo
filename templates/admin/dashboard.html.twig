@@ -346,6 +346,15 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-6">
+                        <div class="card card-body rounded-3 h-100" style="background: var(--sidebar-bg);border: var(--border-width) solid var(--main-content-border-color);">
+                            <h5 class="card-title">Häufigkeit ausgefallener Stunden</h5>
+                            <h6 class="card-subtitle mb-2 tk-text-primary">{{ "first day of this month"|date()|date_modify('-1 month')|format_datetime(date_format='none', time_format='none', locale='de', pattern='MMMM Y') }}</h6>
+                            <div class="ratio ratio-21x9">
+                                <div id="heat-map"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
 
@@ -360,37 +369,39 @@
         const timeData = {{ stat_ticks|json_encode|raw }};
         const mehrstunden = {{ stat_carryovers|json_encode|raw }};
         const minderstunden = {{ stat_decays|json_encode|raw }};
+        const heatMapData = {{ stat_heatmap|json_encode|raw }};
 
         const chart = echarts.init(document.getElementById('my-chart'));
         const chart2 = echarts.init(document.getElementById('my-chart-2'));
+        const heatMap = echarts.init(document.getElementById('heat-map'));
 
 
         chart.setOption({
             xAxis: [
                 {
                     type: 'category',
-                    boundaryGap: false,
+                    boundaryGap: true,
                     axisLine: { onZero: true },
                     data: timeData,
-                    position: 'top'
+                    position: 'bottom'
                 },
                 {
                     gridIndex: 1,
                     type: 'category',
-                    boundaryGap: false,
+                    boundaryGap: true,
                     axisLine: { onZero: true },
                     data: timeData,
-                    position: 'bottom'
+                    position: 'top'
                 }
             ],
             yAxis: [
                 {
-                    name: 'Mehrstunden',
+
                     type: 'value',
                 },
                 {
                     gridIndex: 1,
-                    name: 'Minderstunden',
+
                     type: 'value',
                     inverse: true
                 }
@@ -422,28 +433,17 @@
                     return html;
                 }
             },
-            dataZoom: [
-                {
-                    show: false,
-                    realtime: true,
-                    xAxisIndex: [0, 1]
-                },
-                {
-                    type: 'inside',
-                    realtime: true,
-                    xAxisIndex: [0, 1]
-                }
-            ],
             grid: [
                 {
-                    left: 60,
+                    left: 50,
                     right: 50,
+                    top: 10,
                     height: '35%'
                 },
                 {
-                    left: 60,
+                    left: 50,
                     right: 50,
-                    top: '55%',
+                    top: '50%',
                     height: '35%'
                 }
             ],
@@ -486,9 +486,10 @@
                 }
             },
             grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
+                top: 10,
+                bottom: 5,
+                left: 0,
+                right: 0,
                 containLabel: true
             },
             series: [
@@ -513,12 +514,64 @@
             ]
         });
 
+        const xCnt = 5;
+        const yCnt = 10;
+
+        heatMap.setOption({
+            tooltip: {
+                position: 'top'
+            },
+            matrix: {
+                x: {
+                    data: ['Mo', 'Di', 'Mi', 'Do', 'Fr'],
+                },
+                y: {
+                    data: Array.from({length: 10}, (_, i) => {
+                        return (i) + '. Stunde';
+                    })
+                },
+                top: 5,
+                bottom: 5,
+                left: 0,
+                right: 80,
+            },
+            visualMap: {
+                type: 'continuous',
+                min: 1,
+                max: {{ stat_heatmap_max }},
+                dimension: 2,
+                calculable: true,
+                orient: 'vertical',
+                top: 'middle',
+                right: 0,
+                inRange: {
+                    // ECharts verteilt diese Farben gleichmäßig über den Wertebereich (0 bis max)
+                    color: [
+                        '#1ed379', // 25% (Grün)
+                        '#ddd316', // 50% (Gelb)
+                        '#d03148'  // 100% (Dunkelrot)
+                    ]
+                }
+            },
+            series: {
+                type: 'heatmap',
+                coordinateSystem: 'matrix',
+                data: heatMapData,
+                label: {
+                    show: false,
+                }
+            }
+        });
+
+
         window.addEventListener('resize', () => chart.resize());
         window.addEventListener('resize', () => chart2.resize());
+        window.addEventListener('resize', () => heatMap.resize());
 
         document.addEventListener('DOMContentLoaded', () => {
             chart.resize();
             chart2.resize();
+            heatMap.resize();
         });
 
         const tab = document.querySelector('#tablist-tab-chart')
@@ -527,6 +580,7 @@
             setTimeout(() => {
                 chart.resize();
                 chart2.resize();
+                heatMap.resize();
             }, 0);
         })
 

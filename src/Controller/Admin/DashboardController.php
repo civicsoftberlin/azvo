@@ -62,6 +62,9 @@ class DashboardController extends AbstractDashboardController
         $statCarryOvers = $this->overtimeEntryRepository->sumCarryOversForPeriod($startDate, $endDate, true);
         $realDecays = $this->overtimeEntryRepository->sumRealDecays();
         $realCarryOvers = $this->overtimeEntryRepository->sumRealCarryOvers();
+        $heatMapData = $this->overtimeEntryRepository->getWeeklyHourDistribution();
+
+        $maxValue = $heatMapData ? max(array_column($heatMapData, 2)) : 0;
 
         $monthlyDecays = [];
         foreach ($statDecays as $dayKey => $value) {
@@ -95,6 +98,8 @@ class DashboardController extends AbstractDashboardController
             'stat_ticks' => $array_with_ticks,
             'stat_real_decays' => $realDecays,
             'stat_real_carryovers' => $realCarryOvers,
+            'stat_heatmap' => $heatMapData,
+            'stat_heatmap_max' => $maxValue
         ]);
     }
 

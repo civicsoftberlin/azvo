@@ -143,6 +143,53 @@ class OvertimeEntryRepository extends ServiceEntityRepository
         return $mappedResults;
     }
 
+    public function getWeeklyHourDistribution(): array
+    {
+        $startDate = new \DateTimeImmutable('first day of last month');
+        $endDate = new \DateTimeImmutable('last day of last month');
+        $entries = $this->createQueryBuilder('e')
+            ->select('e.incidentDate', 'e.courseHour', 'e.amount')
+            ->andWhere('e.incidentDate >= :startDate')
+            ->andWhere('e.incidentDate <= :endDate')
+            ->andWhere('e.amount < 0')
+            ->andWhere('e.untisId NOT LIKE :excludeVert')
+            ->andWhere('e.untisId NOT LIKE :excludeOrig')
+            ->setParameter('excludeVert', '%vert')
+            ->setParameter('excludeOrig', '%orig')
+            ->setParameter('startDate', $startDate->format('Y-m-d'))
+            ->setParameter('endDate', $endDate->format('Y-m-d'))
+            ->getQuery()
+            ->getResult();
+
+        $aggregated = [];
+        foreach ($entries as $entry) {
+            $date = $entry['incidentDate'];
+            $hour = $entry['courseHour'];
+
+            $dayOfWeek = (int) $date->format('N');
+
+            if ($dayOfWeek >= 1 && $dayOfWeek <= 5) {
+                $x = $dayOfWeek - 1;
+                $y = (int) $hour;
+
+                if (!isset($aggregated[$x][$y])) {
+                    $aggregated[$x][$y] = 0;
+                }
+                $aggregated[$x][$y]++;
+            }
+        }
+
+        $heatmapData = [];
+
+        foreach ($aggregated as $x => $hours) {
+            foreach ($hours as $y => $count) {
+                $heatmapData[] = [$x, $y, $count];
+            }
+        }
+
+        return $heatmapData;
+    }
+
     public function hasCarryOverForTeacherAndDate(
         int $teacherId,
         \DateTime $incidentDate,
