@@ -41,7 +41,7 @@ enum GpuSubstitutionType: string
             self::BreakSupervision  => 'Pausenaufsichtsvertretung',
             self::TeacherExchange   => 'Lehrertausch',
             self::Exam              => 'Klausur',
-            self::Unused             => '-',
+            self::Unused             => '',
         };
     }
 

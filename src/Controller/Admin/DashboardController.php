@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\EntryType;
 use App\Entity\UntisImport;
+use App\Repository\OvertimeEntryRepository;
 use App\Repository\SettingRepository;
 use App\Repository\TeacherRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
@@ -27,19 +28,73 @@ class DashboardController extends AbstractDashboardController
 {
     private TeacherRepository $teacherRepository;
     private SettingRepository $settingRepository;
+    private OvertimeEntryRepository $overtimeEntryRepository;
 
-    public function __construct(TeacherRepository $repository, SettingRepository $settingRepository)
+    public function __construct(TeacherRepository $repository, SettingRepository $settingRepository, OvertimeEntryRepository $overtimeEntryRepository)
     {
         $this->teacherRepository = $repository;
         $this->settingRepository = $settingRepository;
+        $this->overtimeEntryRepository = $overtimeEntryRepository;
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
     public function index(): Response
     {
+
+        $now = new \DateTimeImmutable('first day of this month');
+        $endDate = (clone $now)->modify('-1 day');
+        $startDate = (clone $now)->modify('-13 months');
+
+        $monthsDE = [
+            1 => 'Jan', 2 => 'Feb', 3 => 'Mär', 4 => 'Apr',
+            5 => 'Mai', 6 => 'Jun', 7 => 'Jul', 8 => 'Aug',
+            9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Dez'
+        ];
+
+        $array_with_ticks = [];
+        $chartDecayValues = [];
+        $chartCarryoverValues = [];
+        $currentDate = clone $startDate;
+
+        $statDecays = $this->overtimeEntryRepository->sumDecaysForPeriod($startDate, $endDate);
+        $statCarryOvers = $this->overtimeEntryRepository->sumCarryOversForPeriod($startDate, $endDate, true);
+        $realDecays = $this->overtimeEntryRepository->sumRealDecays();
+        $realCarryOvers = $this->overtimeEntryRepository->sumRealCarryOvers();
+
+        $monthlyDecays = [];
+        foreach ($statDecays as $dayKey => $value) {
+            $monthKey = substr($dayKey, 0, 7);
+            $monthlyDecays[$monthKey] = ($monthlyDecays[$monthKey] ?? 0) + abs($value);
+        }
+
+        $monthlyCarryOvers = [];
+        foreach ($statCarryOvers as $dayKey => $value) {
+            $monthKey = substr($dayKey, 0, 7);
+            $monthlyCarryOvers[$monthKey] = ($monthlyCarryOvers[$monthKey] ?? 0) + abs($value);
+        }
+
+        while ($currentDate <= $endDate) {
+            $monthKey = $currentDate->format('Y-m');
+            $monthName = $monthsDE[(int)$currentDate->format('n')];
+            $yearShort = $currentDate->format('y');
+            $array_with_ticks[] = $monthName . ' ' . $yearShort;
+            $chartDecayValues[] = $monthlyDecays[$monthKey] ?? 0;
+            $chartCarryoverValues[] = $monthlyCarryOvers[$monthKey] ?? 0;
+            $currentDate = $currentDate->modify('+1 month');
+        }
+
         $teachers = $this->teacherRepository->findAll();
+
         return $this->render('admin/dashboard.html.twig',[
             'icon' => "clock",
             'teachers' => $teachers,
+            'stat_decays' => $chartDecayValues,
+            'stat_carryovers' => $chartCarryoverValues,
+            'stat_ticks' => $array_with_ticks,
+            'stat_real_decays' => $realDecays,
+            'stat_real_carryovers' => $realCarryOvers,
         ]);
     }
 

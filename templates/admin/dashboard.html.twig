@@ -21,6 +21,7 @@
             <twig:ea:Tabs:Item paneId="tab-warning" label="Mehrstunden <span class='badge badge-warning'>{{ teachers|filter(e => e.countCurrentMonthOvertimeEntries > 0)|length }}</span>" icon="ti ti-clock-up"/>
             <twig:ea:Tabs:Item paneId="tab-neutral" label="Ausgeglichen <span class='badge badge-success'>{{ teachers|filter(e => e.countCurrentMonthOvertimeEntries == 0)|length }}</span>" icon="ti ti-clock-check" />
             <twig:ea:Tabs:Item paneId="tab-decay" label="Bis {{ 'last day of this month'|date('d.m.Y')}} auszugleichen <span class='badge badge-info'>{{ teachers|filter(e => e.countCurrentExpiringEntries > 0)|length }}</span>" icon="ti ti-alert-circle" />
+            <twig:ea:Tabs:Item paneId="tab-chart" label="Statistik" icon="ti ti-chart-bar" />
         </twig:ea:Tabs>
 
         <div class="tab-content">
@@ -86,12 +87,14 @@
                             <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
                             <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
                             <td class="text-end actions">
-                                <a href="{{ detailUrlB }}" class="btn btn-secondary "><i class="ti ti-school tk-text-primary"></i>
-                                    <span class="btn-label"><span class="action-label">Details</span></span>
-                                </a>
                                 <a href="{{ viewUrl }}" class="btn btn-secondary"><i class="ti ti-table tk-text-primary"></i>Stundenkonto</a>
                                 <a href="{{ exportUrl }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Monatsansicht exportieren</a>
                             </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Keine Einträge vorhanden</td>
+                            <td></td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -159,12 +162,14 @@
                             <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
                             <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
                             <td class="text-end actions">
-                                <a href="{{ detailUrlB }}" class="btn btn-secondary "><i class="ti ti-school tk-text-primary"></i>
-                                    <span class="btn-label"><span class="action-label">Details</span></span>
-                                </a>
                                 <a href="{{ viewUrl }}" class="btn btn-secondary"><i class="ti ti-table tk-text-primary"></i>Stundenkonto</a>
                                 <a href="{{ exportUrl }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Monatsansicht exportieren</a>
                             </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Keine Einträge vorhanden</td>
+                            <td></td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -232,12 +237,14 @@
                             <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
                             <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
                             <td class="text-end actions">
-                                <a href="{{ detailUrlB }}" class="btn btn-secondary "><i class="ti ti-school tk-text-primary"></i>
-                                    <span class="btn-label"><span class="action-label">Details</span></span>
-                                </a>
                                 <a href="{{ viewUrl }}" class="btn btn-secondary"><i class="ti ti-table tk-text-primary"></i>Stundenkonto</a>
                                 <a href="{{ exportUrl }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Monatsansicht exportieren</a>
                             </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Keine Einträge vorhanden</td>
+                            <td></td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -305,9 +312,6 @@
                             <td class="text-end text-muted">{{ teacher.countLastMonthOvertimeEntries }}</td>
                             <td class="text-end text-muted">{{ teacher.countCurrentExpiringEntries }}</td>
                             <td class="text-end actions">
-                                <a href="{{ detailUrlB }}" class="btn btn-secondary "><i class="ti ti-school tk-text-primary"></i>
-                                    <span class="btn-label"><span class="action-label">Details</span></span>
-                                </a>
                                 <a href="{{ viewUrl }}" class="btn btn-secondary"><i class="ti ti-table tk-text-primary"></i>Stundenkonto</a>
                                 <a href="{{ exportUrl }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Monatsansicht exportieren</a>
                             </td>
@@ -321,9 +325,212 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="tab-pane" id="tab-chart">
+                <div class="row g-3 align-items-stretch">
+                    <div class="col-8">
+                        <div class="card card-body rounded-3 h-100" style="background: var(--sidebar-bg);border: var(--border-width) solid var(--main-content-border-color);">
+                            <h5 class="card-title">Reine Mehr-/Minderstunden</h5>
+                            <h6 class="card-subtitle mb-2 tk-text-primary">Letzte 12 Monate</h6>
+                            <div class="ratio ratio-21x9">
+                                <div id="my-chart"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card card-body rounded-3 h-100" style="background: var(--sidebar-bg);border: var(--border-width) solid var(--main-content-border-color);">
+                            <h5 class="card-title">Stundenverfall und Überträge</h5>
+                            <h6 class="card-subtitle mb-2 tk-text-primary">{{ "first day of this month"|date()|date_modify('-1 month')|format_datetime(date_format='none', time_format='none', locale='de', pattern='MMMM Y') }}</h6>
+                            <div class="ratio h-100 w-100">
+                                <div id="my-chart-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
         </div>
 
     </div>
+
+    <script type="module">
+        import * as echarts from 'echarts';
+
+        const timeData = {{ stat_ticks|json_encode|raw }};
+        const mehrstunden = {{ stat_carryovers|json_encode|raw }};
+        const minderstunden = {{ stat_decays|json_encode|raw }};
+
+        const chart = echarts.init(document.getElementById('my-chart'));
+        const chart2 = echarts.init(document.getElementById('my-chart-2'));
+
+
+        chart.setOption({
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    axisLine: { onZero: true },
+                    data: timeData,
+                    position: 'top'
+                },
+                {
+                    gridIndex: 1,
+                    type: 'category',
+                    boundaryGap: false,
+                    axisLine: { onZero: true },
+                    data: timeData,
+                    position: 'bottom'
+                }
+            ],
+            yAxis: [
+                {
+                    name: 'Mehrstunden',
+                    type: 'value',
+                },
+                {
+                    gridIndex: 1,
+                    name: 'Minderstunden',
+                    type: 'value',
+                    inverse: true
+                }
+            ],
+            axisPointer: {
+                link: [
+                    {
+                        xAxisIndex: 'all'
+                    }
+                ]
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    animation: false
+                },
+                formatter: function (params) {
+                    // Sortiere: yAxisIndex 0 (oben/Mehrstunden) zuerst
+                    params.sort((a, b) => a.yAxisIndex - b.yAxisIndex);
+
+                    let html = `<div style="font-weight:bold;margin-bottom:6px;">${params[0].axisValue}</div>`;
+                    params.forEach(p => {
+                        html += `<div style="display:flex;align-items:center;gap:8px;margin:4px 0;">
+                <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};"></span>
+                <span>${p.seriesName}</span>
+                <span style="margin-left:auto;font-weight:bold;">${p.value}</span>
+            </div>`;
+                    });
+                    return html;
+                }
+            },
+            dataZoom: [
+                {
+                    show: false,
+                    realtime: true,
+                    xAxisIndex: [0, 1]
+                },
+                {
+                    type: 'inside',
+                    realtime: true,
+                    xAxisIndex: [0, 1]
+                }
+            ],
+            grid: [
+                {
+                    left: 60,
+                    right: 50,
+                    height: '35%'
+                },
+                {
+                    left: 60,
+                    right: 50,
+                    top: '55%',
+                    height: '35%'
+                }
+            ],
+            series: [
+                {
+                    name: 'Mehrstunden',
+                    type: 'line',
+                    symbolSize: 8,
+                    data: mehrstunden,
+                    color: '#c69c2c'
+                },
+                {
+                    name: 'Minderstunden',
+                    type: 'line',
+                    xAxisIndex: 1,
+                    yAxisIndex: 1,
+                    symbolSize: 8,
+                    data: minderstunden,
+                    color: '#d03148'
+                }
+
+            ]
+        });
+
+        chart2.setOption({
+            xAxis: {
+                type: 'category',
+                data: ['Verfallen', 'Übertragen'],
+                axisTick: {
+                    alignWithLabel: true
+                }
+            },
+            yAxis: {
+                type: 'value'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            series: [
+                {
+                    data: [
+                        {
+                            value: {{ stat_real_decays }},
+                            itemStyle: {
+                                color: '#d03148'
+                            }
+                        },
+                        {
+                            value: {{ stat_real_carryovers }},
+                            itemStyle: {
+                                color: '#c69c2c'
+                            }
+                        },
+                    ],
+                    type: 'bar',
+                    barWidth: '40%',
+                }
+            ]
+        });
+
+        window.addEventListener('resize', () => chart.resize());
+        window.addEventListener('resize', () => chart2.resize());
+
+        document.addEventListener('DOMContentLoaded', () => {
+            chart.resize();
+            chart2.resize();
+        });
+
+        const tab = document.querySelector('#tablist-tab-chart')
+
+        tab.addEventListener('click', event => {
+            setTimeout(() => {
+                chart.resize();
+                chart2.resize();
+            }, 0);
+        })
+
+    </script>
 {% endblock %}
 
 

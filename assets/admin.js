@@ -2,6 +2,7 @@
 
 
 import { TabulatorFull as Tabulator } from 'tabulator-tables';
+import * as echarts from 'echarts';
 /*
  * Welcome to your app's main JavaScript file!
  *
@@ -14,6 +15,29 @@ import './styles/admin.css';
 
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    let charEl = document.getElementById('chart');
+
+    if (charEl) {
+        const myChart = echarts.init(charEl);
+        console.info("Element gefunden")
+        myChart.setOption({
+            tooltip: {},
+            xAxis: {
+                data: ['shirt', 'cardigan', 'chiffon', 'pants', 'heels', 'socks']
+            },
+            yAxis: {},
+            series: [
+                {
+                    name: 'sales',
+                    type: 'bar',
+                    data: [5, 20, 36, 10, 10, 20]
+                }
+            ]
+        });
+        window.addEventListener('resize', () => myChart.resize());
+    }
+
     const table = document.getElementById('teacherTable');
     if (table) {
         new Tabulator(table, {

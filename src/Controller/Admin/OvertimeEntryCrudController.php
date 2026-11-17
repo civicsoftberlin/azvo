@@ -348,13 +348,13 @@ class OvertimeEntryCrudController extends AbstractCrudController
             TextField::new('untisType')->formatValue(fn($i) => $i ? GpuSubstitutionType::tryFromChar($i)->getGermanLabel() : ' '),
             //TextField::new('untiCount')->formatValue(fn ($value) => $value ?? ' '),
             NumberField::new('amount'),
-            DateField::new('expiresAt')->formatValue(fn ($value) => $value instanceof \DateTime ? $value->format('d.m.Y') : ''),
-            DateField::new('invalidatedAt')->formatValue(fn ($value) => $value instanceof \DateTime ? $value->format('d.m.Y') : ''),
-            AssociationField::new('invalidatedBy')->formatValue(fn ($value) => $value ?? ''),
+            DateField::new('expiresAt')->formatValue(fn ($value) => $value instanceof \DateTime ? $value->format('d.m.Y') : ' '),
+            DateField::new('invalidatedAt')->formatValue(fn ($value) => $value instanceof \DateTime ? $value->format('d.m.Y') : ' '),
+            //AssociationField::new('invalidatedBy')->formatValue(fn ($value) => $value ?? ''),
 
             //DateField::new('createdAt'),
             //AssociationField::new('createdBy'),
-            TextField::new('comment')->formatValue(fn ($value) => $value ?? ''),
+            TextField::new('comment')->formatValue(fn ($value) => $value ?? ' '),
             //BooleanField::new('malus')->formatValue(fn ($value) => $value ?? '0')->setHelp("Zur Meldung an den Administrator."),
         ];
     }

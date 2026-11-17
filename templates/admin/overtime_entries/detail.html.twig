@@ -13,7 +13,6 @@
     <table id="" class="table table-custom datagrid align-middle">
         <thead>
         <tr class="">
-            <th>ID</th>
             <th>Lehrkraft</th>
             <th class="">Ereignisdatum</th>
             <th class="">Klasse</th>
@@ -21,11 +20,11 @@
             <th>Fach</th>
             <th class="">Grund</th>
             <th class="">Untis-Kommentar</th>
-            <th class="">Untis-Zeichen</th>
-            <th class="">Untis-Zähler</th>
+            <th class="">Untis-Typ</th>
             <th class="text-end">Stundendifferenz</th>
             <th class="text-end">Auszugleichen bis</th>
             <th class="text-end">Ausgeglichen am</th>
+            <th class="text-end">ID</th>
             <th class="text-end">Ausgeglichen durch ID</th>
             <th class="text-end"></th>
         </tr>
@@ -77,7 +76,6 @@
 
 
             <tr data-default-action-url="{{ detailRowUrl }}" role="link" tabindex="0" class="ea-clickable-row {% if loop.index == 1 %}fw-bold{% endif %}">
-                <td>{{ ote.id }}</td>
                 <td class=""><a href="{{ detailUrl }}">{{ ote.teacher.shortName }}</a></td>
                 <td class="">{{ ote.incidentDate|date('d.m.Y') }}</td>
                 <td class="">{{ ote.class }}</td>
@@ -85,11 +83,11 @@
                 <td>{{ ote.subject }}</td>
                 <td class="">{{ ote.reason }}</td>
                 <td class="">{{ ote.untisComment }}</td>
-                <td class="">{{ ote.untisBit }}</td>
-                <td class="">{{ ote.untiCount }}</td>
+                <td class="">{{ ote.untisTypeAsLabel }}</td>
                 <td class="text-end">{{ ote.amount }}</td>
                 <td class="text-end">{{ ote.expiresAt ? ote.expiresAt|date('d.m.Y') : '' }}</td>
                 <td class="text-end">{{ ote.invalidatedAt ? ote.invalidatedAt|date('d.m.Y') : '' }}</td>
+                <td class="text-end">{{ ote.id }}</td>
                 <td class="text-end">{{ ote.invalidatedBy }}</td>
                 <td class="text-end actions">
                     <a href="{{ detailUrlB }}" class="btn btn-secondary "><i class="ti ti-school tk-text-primary"></i>
@@ -102,7 +100,7 @@
             {% if loop.index == 1 and other_entry|length > 1 %}
             <tr class="row-custom">
                 <td  class="text-center text-muted" style="background-color: var(--body-bg)"></td>
-                <td colspan="15" class="text-muted" style="background-color: var(--body-bg)"><i class="ti ti-arrow-big-down-lines me-2 tk-text-primary"></i>verknüpft mit folgenden Buchungen</td>
+                <td colspan="14" class="text-muted" style="background-color: var(--body-bg)"><i class="ti ti-arrow-big-down-lines me-2 tk-text-primary"></i>verknüpft mit folgenden Buchungen</td>
             </tr>
             {% endif %}
         {% endfor %}
