@@ -17,7 +17,7 @@
 
 .table:not(.table-custom) thead {
     position: sticky!important;
-    top: 96px!important;
+    top: 86px!important;
     z-index: 900!important;
 }
 
