@@ -16,29 +16,32 @@
             %}
             {% set baseUrl = ea_url().unset('filters[teacher]') %}
 
-            <select class="form-select form-select-sm tk-border-primary rounded-4"
-                    style="width: auto; min-width: 180px;"
-                    onchange="if(this.value) { window.location.href = this.value; } else {
-                        window.location.href = '{{ baseUrl }}';
-                        }">
+            <div class="form-widget">
+                <select class="form-select form-select-sm  tk-border-primary rounded-4"
+                        style="width: auto; min-width: 180px;"
+                        onchange="if(this.value) { window.location.href = this.value; } else {
+                            window.location.href = '{{ baseUrl }}';
+                            }">
 
-                {# Option "Alle Lehrkräfte" (Reset) - nutzt die saubere Basis-URL #}
-                <option value="{{ viewUrl }}"
-                        {% if app.request.query.all('filters')['teacher'] is not defined %}selected{% endif %}>
-                    Alle Lehrkräfte
-                </option>
-
-                {# Lehrkräfte-Optionen - alle bauen auf der sauberen Basis-URL auf #}
-                {% for teacher in teachers|sort((a, b) => a.shortName <=> b.shortName) %}
-                    <option value="{{ baseUrl.set('filters[teacher][value]', teacher.id).set('filters[teacher][comparison]', '=') }}"
-                            {% if app.request.query.all('filters')['teacher']['value'] is defined and app.request.query.all('filters')['teacher']['value'] == teacher.id %}selected{% endif %}>
-                        {{ teacher.shortName }}
+                    {# Option "Alle Lehrkräfte" (Reset) - nutzt die saubere Basis-URL #}
+                    <option value="{{ viewUrl }}"
+                            {% if app.request.query.all('filters')['teacher'] is not defined %}selected{% endif %}>
+                        Alle Lehrkräfte
                     </option>
-                {% endfor %}
-            </select>
+
+                    {# Lehrkräfte-Optionen - alle bauen auf der sauberen Basis-URL auf #}
+                    {% for teacher in teachers|sort((a, b) => a.shortName <=> b.shortName) %}
+                        <option value="{{ baseUrl.set('filters[teacher][value]', teacher.id).set('filters[teacher][comparison]', '=') }}"
+                                {% if app.request.query.all('filters')['teacher']['value'] is defined and app.request.query.all('filters')['teacher']['value'] == teacher.id %}selected{% endif %}>
+                            {{ teacher.shortName }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
         </label>
     </div>
-    <div class="ms-2  d-inline-blocktk-text-primary d-flex align-items-center">
+    <div class="ms-2 me-auto d-inline-blocktk-text-primary d-flex align-items-center">
         {% if current_date is defined %}
             {% set allQueryParams = app.request.query.all() %}
             {% set currentFilters = allQueryParams['filters'] ?? {} %}
@@ -50,17 +53,17 @@
                 .setAction('index')
                 .set('filters', filterParams)
             %}
+        <div class="form-widget">
             <div class="input-group input-group-sm">
-                <input type="text" readonly class="form-control tk-border-primary rounded-start-4" value="{{ current_date|default(0) ? current_date|date('d.m.Y') : '' }}">
+                <input type="text" class="form-control tk-border-primary rounded-start-4" value="{{ current_date|default(0) ? current_date|date('d.m.Y') : '' }}">
                 <a href="{{ viewUrl }}" class="rounded-start-0 btn btn-primary tk-border-primary"><i class="fa fa-xmark text-secondary"></i></a>
             </div>
+        </div>
         {% endif %}
     </div>
-    <div class="ms-2">
-        <div class="row g-1 align-items-center p-0">
-            <div class="col-auto">
-                <input type="text" readonly id="ist" class="form-control form-control-sm tk-border-primary rounded-4" value="{{ virtual_has|default('0') }}">
-            </div>
+    <div class="">
+        <div class="form-widget">
+            <input type="text" id="ist" class="form-control tk-border-primary rounded-4" value="{{ virtual_has|default('0') }}">
         </div>
     </div>
 {% endblock %}

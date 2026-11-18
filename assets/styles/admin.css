@@ -7,6 +7,14 @@
     align-items: center;
 }
 
+.content-header {
+    align-items: center;
+}
+
+.page-actions {
+    margin-top: 0!important;
+}
+
 .table:not(.table-custom) thead {
     position: sticky!important;
     top: 96px!important;
@@ -97,6 +105,7 @@ html, body {
 }
 
 .tk-border-primary {
+    border-width: var(--bs-border-width);
     border-color:  var(--color-primary) !important;
     background-color: color-mix(in srgb, var(--color-primary) 20%, transparent) !important;
 }
