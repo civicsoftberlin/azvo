@@ -7,7 +7,13 @@
     align-items: center;
 }
 
-.table-custom thead, .table thead {
+.table:not(.table-custom) thead {
+    position: sticky!important;
+    top: 96px!important;
+    z-index: 900!important;
+}
+
+.table-custom thead  {
     position: sticky!important;
     top: 78px!important;
     z-index: 900!important;

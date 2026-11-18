@@ -60,6 +60,7 @@ class WorkingTimeImportService
                     amount: $row->getAmount(), reason: $row->getReason(), subject: $row->getSubject(),
                     className: $classes, room: $row->getRoom(), currentUser: $currentUser, autoCreate: $autoCreate,
                     message: $row->getMessage(), gpuBit: $bits, gpuType: $row->getType()?->value, gpuCount: $counts,
+                    statistics: $row->getComment()
                 );
                 $importCount++;
             }
@@ -90,7 +91,8 @@ class WorkingTimeImportService
         ?string $message,
         ?string $gpuBit,
         ?string $gpuType,
-        ?string $gpuCount
+        ?string $gpuCount,
+        ?string $statistics
     ): void {
         // 1. Lehrer finden
         $teacher = $this->em->getRepository(Teacher::class)->findOneBy(['shortName' => $teacherKuerzel]);
@@ -132,7 +134,8 @@ class WorkingTimeImportService
         $entry->setClass($className);
         $entry->setRoom($room);
         $entry->setUntisComment($message);
-        $entry->setCreatedBy($currentUser); // Falls du den aktuellen User injizierst
+        $entry->setCreatedBy($currentUser);
+        $entry->setStatistics($statistics);
 
         // 4. Verfallsdatum nur bei Mehrarbeit (+1) berechnen
         if ($amount != 0) {

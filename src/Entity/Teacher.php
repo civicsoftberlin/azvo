@@ -183,9 +183,9 @@ class Teacher
     /**
      * @throws DateMalformedStringException
      */
-    public function countCurrentMonthOvertimeEntries(): int
+    public function countCurrentMonthOvertimeEntries(?\DateTimeInterface $date = null): int
     {
-        $entries = $this->getCurrentMonthOvertimeEntries();
+        $entries = $this->getCurrentMonthOvertimeEntries($date);
         $totalAmount = 0;
 
         foreach ($entries as $entry) {

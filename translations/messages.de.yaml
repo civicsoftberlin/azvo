@@ -17,6 +17,14 @@ Debutat: Stundendeputat
 Debutats: Deputate
 Discount Valid From: Ermäßigung gültig ab
 Discount: Pflichtstundenermäßigung
+Daily Report: Tagesbericht
+DailyReport: Tagesbericht
+DailyReportType: Art
+Date: Datum
+Type: Art
+Value: Wert
+Max: Gesamt
+Report Type: Art
 Effects Total: Zahlt auf Konto ein
 Entry Types: Eintragsarten
 EntryType: Eintragsart

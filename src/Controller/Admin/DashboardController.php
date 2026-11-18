@@ -4,6 +4,8 @@ namespace App\Controller\Admin;
 
 use App\Entity\EntryType;
 use App\Entity\UntisImport;
+use App\Repository\DailyReportRepository;
+use App\Repository\DailyReportTypeRepository;
 use App\Repository\OvertimeEntryRepository;
 use App\Repository\SettingRepository;
 use App\Repository\TeacherRepository;
@@ -29,12 +31,14 @@ class DashboardController extends AbstractDashboardController
     private TeacherRepository $teacherRepository;
     private SettingRepository $settingRepository;
     private OvertimeEntryRepository $overtimeEntryRepository;
+    private DailyReportRepository $reportRepository;
 
-    public function __construct(TeacherRepository $repository, SettingRepository $settingRepository, OvertimeEntryRepository $overtimeEntryRepository)
+    public function __construct(TeacherRepository $repository, SettingRepository $settingRepository, OvertimeEntryRepository $overtimeEntryRepository, DailyReportRepository $reportRepository)
     {
         $this->teacherRepository = $repository;
         $this->settingRepository = $settingRepository;
         $this->overtimeEntryRepository = $overtimeEntryRepository;
+        $this->reportRepository = $reportRepository;
     }
 
     /**
@@ -63,6 +67,8 @@ class DashboardController extends AbstractDashboardController
         $realDecays = $this->overtimeEntryRepository->sumRealDecays();
         $realCarryOvers = $this->overtimeEntryRepository->sumRealCarryOvers();
         $heatMapData = $this->overtimeEntryRepository->getWeeklyHourDistribution();
+        $dailyReport = $this->overtimeEntryRepository->countCancellationForYesterday();
+        $reports = $this->reportRepository->findAllDistinct();
 
         $maxValue = $heatMapData ? max(array_column($heatMapData, 2)) : 0;
 
@@ -99,7 +105,9 @@ class DashboardController extends AbstractDashboardController
             'stat_real_decays' => $realDecays,
             'stat_real_carryovers' => $realCarryOvers,
             'stat_heatmap' => $heatMapData,
-            'stat_heatmap_max' => $maxValue
+            'stat_heatmap_max' => $maxValue,
+            'daily_report' => $dailyReport,
+            'reports' => $reports,
         ]);
     }
 
@@ -174,6 +182,9 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(OvertimeEntryCrudController::class, 'OvertimeEntry', 'ti ti-calendar');
         yield MenuItem::linkTo(TeacherDebutatCrudController::class, 'Debutat', 'ti ti-calendar');
 
+        yield MenuItem::section('Statistik', 'ti ti-chart-bar');
+        yield MenuItem::linkTo(DailyReportCrudController::class, 'Daily Report', 'ti ti-chart-bar');
+        yield MenuItem::linkTo(DailyReportTypeCrudController::class, 'Report Type', 'ti ti-list');
         //yield MenuItem::section('Settings', 'ti ti-settings');
 
         //yield MenuItem::linkTo(EntryTypeCrudController::class, 'Entry Types', 'ti ti-tag');

@@ -143,6 +143,48 @@ class OvertimeEntryRepository extends ServiceEntityRepository
         return $mappedResults;
     }
 
+    public function countCancellationForYesterday(): array
+    {
+        $date = new \DateTimeImmutable('yesterday');
+        // $date = new \DateTimeImmutable('2026-09-16'); // nur zum testen
+        $qb = $this->createQueryBuilder('e');
+
+        $dbResult = $qb->select('e.untisId, e.incidentDate, e.statistics')
+            ->andWhere('e.incidentDate = :date')
+            ->andWhere('e.comment IS NULL')
+            ->setParameter('date', $date->format('Y-m-d'))
+            ->getQuery()
+            ->getResult();
+
+        $result = [
+            'DATE' => $date,                // Datum
+            'COUNT' => count($dbResult),    // Summe
+            'CANCELLED' => 0,               // Ausfall
+            'SUBSTITUTED' => 0,             // Vertretung
+            'MERGED' => 0,                  // Zusammenlegung
+        ];
+
+        foreach ($dbResult as $row) {
+
+            // Fallback immer Ausfall
+            $category = 'CANCELLED';
+
+            // Vertretung
+            if (str_contains($row['untisId'], '_vert')) {
+                $category = 'SUBSTITUTED';
+            }
+
+            // Zusammenlegung
+            if ($row['statistics'] == 'z') {
+                $category = 'MERGED';
+            }
+
+            // Zähler erhöhen
+            $result[$category]++;
+        }
+        return $result;
+    }
+
     public function getWeeklyHourDistribution(): array
     {
         $startDate = new \DateTimeImmutable('first day of last month');

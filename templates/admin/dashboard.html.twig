@@ -20,7 +20,10 @@
             <twig:ea:Tabs:Item paneId="tab-critical" label="Minderstunden" errorCount="{{ teachers|filter(e => e.countCurrentMonthOvertimeEntries < 0)|length }}" icon="ti ti-clock-down" active/>
             <twig:ea:Tabs:Item paneId="tab-warning" label="Mehrstunden <span class='badge badge-warning'>{{ teachers|filter(e => e.countCurrentMonthOvertimeEntries > 0)|length }}</span>" icon="ti ti-clock-up"/>
             <twig:ea:Tabs:Item paneId="tab-neutral" label="Ausgeglichen <span class='badge badge-success'>{{ teachers|filter(e => e.countCurrentMonthOvertimeEntries == 0)|length }}</span>" icon="ti ti-clock-check" />
+            <div style="width: 5px; border-left:  var(--border-width) solid var(--form-tabs-border-color)" class="py-3"></div>
             <twig:ea:Tabs:Item paneId="tab-decay" label="Bis {{ 'last day of this month'|date('d.m.Y')}} auszugleichen <span class='badge badge-info'>{{ teachers|filter(e => e.countCurrentExpiringEntries > 0)|length }}</span>" icon="ti ti-alert-circle" />
+            <div style="width: 5px; border-left:  var(--border-width) solid var(--form-tabs-border-color)" class="py-3"></div>
+            <twig:ea:Tabs:Item paneId="tab-report" label="Tagesreport" icon="ti ti-chart-pie-3" />
             <twig:ea:Tabs:Item paneId="tab-chart" label="Statistik" icon="ti ti-chart-bar" />
         </twig:ea:Tabs>
 
@@ -356,8 +359,29 @@
                         </div>
                     </div>
                 </div>
-
-
+            </div>
+            <div class="tab-pane" id="tab-report">
+                <table class="table table-custom datagrid align-middle">
+                    <thead>
+                        <tr>
+                            <th>Datum</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in reports %}
+                        <tr>
+                            <td>{{ item.date|date('d.m.Y') }}</td>
+                            <td class="text-end actions"><a href="{{ path('admin_export_report', {'date': item.date|date('d.m.Y') }) }}" class="btn btn-secondary"><i class="ti ti-table-export text-success"></i>Bericht exportieren</a></td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td class="text-center">Keine Einträge vorhanden</td>
+                            <td></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
 

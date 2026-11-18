@@ -86,6 +86,9 @@ class OvertimeEntry
     #[ORM\Column(length: 5, nullable: true)]
     private ?string $untiCount = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $statistics = null;
+
     public function __toString(): string
     {
         return (string) $this->id;
@@ -354,6 +357,18 @@ class OvertimeEntry
     public function setUntiCount(?string $untiCount): static
     {
         $this->untiCount = $untiCount;
+
+        return $this;
+    }
+
+    public function getStatistics(): ?string
+    {
+        return $this->statistics;
+    }
+
+    public function setStatistics(?string $statistics): static
+    {
+        $this->statistics = $statistics;
 
         return $this;
     }

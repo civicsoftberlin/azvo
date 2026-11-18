@@ -252,6 +252,9 @@ class OvertimeEntryCrudController extends AbstractCrudController
             ;
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
     public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
     {
         // Daten nur auf der Index-Seite laden
@@ -259,10 +262,18 @@ class OvertimeEntryCrudController extends AbstractCrudController
             $responseParameters->set('teachers', $this->teacherRepository->findAll());
             $responseParameters->set('page_title', 'Stundenkonto');
             $filters = $this->getContext()->getRequest()->query->all('filters');
+            $totalOvertime = "N/A";
             if (!empty($filters['teacher'])) {
                 $teacher = $this->teacherRepository->find($filters['teacher']['value']);
+                if (!empty($filters['incidentDateMonth'])) {
+                    $month = $filters['incidentDateMonth'];
+                    $year = $filters['incidentDateYear'];
+                    $date = \DateTimeImmutable::createFromFormat("Y-n-d", "$year-$month-01");
+                    $totalOvertime = $teacher->countCurrentMonthOvertimeEntries($date);
+                }
                 $responseParameters->set('page_title', sprintf('Stundenkonto für %s', $teacher));
             }
+            $responseParameters->set('virtual_has', $totalOvertime);
             if (!empty($filters['incidentDateDay'])) {
                 $day = $filters['incidentDateDay'];
                 $month = $filters['incidentDateMonth'];
@@ -355,6 +366,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
             //DateField::new('createdAt'),
             //AssociationField::new('createdBy'),
             TextField::new('comment')->formatValue(fn ($value) => $value ?? ' '),
+            TextField::new('statistics')->formatValue(fn ($value) => $value ?? ' '),
             //BooleanField::new('malus')->formatValue(fn ($value) => $value ?? '0')->setHelp("Zur Meldung an den Administrator."),
         ];
     }
