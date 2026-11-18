@@ -1,7 +1,7 @@
 {% extends '@EasyAdmin/crud/index.html.twig' %}
 
 {% block content_title %}
-    Stundenkonto
+    <div class="text-truncate">Stundenkonto</div>
     <div class="ms-3 d-inline-block">
         <label>
             {# Basis-URL ohne Teacher-Filter erstellen #}
@@ -58,9 +58,6 @@
     </div>
     <div class="ms-2">
         <div class="row g-1 align-items-center p-0">
-            <div class="col-auto">
-                <label for="ist" class="col-form-label fs-6 fw-normal">Virtuelles IST</label>
-            </div>
             <div class="col-auto">
                 <input type="text" readonly id="ist" class="form-control form-control-sm tk-border-primary rounded-4" value="{{ virtual_has|default('0') }}">
             </div>
