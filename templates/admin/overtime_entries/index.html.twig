@@ -63,7 +63,17 @@
     </div>
     <div class="">
         <div class="form-widget">
-            <input type="text" id="ist" class="form-control tk-border-primary rounded-4" value="{{ virtual_has|default('0') }}">
+            {% set color = 'success' %}
+            {% if virtual_has == 'N/A' %}
+                {% set color = 'primary' %}
+            {% else %}
+                {% if virtual_has > 0 %}
+                    {% set color = 'warning' %}
+                {% elseif virtual_has < 0 %}
+                    {% set color = 'danger' %}
+                {% endif %}
+            {% endif %}
+            <input type="text" id="ist" class="form-control tk-border-{{ color }} rounded-4" value="{{ virtual_has }}{{ virtual_has == 'N/A' ? '' : ' Std' }}">
         </div>
     </div>
 {% endblock %}

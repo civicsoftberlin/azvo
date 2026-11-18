@@ -110,6 +110,30 @@ html, body {
     background-color: color-mix(in srgb, var(--color-primary) 20%, transparent) !important;
 }
 
+.tk-border-info {
+    border-width: var(--bs-border-width);
+    border-color:  var(--color-info) !important;
+    background-color: color-mix(in srgb, var(--color-info) 20%, transparent) !important;
+}
+
+.tk-border-warning {
+    border-width: var(--bs-border-width);
+    border-color:  var(--color-warning) !important;
+    background-color: color-mix(in srgb, var(--color-warning) 20%, transparent) !important;
+}
+
+.tk-border-danger {
+    border-width: var(--bs-border-width);
+    border-color:  var(--color-danger) !important;
+    background-color: color-mix(in srgb, var(--color-danger) 20%, transparent) !important;
+}
+
+.tk-border-success {
+    border-width: var(--bs-border-width);
+    border-color:  var(--color-success) !important;
+    background-color: color-mix(in srgb, var(--color-success) 20%, transparent) !important;
+}
+
 .table-info {
     background-color: var(--body-bg) !important;
     box-shadow: inset 0 2px 0 var(--table-cell-border-color);
