@@ -66,9 +66,10 @@ class DashboardController extends AbstractDashboardController
         $statCarryOvers = $this->overtimeEntryRepository->sumCarryOversForPeriod($startDate, $endDate, true);
         $realDecays = $this->overtimeEntryRepository->sumRealDecays();
         $realCarryOvers = $this->overtimeEntryRepository->sumRealCarryOvers();
-        $heatMapData = $this->overtimeEntryRepository->getWeeklyHourDistribution();
+        $heatMapData = []; //$this->overtimeEntryRepository->getWeeklyHourDistribution();
         $dailyReport = $this->overtimeEntryRepository->countCancellationForYesterday();
-        $reports = $this->reportRepository->findAllDistinct();
+        $reportList = $this->reportRepository->findAllGroupedByDate();
+
 
         $maxValue = $heatMapData ? max(array_column($heatMapData, 2)) : 0;
 
@@ -107,7 +108,7 @@ class DashboardController extends AbstractDashboardController
             'stat_heatmap' => $heatMapData,
             'stat_heatmap_max' => $maxValue,
             'daily_report' => $dailyReport,
-            'reports' => $reports,
+            'reports' => $reportList,
         ]);
     }
 
