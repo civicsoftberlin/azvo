@@ -65,7 +65,7 @@
         <div class="form-widget">
             {% set color = 'success' %}
             {% if virtual_has == 'N/A' %}
-                {% set color = 'primary' %}
+                {% set color = '' %}
             {% else %}
                 {% if virtual_has > 0 %}
                     {% set color = 'warning' %}
