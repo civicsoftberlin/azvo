@@ -41,7 +41,7 @@
 
         </label>
     </div>
-    <div class="ms-2 me-auto d-inline-blocktk-text-primary d-flex align-items-center">
+    <div class="m-2 me-auto d-inline-blocktk-text-primary d-flex align-items-center">
         {% if current_date is defined %}
             {% set allQueryParams = app.request.query.all() %}
             {% set currentFilters = allQueryParams['filters'] ?? {} %}
@@ -61,7 +61,7 @@
         </div>
         {% endif %}
     </div>
-    <div class="">
+    <div class="ms-2">
         <div class="form-widget">
             {% set color = 'success' %}
             {% if virtual_has == 'N/A' %}
@@ -73,7 +73,7 @@
                     {% set color = 'danger' %}
                 {% endif %}
             {% endif %}
-            <input type="text" id="ist" class="form-control tk-border-{{ color }} rounded-4" value="{{ virtual_has }}{{ virtual_has == 'N/A' ? '' : ' Std' }}">
+            <input style="width: 100px" type="text" id="ist" class="form-control tk-border-{{ color }} rounded-4" value="{{ virtual_has }}{{ virtual_has == 'N/A' ? '' : ' Std' }}">
         </div>
     </div>
 {% endblock %}

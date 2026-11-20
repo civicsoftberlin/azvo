@@ -143,9 +143,9 @@ class OvertimeEntryRepository extends ServiceEntityRepository
         return $mappedResults;
     }
 
-    public function countCancellationForYesterday(): array
+    public function countCancellationForToday(): array
     {
-        $date = new \DateTimeImmutable('yesterday');
+        $date = new \DateTimeImmutable('now');
         // $date = new \DateTimeImmutable('2026-09-16'); // nur zum testen
         $qb = $this->createQueryBuilder('e');
 
