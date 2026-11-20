@@ -6,11 +6,8 @@ use App\Controller\Admin\DashboardController;
 use App\Repository\DailyReportRepository;
 use App\Service\DirectoryService;
 use App\Type\ReportTemplateUploadType;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGeneratorInterface;
 use Exception;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -19,11 +16,10 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Validator\Constraints\LessThan;
-use Symfony\Component\Validator\Constraints\Positive;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\Regex;
 
 #[Route('/admin/report', name: 'admin_report_')]
@@ -34,10 +30,10 @@ class ReportController extends AbstractController
     private string $template;
 
     public function __construct(
-        #[Autowire('%kernel.project_dir%')] private string                 $projectDir,
-        #[Autowire(env: 'DAILY_REPORT_DIR_NAME')] private string           $dailyReportDir,
+        #[Autowire('%kernel.project_dir%')] string                         $projectDir,
+        #[Autowire(env: 'DAILY_REPORT_DIR_NAME')] string                   $dailyReportDir,
         #[Autowire(env: 'DAILY_REPORT_FILE_NAME')] private readonly string $fileName,
-        #[Autowire(env: 'DAILY_REPORT_FILE_EXT')] private string           $fileExtension,
+        #[Autowire(env: 'DAILY_REPORT_FILE_EXT')] private readonly string  $fileExtension,
     )
     {
         $this->reportDirPath = rtrim($projectDir, '/') . '/' . ltrim($dailyReportDir, '/');
@@ -70,7 +66,7 @@ class ReportController extends AbstractController
 
         $configForm = $this->createFormBuilder($config)
             ->add('cancelled', TextType::class, [
-                'label' => 'Ausfall',
+                'label' => 'Ausfälle',
                 'constraints' => [new Regex('/^[A-Z]+$/')],
                 'help' => 'Spalte, in der Ausfälle eingetragen werden sollen.',
                 'attr' => [
@@ -78,7 +74,7 @@ class ReportController extends AbstractController
                 ],
             ])
             ->add('substituted', TextType::class, [
-                'label' => 'Vertretung',
+                'label' => 'Vertretungen',
                 'constraints' => [new Regex('/^[A-Z]+$/')],
                 'help' => 'Spalte, in der Vertretungen eingetragen werden sollen.',
                 'attr' => [
@@ -86,7 +82,7 @@ class ReportController extends AbstractController
                 ],
             ])
             ->add('merged', TextType::class, [
-                'label' => 'Zusammenlegung',
+                'label' => 'Zusammenlegungen',
                 'constraints' => [new Regex('/^[A-Z]+$/')],
                 'help' => 'Spalte, in der Zusammenlegungen eingetragen werden sollen.',
                 'attr' => [
@@ -104,14 +100,14 @@ class ReportController extends AbstractController
             ->add('page_index', IntegerType::class, [
                 'label' => 'Blatt-Index',
                 'help' => 'Das erste Excel-Blatt hat den Index 1.',
-                'constraints' => [new Positive(), new LessThan(10)],
+                'constraints' => new GreaterThan(0),
                 'attr' => [
                     'class' => 'form-control-sm rounded-5 '
                 ],
             ])
             ->add('row_offset', IntegerType::class, [
                 'label' => 'Zeilen-Offset',
-                'constraints' => [new Positive(), new LessThan(10)],
+                'constraints' => new GreaterThanOrEqual(0),
                 'help' => 'Nach wie viel Zeilen nach dem Datum folgen die Eingaben?',
                 'attr' => [
                     'class' => 'form-control-sm rounded-5 '
@@ -209,14 +205,14 @@ class ReportController extends AbstractController
             ])
             ->add('page_index', IntegerType::class, [
                 'label' => 'Blatt-Index',
-                'constraints' => [new Positive(), new LessThan(10)],
+                'constraints' => new GreaterThan(0),
                 'attr' => [
                     'class' => 'form-control-sm rounded-5 '
                 ],
             ])
             ->add('row_offset', IntegerType::class, [
                 'label' => 'Zeilen-Offset',
-                'constraints' => [new Positive(), new LessThan(10)]
+                'constraints' => new GreaterThanOrEqual(0)
             ])
             ->getForm();
 
