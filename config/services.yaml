@@ -12,6 +12,7 @@ parameters:
     app.daily_report_file_name: '%env(DAILY_REPORT_FILE_NAME)%'
     app.daily_report_file_ext: '%env(DAILY_REPORT_FILE_EXT)%'
 
+
 services:
     # default configuration for services in *this* file
     _defaults:

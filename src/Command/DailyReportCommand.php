@@ -168,17 +168,31 @@ class DailyReportCommand extends Command
             }
         }
 
+        $configFile = $this->projectDir. '/config/report.json';
+        $config = file_exists($configFile)
+            ? json_decode(file_get_contents($configFile), true)
+            : [
+                'substituted' => 'A',
+                'merged' => 'C',
+                'cancelled' => 'E',
+                'total' => 'G',
+                'row_offset' => 2,
+                'page_index' => 2
+            ];
+
         // Zellen
-        $pageIndex = 1;
-        $cancelled = 'E';
-        $substituted = 'A';
-        $merged = 'C';
-        $sum = 'G';
-        $rowOffset = 2;
+        $pageIndex = $config['page_index'];
+        $cancelled = $config['cancelled'];
+        $substituted =  $config['substituted'];
+        $merged = $config['merged'];
+        $sum = $config['total'];
+        $rowOffset = $config['row_offset'];
+
+        // nur dev
         $foundCellOutput = 'H6';
 
         $spreadsheet = IOFactory::load($templatePath);
-        $sheet = $spreadsheet->getSheet($pageIndex);
+        $sheet = $spreadsheet->getSheet($pageIndex - 1);
 
         // Ziel-Zeile finden
         $foundCell = $this->excelService->findTargetRow($date->format('Y-m-d'), $sheet);

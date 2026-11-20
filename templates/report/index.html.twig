@@ -115,6 +115,49 @@
             </fieldset>
         </div>
 
+        {{ form_start(config_form, {
+            action: path('admin_report_settings_update'),
+        }) }}
+        <div class="form-fieldset field-form_fieldset">
+            <fieldset class="">
+                <div class="form-fieldset-header">
+                    <div class="form-fieldset-title">
+                            <span class="not-collapsible form-fieldset-title-content">
+                                <span class="icon form-fieldset-icon"><i class="ti ti-file-type-xls"></i></span>
+                                <span class="">Excel-Spalten anpassen</span>
+                            </span>
+                    </div>
+                </div>
+                <div class="form-fieldset-body show">
+                    <div class="row mb-3">
+                        <div class="col-xxl-3">{{ form_row(config_form.substituted) }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-xxl-3">{{ form_row(config_form.merged) }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-xxl-3">{{ form_row(config_form.cancelled) }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-xxl-3">{{ form_row(config_form.total) }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-xxl-3">{{ form_row(config_form.page_index) }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-xxl-3">{{ form_row(config_form.row_offset) }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-primary">Aktualisieren</button>
+                    </div>
+                    <div class="py-2 small text-danger">
+                        Änderungen sind sofort aktiv.
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        {{ form_end(config_form) }}
+
         {{ form_start(form, {
             action: path('admin_report_upload'),
             attr: { enctype: 'multipart/form-data' }
