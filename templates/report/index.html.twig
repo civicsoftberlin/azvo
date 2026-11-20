@@ -16,6 +16,7 @@
 <twig:ea:Tabs>
     <twig:ea:Tabs:Item paneId="tab-report" label="Tagesreport" icon="ti ti-chart-pie-3" active/>
     <twig:ea:Tabs:Item paneId="tab-chart" label="Dateien" icon="ti ti-file-type-xls"/>
+    <div style="width: 5px; border-left:  var(--border-width) solid var(--form-tabs-border-color)" class="py-3"></div>
     <twig:ea:Tabs:Item paneId="tab-template" label="Vorlage" icon="ti ti-file"/>
 </twig:ea:Tabs>
 
@@ -118,7 +119,7 @@
             action: path('admin_report_upload'),
             attr: { enctype: 'multipart/form-data' }
         }) }}
-        <div class="form-fieldset field-form_fieldset">
+        <div class="form-fieldset field-form_fieldset border-danger">
             <fieldset class="">
                 <div class="form-fieldset-header">
                     <div class="form-fieldset-title">
@@ -150,6 +151,9 @@
                         </div>
                     </div>
                     <div id="report_template_upload_templateFile_new_file_name" class="small"></div>
+                    <div class="py-2 small text-danger">
+                        Eine neue Vorlage wird erst mit dem kommenden Monat aktiv. Dies verhindert Brüche in der laufenden Dokumentation.
+                    </div>
                 </div>
             </fieldset>
         </div>
