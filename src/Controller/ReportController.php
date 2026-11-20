@@ -47,7 +47,7 @@ class ReportController extends AbstractController
 
         $templateFile = [];
         // Vorlage entfernen
-        if (array_key_exists($this->template, $reportList)) {
+        if (array_key_exists($this->template, $fileList)) {
             $templateFile = $fileList[$this->template];
             unset($fileList[$this->template]);
         }
