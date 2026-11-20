@@ -45,9 +45,12 @@ class ReportController extends AbstractController
         $fileList = $directoryService->readDirectoryContents($this->reportDirPath);
         $reportList = $reportRepository->findAllGroupedByDate();
 
+        $templateFile = [];
         // Vorlage entfernen
-        $templateFile = $fileList[$this->template];
-        unset($fileList[$this->template]);
+        if (array_key_exists($this->template, $reportList)) {
+            $templateFile = $fileList[$this->template];
+            unset($fileList[$this->template]);
+        }
 
         $form = $this->createForm(ReportTemplateUploadType::class);
 

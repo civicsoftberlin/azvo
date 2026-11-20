@@ -98,10 +98,16 @@
                         </tr>
                         </thead>
                         <tbody>
+                        {% if template_file %}
                             <tr class="actions">
                                 <td class="">{{ template_file.mtime|date('d.m.Y H:i') }} Uhr</td>
                                 <td class="text-end actions"><a href="{{ path('admin_report_export', {'file': template_file.name }) }}" class="btn btn-secondary">Download</a></td>
                             </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="2" class="text-center">Keine Datei vorhanden</td>
+                            </tr>
+                        {% endif %}
                         </tbody>
                     </table>
                 </div>
