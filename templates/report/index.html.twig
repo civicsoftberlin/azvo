@@ -1,11 +1,11 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
 {% block page_title %}
-    Tagesbericht
+    Berichte
 {% endblock %}
 
 {% block content_title %}
-    Tagesbericht
+    Berichte
 {% endblock %}
 
 {% block page_actions %}
@@ -15,7 +15,7 @@
 {% block main %}
 <twig:ea:Tabs>
     <twig:ea:Tabs:Item paneId="tab-report" label="Tagesreport" icon="ti ti-chart-pie-3" active/>
-    <twig:ea:Tabs:Item paneId="tab-chart" label="Dateien" icon="ti ti-file-type-xls"/>
+    <twig:ea:Tabs:Item paneId="tab-chart" label="Halbjahre" icon="ti ti-file-type-xls"/>
     <div style="width: 5px; border-left:  var(--border-width) solid var(--form-tabs-border-color)" class="py-3"></div>
     <twig:ea:Tabs:Item paneId="tab-template" label="Vorlage" icon="ti ti-file"/>
 </twig:ea:Tabs>
@@ -46,8 +46,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td class="text-center">Keine Einträge vorhanden</td>
-                        <td></td>
+                        <td class="text-center" colspan="6">Keine Einträge vorhanden</td>
                     </tr>
                 {% endfor %}
                 </tbody>
