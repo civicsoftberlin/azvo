@@ -40,10 +40,10 @@ class DailyReportRepository extends ServiceEntityRepository
             ->addSelect('SUM(CASE WHEN t.label = \'Zusammenlegung\' THEN dr.amount ELSE 0 END) AS MERGED')
             ->leftJoin('dr.type', 't')
             ->groupBy('dr.date')
-            ->having('MAX(dr.max) > 0') // NEU: leere Zeilen ignorieren!
+            ->having('MAX(dr.max) > 0')
             ->orderBy('dr.date', 'DESC')
             ->getQuery()
-            ->getArrayResult(); // WICHTIG: Kein Entity-Overhead, nur rohe Arrays!
+            ->getArrayResult();
     }
 
     /**
