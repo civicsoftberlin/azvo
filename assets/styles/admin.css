@@ -93,6 +93,8 @@
     }
 }
 
+
+
 /* html/body als scrollende Container */
 html, body {
     overflow-x: hidden !important;
@@ -204,8 +206,25 @@ html, body {
     background-color: color-mix(in srgb, var(--color-warning) 10%, transparent) !important;
     color: var(--bs-body-color) !important;
 }
-.is-warning:has(td:hover) > td {
-    background-color: color-mix(in srgb, var(--color-warning) 20%, transparent) !important;
+
+.bg-light-hover {
+    background-color: var(--gray-50) !important;
+    border-width: 3px !important;
+    border-left: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+    border-right: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+}
+
+tr:has(td:hover:hover) {
+    border-bottom: 1px solid var(--color-primary) !important;
+}
+
+tr:has(td:hover:hover) > .bg-light-hover {
+    background-color: var(--gray-200) !important;
+    color: var(--bs-body-color) !important;
+}
+
+tr:has(td:hover:hover) > .bg-medium-hover {
+    background-color: var(--gray-300) !important;
     color: var(--bs-body-color) !important;
 }
 

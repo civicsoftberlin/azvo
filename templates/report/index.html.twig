@@ -31,11 +31,11 @@
                     <th class="text-end">Fortblg.</th>
                     <th class="text-end">Veranstlg.</th>
                     <th class="text-end">Sonst. A.</th>
-                    <th class="text-end text-black">SUMME A</th>
+                    <th class="text-end text-black bg-light-hover pt-2">SUMME A</th>
                     <th class="text-end">Zsmlg.</th>
                     <th class="text-end">Vertr.-Res.</th>
                     <th class="text-end">Mehrarbeit</th>
-                    <th class="text-end text-black">SUMME B</th>
+                    <th class="text-end text-black bg-light-hover pt-2">SUMME B</th>
                     <th class="text-end text-black fw-bold">A - B</th>
                 </tr>
                 </thead>
@@ -47,12 +47,12 @@
                         <td class="text-end">{{ item.TRAINING }}</td>
                         <td class="text-end">{{ item.EVENT }}</td>
                         <td class="text-end">{{ item.CANCELLED }}</td>
-                        <td class="text-end text-black border-start border-end border-3">{{ item.CANCELLED + item.ILL + item.TRAINING + item.EVENT }}</td>
+                        <td class="text-end text-black bg-light-hover">{{ item.CANCELLED + item.ILL + item.TRAINING + item.EVENT }}</td>
                         <td class="text-end">{{ item.MERGED }}</td>
                         <td class="text-end">{{ item.SUBSTITUTED }}</td>
                         <td class="text-end">{{ item.ADDITIONAL }}</td>
-                        <td class="text-end text-black border-start border-end border-3">{{ item.SUBSTITUTED + item.ADDITIONAL + item.MERGED }}</td>
-                        <td class="text-end fw-bold">{{ (item.CANCELLED + item.ILL + item.TRAINING + item.EVENT) - (item.SUBSTITUTED + item.ADDITIONAL + item.MERGED) }}</td>
+                        <td class="text-end text-black bg-light-hover">{{ item.SUBSTITUTED + item.ADDITIONAL + item.MERGED }}</td>
+                        <td class="text-end fw-bold bg-medium-hover">{{ (item.CANCELLED + item.ILL + item.TRAINING + item.EVENT) - (item.SUBSTITUTED + item.ADDITIONAL + item.MERGED) }}</td>
                     </tr>
                 {% else %}
                     <tr>

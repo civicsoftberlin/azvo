@@ -326,7 +326,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
     {
         return [
             //IdField::new('ID')->hideOnForm(),
-            AssociationField::new('teacher', 'Lehrkraft')
+            AssociationField::new('teacher', 'Lehrkraft')->addCssClass('bg-light-hover')
                 ->setTemplatePath('admin/overtime_entries/teacher.html.twig')
                 ->setSortable(true) // Sortiert jetzt perfekt A-Z nach dem Kürzel
                 ->formatValue(function ($value, $entity) {
@@ -352,13 +352,13 @@ class OvertimeEntryCrudController extends AbstractCrudController
             TextField::new('subject'),
             //TextField::new('room'),
             //TextField::new('untisId'),
-            TextField::new('reason'),
+            TextField::new('reason')->addCssClass('bg-light-hover'),
             TextField::new('untisId')->onlyOnDetail(),
             TextField::new('untisComment'),
             //TextField::new('untisBit'),
             TextField::new('untisType')->formatValue(fn($i) => $i ? GpuSubstitutionType::tryFromChar($i)->getGermanLabel() : ' '),
             //TextField::new('untiCount')->formatValue(fn ($value) => $value ?? ' '),
-            NumberField::new('amount'),
+            NumberField::new('amount')->addCssClass('bg-light-hover'),
             DateField::new('expiresAt')->formatValue(fn ($value) => $value instanceof \DateTime ? $value->format('d.m.Y') : ' '),
             DateField::new('invalidatedAt')->formatValue(fn ($value) => $value instanceof \DateTime ? $value->format('d.m.Y') : ' '),
             //AssociationField::new('invalidatedBy')->formatValue(fn ($value) => $value ?? ''),
