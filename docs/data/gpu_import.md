@@ -97,7 +97,7 @@ Das ergibt: Bit 1 und Bit 21, also *Betreuung* und *Kennzeichen neu*
 
 
 
-<table class="table table-striped mb-3">
+<table class="table table-custom datagrid my-3">
     <thead>
         <tr>
             <th>Bit</th>
@@ -210,7 +210,7 @@ Das ergibt: Bit 1 und Bit 21, also *Betreuung* und *Kennzeichen neu*
 - **Name**: Vertretungsart
 - **Format**: Zeichen, ``~`` oder ``(leer)``
 
-<table class="table table-striped mb-3">
+<table class="table table-custom datagrid my-3">
     <thead>
         <tr>
             <th>Zeichen</th>
