@@ -53,6 +53,7 @@ class DailyReportCommand extends Command
             // Hilfsvariablen
             $date = $reportData['DATE'];
             $cancelled = $reportData['CANCELLED'];
+            $ill = $reportData['ILL'];
             $substituted = $reportData['SUBSTITUTED'];
             $merged = $reportData['MERGED'];
             $count = $reportData['COUNT'];
@@ -67,6 +68,7 @@ class DailyReportCommand extends Command
 
             // Alle Typen erfassen (werden über DataFixtures erstellt)
             $cancellationType = $this->reportTypeRepository->findOneBy(['label' => 'Ausfall']);
+            $illnessType = $this->reportTypeRepository->findOneBy(['label' => 'Krank']);
             $substitutionType = $this->reportTypeRepository->findOneBy(['label' => 'Vertretung']);
             $mergeType = $this->reportTypeRepository->findOneBy(['label' => 'Zusammenlegung']);
 
@@ -80,11 +82,23 @@ class DailyReportCommand extends Command
                 throw new Exception("Typ 'Zusammenlegung' existiert nicht.");
             }
 
+            if (!$illnessType) {
+                throw new Exception("Typ 'Krank' existiert nicht.");
+            }
+
             // Ausfall
             $report = new DailyReport();
             $report->setDate($date);
             $report->setType($cancellationType);
             $report->setAmount($cancelled);
+            $report->setMax($count);
+            $this->entityManager->persist($report);
+
+            // Krankheit
+            $report = new DailyReport();
+            $report->setDate($date);
+            $report->setType($illnessType);
+            $report->setAmount($ill);
             $report->setMax($count);
             $this->entityManager->persist($report);
 
@@ -107,6 +121,12 @@ class DailyReportCommand extends Command
             // Persistieren
             $this->entityManager->flush();
 
+            // Datei nur updaten, wenn heute Freitag ist.
+            if ($date->format('N') != "5") {
+                $this->logger->notice("Heute ist nicht Freitag!");
+                return Command::SUCCESS;
+            }
+
             $this->updateExcelFile($report->getDate()->format('d.m.Y'));
         } catch (Exception $e) {
             $this->logger->notice($e->getMessage());
@@ -124,9 +144,29 @@ class DailyReportCommand extends Command
         if ($date === false) {
             throw new \InvalidArgumentException('Ungültiges Datumsformat, erwartet: TT.MM.JJJJ');
         }
-        $dateString = $date->format('Ym');
+        $dayOfWeek = (int) $date->format('N');
 
-        // Template für diesen Monat
+        if ($dayOfWeek > 1) {
+            $mondayDate = $date->modify('monday this week');
+        } else {
+            $mondayDate = $date;
+        }
+
+        $configFile = $this->projectDir. '/config/report.json';
+        $config = file_exists($configFile)
+            ? json_decode(file_get_contents($configFile), true)
+            : [
+                'substituted' => 'L',
+                'merged' => 'K',
+                'cancelled' => 'E',
+                'not_ill' => 'I',
+                'total' => 'G',
+                'row_offset' => 0,
+                'page_index' => 3,
+            ];
+        $dateString = $config['UNTIL'];
+
+            // Template für dieses Halbjahr
         $templatePath = rtrim($this->projectDir, '/') . '/' . trim($this->dailyReportDirName, '/') . '/' . trim($this->dailyReportTemplateFile . "-$dateString" . $this->dailyReportTemplateFileExtension, '/');
 
         // allgemeines Template, wenn kein vorausgefülltes gefunden wurde
@@ -142,73 +182,56 @@ class DailyReportCommand extends Command
             throw new \RuntimeException(sprintf('Excel-Vorlage nicht gefunden unter: %s', $templatePath));
         }
 
-        $report = $this->reportRepository->findBy(['date' => $date->format('Y-m-d')]);
-        if (!$report) {
+        // Heute muss Freitag sein, ansonsten leeres Array
+        $reportData = $this->reportRepository->findAllGroupedByRange();
+
+
+        if (!empty($reportData)) {
+            $cancelCount = $reportData['CANCELLED'];
+            $substitutionCount = $reportData['SUBSTITUTED'];
+            $mergeCount = $reportData['MERGED'];
+            $illnessCount = $reportData['ILL'];
+        } else {
+            $this->logger->notice("keine Daten für den Zeitraum vorhanden!");
             return;
         }
 
-        // Hilfsvariablen
-        $cancelCount = 0;
-        $substitutionCount = 0;
-        $mergeCount = 0;
-        $maxCount = $report[0]->getMax();
-
-        foreach ($report as $reportItem) {
-            if (null == $reportItem->getType()) {
-                throw new \RuntimeException("Typ der Änderung muss angegeben werden.");
-            }
-            if ($reportItem->getType()->getLabel() == 'Ausfall') {
-                $cancelCount = $reportItem->getAmount();
-            }
-            if ($reportItem->getType()->getLabel() == 'Vertretung') {
-                $substitutionCount = $reportItem->getAmount();
-            }
-            if ($reportItem->getType()->getLabel() == 'Zusammenlegung') {
-                $mergeCount = $reportItem->getAmount();
-            }
-        }
 
         $configFile = $this->projectDir. '/config/report.json';
         $config = file_exists($configFile)
             ? json_decode(file_get_contents($configFile), true)
             : [
-                'substituted' => 'A',
-                'merged' => 'C',
+                'substituted' => 'L',
+                'merged' => 'K',
                 'cancelled' => 'E',
+                'not_ill' => 'I',
                 'total' => 'G',
-                'row_offset' => 2,
-                'page_index' => 2
+                'row_offset' => 0,
+                'page_index' => 3,
             ];
 
         // Zellen
         $pageIndex = $config['page_index'];
         $cancelled = $config['cancelled'];
+        $notIll = $config['not_ill'];
         $substituted =  $config['substituted'];
         $merged = $config['merged'];
         $sum = $config['total'];
         $rowOffset = $config['row_offset'];
 
-        // nur dev
-        $foundCellOutput = 'H6';
 
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getSheet($pageIndex - 1);
 
         // Ziel-Zeile finden
-        $foundCell = $this->excelService->findTargetRow($date->format('Y-m-d'), $sheet);
+        $foundCell = $this->excelService->findTargetRow($mondayDate->format('d.m.'), $sheet);
         if (!empty($foundCell)) {
             $row = $foundCell[1] + $rowOffset;
-            $sheet->getCell($foundCellOutput)->setValue(implode("", $foundCell));
-
-            $sheet->getTabColor('Bearbeitet')->setRGB(Color::COLOR_GREEN);
-            $sheet->getCell($cancelled . $row)->setValue($cancelCount);
+            $sheet->getCell($cancelled . $row)->setValue($illnessCount);
+            $sheet->getCell($notIll . $row)->setValue($cancelCount);
             $sheet->getCell($substituted . $row)->setValue($substitutionCount);
             $sheet->getCell($merged . $row)->setValue($mergeCount);
-            $sheet->getCell($sum . $row)->setValue($maxCount);
-        } else {
-            $sheet->getCell($foundCellOutput)->setValue($date->format('d.m.Y') . " nicht gefunden");
         }
-
         $writer = new Xlsx($spreadsheet);
         $writer->save($monthFile);
     }

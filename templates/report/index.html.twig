@@ -27,10 +27,10 @@
                 <thead>
                 <tr>
                     <th>Datum</th>
-                    <th class="text-end">Ausfälle</th>
+                    <th class="text-end">Absenzen</th>
                     <th class="text-end">Vertretungen</th>
                     <th class="text-end">Zusammenlegungen</th>
-                    <th class="text-end">Gesamt</th>
+                    <th class="text-end">Ausfälle</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -40,7 +40,7 @@
                         <td class="text-end">{{ item.CANCELLED }}</td>
                         <td class="text-end">{{ item.SUBSTITUTED }}</td>
                         <td class="text-end">{{ item.MERGED }}</td>
-                        <td class="text-end">{{ item.COUNT }}</td>
+                        <td class="text-end">{{ item.CANCELLED - (item.SUBSTITUTED + item.MERGED) }}</td>
                     </tr>
                 {% else %}
                     <tr>
@@ -130,16 +130,13 @@
                 </div>
                 <div class="form-fieldset-body show">
                     <div class="row mb-3">
-                        <div class="col-xxl-3">{{ form_row(config_form.substituted) }}</div>
-                        <div class="col-xxl-3">{{ form_row(config_form.merged) }}</div>
-                        <div class="col-xxl-3">{{ form_row(config_form.cancelled) }}</div>
-                        <div class="col-xxl-3">{{ form_row(config_form.total) }}</div>
-                    </div>
-                    <div class="row mb-3">
                         <div class="col-xxl-3">{{ form_row(config_form.page_index) }}</div>
+                        <div class="col-xxl-3">{{ form_row(config_form.row_offset) }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-xxl-3">{{ form_row(config_form.row_offset) }}</div>
+                        <div class="col-xxl-3">{{ form_row(config_form.cancelled) }}</div>
+                        <div class="col-xxl-3">{{ form_row(config_form.merged) }}</div>
+                        <div class="col-xxl-3">{{ form_row(config_form.substituted) }}</div>
                     </div>
                     <div class="mb-3">
                         <button type="submit" class="btn btn-primary">Aktualisieren</button>
@@ -183,13 +180,16 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="">
-                            <button type="submit" class="btn btn-danger">Hochladen</button>
-                        </div>
                     </div>
-                    <div id="report_template_upload_templateFile_new_file_name" class="small"></div>
+                    <div id="report_template_upload_templateFile_new_file_name" class="small mb-3"></div>
+                    <div class="row mb-3">
+                        <div class="col-xxl-3">{{ form_row(form.until) }}</div>
+                    </div>
+                    <div class="">
+                        <button type="submit" class="btn btn-danger">Hochladen</button>
+                    </div>
                     <div class="py-2 small text-danger">
-                        Eine neue Vorlage wird erst mit dem kommenden Monat aktiv. Dies verhindert Brüche in der laufenden Dokumentation.
+                        Eine neue Vorlage wird erst mit der kommenden Kalenderwoche aktiv.
                     </div>
                 </div>
             </fieldset>

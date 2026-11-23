@@ -41,6 +41,35 @@ class DailyReportRepository extends ServiceEntityRepository
             ->getArrayResult(); // WICHTIG: Kein Entity-Overhead, nur rohe Arrays!
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
+    public function findAllGroupedByRange(): array
+    {
+        $friday = new \DateTimeImmutable("now");
+        if ($friday->format('N') != 5) {
+            return [];
+        }
+        $monday = $friday->modify('monday this week');
+
+        return $this->createQueryBuilder('dr')
+            ->select('dr.date as DATE')
+            ->addSelect('MAX(dr.max) AS COUNT')
+            ->addSelect('SUM(CASE WHEN t.label = \'Ausfall\' THEN dr.amount ELSE 0 END) AS CANCELLED')
+            ->addSelect('SUM(CASE WHEN t.label = \'Krank\' THEN dr.amount ELSE 0 END) AS ILL')
+            ->addSelect('SUM(CASE WHEN t.label = \'Vertretung\' THEN dr.amount ELSE 0 END) AS SUBSTITUTED')
+            ->addSelect('SUM(CASE WHEN t.label = \'Zusammenlegung\' THEN dr.amount ELSE 0 END) AS MERGED')
+            ->leftJoin('dr.type', 't')
+            ->andWhere('dr.date >= :monday')
+            ->andWhere('dr.date <= :friday')
+            ->setParameter('monday', $monday->format('Y-m-d'))
+            ->setParameter('friday', $friday->format('Y-m-d'))
+            ->groupBy('dr.date')
+            ->orderBy('dr.date', 'DESC')
+            ->getQuery()
+            ->getArrayResult(); // WICHTIG: Kein Entity-Overhead, nur rohe Arrays!
+    }
+
 //    public function findOneBySomeField($value): ?DailyReport
 //    {
 //        return $this->createQueryBuilder('d')

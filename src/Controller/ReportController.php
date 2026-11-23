@@ -66,7 +66,7 @@ class ReportController extends AbstractController
 
         $configForm = $this->createFormBuilder($config)
             ->add('cancelled', TextType::class, [
-                'label' => 'Ausfälle',
+                'label' => 'Absenzen',
                 'constraints' => [new Regex('/^[A-Z]+$/')],
                 'help' => 'Spalte, in der Ausfälle eingetragen werden sollen.',
                 'attr' => [
@@ -87,14 +87,6 @@ class ReportController extends AbstractController
                 'help' => 'Spalte, in der Zusammenlegungen eingetragen werden sollen.',
                 'attr' => [
                     'class' => 'form-control-sm rounded-5 '
-                ],
-            ])
-            ->add('total', TextType::class, [
-                'label' => 'Gesamt',
-                'constraints' => [new Regex('/^[A-Z]+$/')],
-                'help' => 'Spalte, in der die Summe eingetragen werden soll.',
-                'attr' => [
-                    'class' => 'form-control-sm rounded-5'
                 ],
             ])
             ->add('page_index', IntegerType::class, [
@@ -136,6 +128,29 @@ class ReportController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $file */
             $file = $form->get('templateFile')->getData();
+
+            /** @var \DateTime $lastDate */
+            $lastDate = $form->get('until')->getData();
+
+            // Report-Config
+            $projectDir = $this->getParameter('kernel.project_dir');
+            $filePath = $projectDir . '/config/report.json';
+
+            $defaultData = [];
+            if (file_exists($filePath)) {
+                $existingData = json_decode(file_get_contents($filePath), true);
+                if (is_array($existingData)) {
+                    $defaultData = array_merge(['UNTIL' => $lastDate->format('Y-m-d')], $existingData);
+                }
+            }
+
+            $jsonContent = json_encode($defaultData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+            if (file_put_contents($filePath, $jsonContent) !== false) {
+                $this->addFlash('success', 'Die Report-Konfiguration wurde erfolgreich gespeichert.');
+            } else {
+                $this->addFlash('danger', 'Fehler beim Speichern: Keine Schreibrechte für /config/report.json');
+            }
 
             // Namen aus der .env holen DAILY_REPORT_DIR_NAME
             $fileName = $this->getParameter('app.daily_report_file_name') . $this->getParameter('app.daily_report_file_ext');
@@ -199,10 +214,6 @@ class ReportController extends AbstractController
                 'label' => 'Spalte Ausfall',
                 'constraints' => [new Regex('/^[a-z]+$/i')]
             ])
-            ->add('total', TextType::class, [
-                'label' => 'Spalte Gesamt',
-                'constraints' => [new Regex('/^[a-z]+$/i')]
-            ])
             ->add('page_index', IntegerType::class, [
                 'label' => 'Blatt-Index',
                 'constraints' => new GreaterThan(0),
@@ -223,7 +234,7 @@ class ReportController extends AbstractController
             $data = $form->getData();
 
             // ✅ HIER: Die Nutzereingabe jetzt endgültig in Großbuchstaben umwandeln
-            foreach (['substituted', 'merged', 'cancelled', 'total'] as $key) {
+            foreach (['substituted', 'merged', 'cancelled'] as $key) {
                 $data[$key] = strtoupper($data[$key]);
             }
 

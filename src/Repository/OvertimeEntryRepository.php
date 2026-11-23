@@ -149,7 +149,7 @@ class OvertimeEntryRepository extends ServiceEntityRepository
         // $date = new \DateTimeImmutable('2026-09-16'); // nur zum testen
         $qb = $this->createQueryBuilder('e');
 
-        $dbResult = $qb->select('e.untisId, e.incidentDate, e.statistics')
+        $dbResult = $qb->select('e.untisId, e.incidentDate, e.statistics, e.reason')
             ->andWhere('e.incidentDate = :date')
             ->andWhere('e.comment IS NULL')
             ->setParameter('date', $date->format('Y-m-d'))
@@ -159,6 +159,7 @@ class OvertimeEntryRepository extends ServiceEntityRepository
         $result = [
             'DATE' => $date,                // Datum
             'COUNT' => count($dbResult),    // Summe
+            'ILL' => 0,                     // Krank
             'CANCELLED' => 0,               // Ausfall
             'SUBSTITUTED' => 0,             // Vertretung
             'MERGED' => 0,                  // Zusammenlegung
@@ -175,8 +176,13 @@ class OvertimeEntryRepository extends ServiceEntityRepository
             }
 
             // Zusammenlegung
-            if ($row['statistics'] == 'z') {
+            if (strtolower($row['statistics']) == 'z') {
                 $category = 'MERGED';
+            }
+
+            // Krankheit
+            if (strtolower($row['reason']) == 'au') {
+                $category = 'ILL';
             }
 
             // Zähler erhöhen

@@ -28,13 +28,13 @@ class ExcelService
                 if (Date::isDateTime($cell)) {
                     $cellDate = Date::excelToDateTimeObject($cell->getValue());
 
-                    if ($cellDate->format('Y-m-d') === $needle) {
+                    if ($cellDate->format('d.m.') === $needle) {
                         $foundRow = $cell->getRow();
                         $foundColLetter = $cell->getColumn();
                         break 2;
                     }
                 }
-                elseif ($cell->getValue() === $needle) {
+                elseif (str_contains($cell->getCalculatedValue(), $needle)) {
                     $foundRow = $cell->getRow();
                     $foundColLetter = $cell->getColumn();
                     break 2;
