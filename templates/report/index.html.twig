@@ -41,8 +41,31 @@
                 </thead>
                 <tbody>
                 {% for item in reports %}
+                    {% set allQueryParams = app.request.query.all() %}
+                    {% set currentFilters = allQueryParams['filters'] ?? {} %}
+                    {% if currentFilters['incidentDateDay'] is defined  %}
+                        {% set enabled = true %}
+                        {% set filterParams = currentFilters
+                            | filter((value, key) => key != 'incidentDateDay')
+                            | merge({
+                            'incidentDateMonth' : item.DATE|date('n'),
+                            'incidentDateYear' : item.DATE|date('Y'),
+                        }) %}
+                    {% else %}
+                        {% set enabled = false %}
+                        {% set filterParams = currentFilters|merge({
+                            'incidentDateDay' : item.DATE|date('j'),
+                            'incidentDateMonth' : item.DATE|date('n'),
+                            'incidentDateYear' : item.DATE|date('Y'),
+                        }) %}
+                    {% endif %}
+                    {% set viewUrl = ea_url()
+                        .setController('App\\Controller\\Admin\\OvertimeEntryCrudController')
+                        .setAction('index')
+                        .set('filters', filterParams)
+                    %}
                     <tr>
-                        <td>{{ item.DATE|date('d.m.Y') }}</td>
+                        <td><a href="{{ viewUrl }}">{{ item.DATE|date('d.m.Y') }}</a></td>
                         <td class="text-end">{{ item.ILL }}</td>
                         <td class="text-end">{{ item.TRAINING }}</td>
                         <td class="text-end">{{ item.EVENT }}</td>
