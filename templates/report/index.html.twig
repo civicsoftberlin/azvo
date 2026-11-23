@@ -28,6 +28,7 @@
                 <tr>
                     <th>Datum</th>
                     <th class="text-end">Absenzen</th>
+                    <th class="text-end">davon AU</th>
                     <th class="text-end">Vertretungen</th>
                     <th class="text-end">Zusammenlegungen</th>
                     <th class="text-end">Ausfälle</th>
@@ -37,10 +38,11 @@
                 {% for item in reports %}
                     <tr>
                         <td>{{ item.DATE|date('d.m.Y') }}</td>
-                        <td class="text-end">{{ item.CANCELLED }}</td>
+                        <td class="text-end">{{ item.CANCELLED + item.ILL }}</td>
+                        <td class="text-end">{{ item.ILL }}</td>
                         <td class="text-end">{{ item.SUBSTITUTED }}</td>
                         <td class="text-end">{{ item.MERGED }}</td>
-                        <td class="text-end">{{ item.CANCELLED - (item.SUBSTITUTED + item.MERGED) }}</td>
+                        <td class="text-end">{{ (item.CANCELLED + item.ILL) - (item.SUBSTITUTED + item.MERGED) }}</td>
                     </tr>
                 {% else %}
                     <tr>

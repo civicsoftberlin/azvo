@@ -31,6 +31,7 @@ class DailyReportRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('dr')
             ->select('dr.date as DATE')
             ->addSelect('MAX(dr.max) AS COUNT')
+            ->addSelect('SUM(CASE WHEN t.label = \'Krank\' THEN dr.amount ELSE 0 END) AS ILL')
             ->addSelect('SUM(CASE WHEN t.label = \'Ausfall\' THEN dr.amount ELSE 0 END) AS CANCELLED')
             ->addSelect('SUM(CASE WHEN t.label = \'Vertretung\' THEN dr.amount ELSE 0 END) AS SUBSTITUTED')
             ->addSelect('SUM(CASE WHEN t.label = \'Zusammenlegung\' THEN dr.amount ELSE 0 END) AS MERGED')
