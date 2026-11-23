@@ -115,7 +115,6 @@ class ReportController extends AbstractController
             'template_file' => $templateFile,
             'reports' => $reportList,
             'form' => $form->createView(),
-            'config_form' => $configForm,
         ]);
     }
 

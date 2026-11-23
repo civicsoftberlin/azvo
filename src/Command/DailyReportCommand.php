@@ -100,8 +100,11 @@ class DailyReportCommand extends Command
             $date = $reportData['DATE'];
             $cancelled = $reportData['CANCELLED'];
             $ill = $reportData['ILL'];
+            $event = $reportData['EVENT'];
+            $training = $reportData['TRAINING'];
             $substituted = $reportData['SUBSTITUTED'];
             $merged = $reportData['MERGED'];
+            $additional = $reportData['ADDITIONAL'];
             $count = $reportData['COUNT'];
 
             // Bereits erstellt? Dann ignorieren
@@ -115,8 +118,11 @@ class DailyReportCommand extends Command
             // Alle Typen erfassen (werden über DataFixtures erstellt)
             $cancellationType = $this->reportTypeRepository->findOneBy(['label' => 'Ausfall']);
             $illnessType = $this->reportTypeRepository->findOneBy(['label' => 'Krank']);
+            $eventType = $this->reportTypeRepository->findOneBy(['label' => 'Veranstaltung']);
+            $trainingType = $this->reportTypeRepository->findOneBy(['label' => 'Fortbildung']);
             $substitutionType = $this->reportTypeRepository->findOneBy(['label' => 'Vertretung']);
             $mergeType = $this->reportTypeRepository->findOneBy(['label' => 'Zusammenlegung']);
+            $additionalType = $this->reportTypeRepository->findOneBy(['label' => 'Mehrarbeit']);
 
             if (!$cancellationType) {
                 throw new Exception("Typ 'Ausfall' existiert nicht.");
@@ -127,9 +133,17 @@ class DailyReportCommand extends Command
             if (!$mergeType) {
                 throw new Exception("Typ 'Zusammenlegung' existiert nicht.");
             }
-
             if (!$illnessType) {
                 throw new Exception("Typ 'Krank' existiert nicht.");
+            }
+            if (!$eventType) {
+                throw new Exception("Typ 'Fortbildung' existiert nicht.");
+            }
+            if (!$trainingType) {
+                throw new Exception("Typ 'Fortbildung' existiert nicht.");
+            }
+            if (!$additionalType) {
+                throw new Exception("Typ 'Mehrarbeit' existiert nicht.");
             }
 
             // Ausfall
@@ -156,11 +170,35 @@ class DailyReportCommand extends Command
             $report->setMax($count);
             $this->entityManager->persist($report);
 
+            // Mehrarbeit
+            $report = new DailyReport();
+            $report->setDate($date);
+            $report->setType($additionalType);
+            $report->setAmount($additional);
+            $report->setMax($count);
+            $this->entityManager->persist($report);
+
             // Zusammenlegung
             $report = new DailyReport();
             $report->setDate($date);
             $report->setType($mergeType);
             $report->setAmount($merged);
+            $report->setMax($count);
+            $this->entityManager->persist($report);
+
+            // Veranstaltung
+            $report = new DailyReport();
+            $report->setDate($date);
+            $report->setType($eventType);
+            $report->setAmount($event);
+            $report->setMax($count);
+            $this->entityManager->persist($report);
+
+            // Fortbildung
+            $report = new DailyReport();
+            $report->setDate($date);
+            $report->setType($trainingType);
+            $report->setAmount($training);
             $report->setMax($count);
             $this->entityManager->persist($report);
 
@@ -202,10 +240,11 @@ class DailyReportCommand extends Command
             ? json_decode(file_get_contents($configFile), true)
             : [
                 'substituted' => 'L',
+                'additional' => 'M',
                 'merged' => 'K',
                 'cancelled' => 'E',
                 'not_ill' => 'I',
-                'total' => 'G',
+                'total' => 'Z',
                 'row_offset' => 0,
                 'page_index' => 3,
             ];
@@ -230,15 +269,21 @@ class DailyReportCommand extends Command
 
         $cancelCount = 0;
         $substitutionCount = 0;
+        $additionalCount = 0;
         $mergeCount = 0;
         $illnessCount = 0;
+        $eventCount = 0;
+        $trainingCount = 0;
 
         if (!empty($reportData)) {
             foreach ($reportData as $row) {
                 $cancelCount += $row['CANCELLED'] ?? 0;
                 $substitutionCount += $row['SUBSTITUTED'] ?? 0;
+                $additionalCount += $row['ADDITIONAL'] ?? 0;
                 $mergeCount += $row['MERGED'] ?? 0;
                 $illnessCount += $row['ILL'] ?? 0;
+                $eventCount += $row['EVENT'] ?? 0;
+                $trainingCount += $row['TRAINING'] ?? 0;
             }
         } else {
             return;
@@ -263,6 +308,9 @@ class DailyReportCommand extends Command
         $cancelled = $config['cancelled'];
         $notIll = $config['not_ill'];
         $substituted =  $config['substituted'];
+        $additional =  $config['additional'];
+        $event =  $config['event'];
+        $training =  $config['training'];
         $merged = $config['merged'];
         $sum = $config['total'];
         $rowOffset = $config['row_offset'];
@@ -277,7 +325,10 @@ class DailyReportCommand extends Command
             $row = $foundCell[1] + $rowOffset;
             $sheet->getCell($cancelled . $row)->setValue($illnessCount);
             $sheet->getCell($notIll . $row)->setValue($cancelCount);
+            $sheet->getCell($event . $row)->setValue($eventCount);
+            $sheet->getCell($training . $row)->setValue($trainingCount);
             $sheet->getCell($substituted . $row)->setValue($substitutionCount);
+            $sheet->getCell($additional . $row)->setValue($additionalCount);
             $sheet->getCell($merged . $row)->setValue($mergeCount);
         }
         $writer = new Xlsx($spreadsheet);

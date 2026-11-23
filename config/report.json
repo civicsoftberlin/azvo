@@ -1,9 +1,12 @@
 {
     "substituted": "L",
+    "additional": "M",
     "merged": "K",
-    "not_ill": "I",
     "cancelled": "E",
-    "total": "G",
+    "training": "F",
+    "event": "G",
+    "not_ill": "I",
+    "total": "Z",
     "row_offset": 0,
     "UNTIL": "2027-01-29",
     "page_index": 3

@@ -182,7 +182,7 @@ class DashboardController extends AbstractDashboardController
 
         yield MenuItem::section('Statistik', 'ti ti-chart-bar');
         yield MenuItem::linkToRoute('Daily Report', 'ti ti-list', 'admin_report_index');
-        //yield MenuItem::linkTo(DailyReportTypeCrudController::class, 'Report Type', 'ti ti-list');
+        yield MenuItem::linkTo(DailyReportTypeCrudController::class, 'Report Type', 'ti ti-list');
         //yield MenuItem::section('Settings', 'ti ti-settings');
 
         //yield MenuItem::linkTo(EntryTypeCrudController::class, 'Entry Types', 'ti ti-tag');

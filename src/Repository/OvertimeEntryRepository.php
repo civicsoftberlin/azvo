@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Constants\Absence;
 use App\Entity\OvertimeEntry;
 use App\Entity\Teacher;
 use DateTimeInterface;
@@ -162,8 +163,11 @@ class OvertimeEntryRepository extends ServiceEntityRepository
             'DATE' => $date,                // Datum
             'COUNT' => count($dbResult),    // Summe
             'ILL' => 0,                     // Krank
+            'EVENT' => 0,                   // Veranstaltung
+            'TRAINING' => 0,                // Fortbildung
             'CANCELLED' => 0,               // Ausfall
             'SUBSTITUTED' => 0,             // Vertretung
+            'ADDITIONAL' => 0,             // Vertretung
             'MERGED' => 0,                  // Zusammenlegung
         ];
 
@@ -173,8 +177,13 @@ class OvertimeEntryRepository extends ServiceEntityRepository
             $category = 'CANCELLED';
 
             // Vertretung
-            if (str_contains($row['untisId'], '_vert')) {
+            if (str_contains($row['untisId'], '_vert') and $row['amount'] == 0) {
                 $category = 'SUBSTITUTED';
+            }
+
+            // Mehrarbeit (NEU)
+            if (str_contains($row['untisId'], '_vert') and $row['amount'] == 1) {
+                $category = 'ADDITIONAL';
             }
 
             // Zusammenlegung
@@ -184,8 +193,18 @@ class OvertimeEntryRepository extends ServiceEntityRepository
             }
 
             // Krankheit
-            if (!empty($row['reason']) and strtolower($row['reason']) == 'au' and !str_contains($row['untisId'], '_vert')) {
+            if (!empty($row['reason']) and in_array(strtolower($row['reason']), Absence::ILL) and !str_contains($row['untisId'], '_vert')) {
                 $category = 'ILL';
+            }
+
+            // Fortbildung
+            if (!empty($row['reason']) and in_array(strtolower($row['reason']), Absence::TRAINING) and !str_contains($row['untisId'], '_vert')) {
+                $category = 'TRAINING';
+            }
+
+            // Veranstaltung
+            if (!empty($row['reason']) and in_array(strtolower($row['reason']), Absence::EVENT) and !str_contains($row['untisId'], '_vert')) {
+                $category = 'EVENT';
             }
 
             // Zähler erhöhen
