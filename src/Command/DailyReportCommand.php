@@ -7,6 +7,9 @@ use App\Repository\DailyReportRepository;
 use App\Repository\DailyReportTypeRepository;
 use App\Repository\OvertimeEntryRepository;
 use App\Service\ExcelService;
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -15,8 +18,10 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AsCommand(
@@ -42,10 +47,51 @@ class DailyReportCommand extends Command
         parent::__construct();
     }
 
-    public function run(InputInterface $input, OutputInterface $output): int
+    protected function configure(): void
+    {
+        $this
+            ->addArgument(
+                'period',
+                InputArgument::OPTIONAL,
+                'Zeitraum im Format JJJJ-MM-TT (z.B. 2026-09-30). Standard ist der aktuelle Tag'
+            );
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $io = new SymfonyStyle($input, $output);
+        try {
+            $now = new DateTimeImmutable("now");
+
+            $periodInput = $input->getArgument('period');
+            if ($periodInput === null) {
+                $fromDate = new DateTime("now");
+            } else {
+                $fromDate = DateTime::createFromFormat("Y-m-d", $periodInput);
+                if ($fromDate === false) {
+                    $io->error(sprintf(
+                        'Ungültiges Format "%s". Erwartet wird JJJJ-MM-TT (z.B. 2026-09-30).',
+                        $periodInput
+                    ));
+                    return Command::FAILURE;
+                }
+            }
+
+            while ($fromDate->setTime(0,0) <= $now->setTime(0,0)) {
+                $this->runEach(DateTimeImmutable::createFromInterface($fromDate));
+                $fromDate->modify('+1 day');
+            }
+
+        } catch (Exception $e) {
+            $this->logger->notice($e->getMessage());
+        }
+        return Command::SUCCESS;
+    }
+
+    protected function runEach(DateTimeInterface $date): int
     {
         try {
-            $reportData = $this->overtimeEntryRepository->countCancellationForToday();
+            $reportData = $this->overtimeEntryRepository->countCancellationForToday($date);
             if (!$reportData) {
                 throw new Exception("Keine Daten gefunden.");
             }
@@ -123,11 +169,10 @@ class DailyReportCommand extends Command
 
             // Datei nur updaten, wenn heute Freitag ist.
             if ($date->format('N') != "5") {
-                $this->logger->notice("Heute ist nicht Freitag!");
                 return Command::SUCCESS;
             }
 
-            $this->updateExcelFile($report->getDate()->format('d.m.Y'));
+            $this->updateExcelFile($date->format('d.m.Y'));
         } catch (Exception $e) {
             $this->logger->notice($e->getMessage());
         }
@@ -176,23 +221,26 @@ class DailyReportCommand extends Command
         } else {
             $monthFile = $templatePath;
         }
-
         // Abbruch, wenn kein Template gefunden wurde
         if (!file_exists($templatePath)) {
             throw new \RuntimeException(sprintf('Excel-Vorlage nicht gefunden unter: %s', $templatePath));
         }
-
         // Heute muss Freitag sein, ansonsten leeres Array
-        $reportData = $this->reportRepository->findAllGroupedByRange();
+        $reportData = $this->reportRepository->findAllGroupedByRange($date);
 
+        $cancelCount = 0;
+        $substitutionCount = 0;
+        $mergeCount = 0;
+        $illnessCount = 0;
 
         if (!empty($reportData)) {
-            $cancelCount = $reportData['CANCELLED'];
-            $substitutionCount = $reportData['SUBSTITUTED'];
-            $mergeCount = $reportData['MERGED'];
-            $illnessCount = $reportData['ILL'];
+            foreach ($reportData as $row) {
+                $cancelCount += $row['CANCELLED'] ?? 0;
+                $substitutionCount += $row['SUBSTITUTED'] ?? 0;
+                $mergeCount += $row['MERGED'] ?? 0;
+                $illnessCount += $row['ILL'] ?? 0;
+            }
         } else {
-            $this->logger->notice("keine Daten für den Zeitraum vorhanden!");
             return;
         }
 

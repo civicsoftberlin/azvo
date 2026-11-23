@@ -45,9 +45,9 @@ class DailyReportRepository extends ServiceEntityRepository
     /**
      * @throws \DateMalformedStringException
      */
-    public function findAllGroupedByRange(): array
+    public function findAllGroupedByRange(\DateTimeImmutable $dateTime): array
     {
-        $friday = new \DateTimeImmutable("now");
+        $friday = clone $dateTime;
         if ($friday->format('N') != 5) {
             return [];
         }

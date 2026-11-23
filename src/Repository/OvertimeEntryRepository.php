@@ -143,13 +143,15 @@ class OvertimeEntryRepository extends ServiceEntityRepository
         return $mappedResults;
     }
 
-    public function countCancellationForToday(): array
+    public function countCancellationForToday(?DateTimeInterface $date = null): array
     {
-        $date = new \DateTimeImmutable('now');
+        if (!$date) {
+            $date = new \DateTimeImmutable('now');
+        }
         // $date = new \DateTimeImmutable('2026-09-16'); // nur zum testen
         $qb = $this->createQueryBuilder('e');
 
-        $dbResult = $qb->select('e.untisId, e.incidentDate, e.statistics, e.reason')
+        $dbResult = $qb->select('e.untisId, e.incidentDate, e.statistics, e.reason, e.amount')
             ->andWhere('e.incidentDate = :date')
             ->andWhere('e.comment IS NULL')
             ->setParameter('date', $date->format('Y-m-d'))
@@ -176,12 +178,13 @@ class OvertimeEntryRepository extends ServiceEntityRepository
             }
 
             // Zusammenlegung
-            if (strtolower($row['statistics']) == 'z') {
+            //  || (str_contains($row['untisId'], '_vert') and $row['amount'] == 0)
+            if ((!empty($row['statistics']) and strtolower($row['statistics']) == 'z')) {
                 $category = 'MERGED';
             }
 
             // Krankheit
-            if (strtolower($row['reason']) == 'au') {
+            if (!empty($row['reason']) and strtolower($row['reason']) == 'au' and !str_contains($row['untisId'], '_vert')) {
                 $category = 'ILL';
             }
 
