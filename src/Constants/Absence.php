@@ -22,6 +22,7 @@ class Absence
         "betr",
         "prü",
         "prüfung",
+        "exkursion",
         "spo",
         "hos",
         "pro",
