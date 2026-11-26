@@ -2,12 +2,13 @@
 
 {% block content_title %}
     Stundendeputat
-    <div class="d-inline-block me-auto">
+    <div class="ms-3 d-inline-block me-auto">
         <label>
             {# Basis-URL ohne Teacher-Filter erstellen #}
             {% set baseUrl = ea_url().unset('filters[teacher]') %}
+            <div class="form-widget">
 
-            <select class="ms-2 form-select form-select-sm tk-border-primary rounded-3"
+            <select class="form-select form-select-sm  tk-border-primary rounded-4"
                     style="width: auto; min-width: 180px;"
                     onchange="if(this.value) { window.location.href = this.value; } else {
                         window.location.href = '{{ baseUrl }}';
@@ -27,6 +28,7 @@
                     </option>
                 {% endfor %}
             </select>
+            </div>
         </label>
     </div>
 {% endblock %}

@@ -172,7 +172,7 @@ class DashboardController extends AbstractDashboardController
         }
 
 
-        yield MenuItem::linkTo(BackupBagCrudController::class, 'Backups', 'ti ti-restore');
+        //yield MenuItem::linkTo(BackupBagCrudController::class, 'Backups', 'ti ti-restore');
         //yield MenuItem::linkTo(BackupItemCrudController::class, 'BackupItems <span class="ms-1 badge badge-danger text-uppercase">in Planung</span>', 'ti ti-database-export');
 
         yield MenuItem::section('Accounts', 'ti ti-clock-hour-4');
@@ -188,6 +188,9 @@ class DashboardController extends AbstractDashboardController
         //yield MenuItem::linkTo(EntryTypeCrudController::class, 'Entry Types', 'ti ti-tag');
         //yield MenuItem::linkTo(UserCrudController::class, 'Users', 'ti ti-user');
         //yield MenuItem::linkTo(AzVoCrudController::class, 'AzVo', 'ti ti-section-sign');
+
+        yield MenuItem::section('Funktionen', 'ti ti-function');
+        yield MenuItem::linkToRoute('Cron Jobs', 'ti ti-math-function', 'admin_cron_index');
 
     }
 

@@ -365,7 +365,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
 
             //DateField::new('createdAt'),
             //AssociationField::new('createdBy'),
-            TextField::new('comment')->formatValue(fn ($value) => $value ?? ' '),
+            //TextField::new('comment')->formatValue(fn ($value) => $value ?? ' '),
             TextField::new('statistics')->formatValue(fn ($value) => $value ?? ' '),
             //BooleanField::new('malus')->formatValue(fn ($value) => $value ?? '0')->setHelp("Zur Meldung an den Administrator."),
         ];

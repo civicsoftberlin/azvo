@@ -26,17 +26,17 @@
             <table class="table table-custom datagrid align-middle">
                 <thead>
                 <tr>
-                    <th>Datum</th>
+                    <th class="bg-light-hover">Datum</th>
                     <th class="text-end">AU</th>
                     <th class="text-end">Fortblg.</th>
                     <th class="text-end">Veranstlg.</th>
                     <th class="text-end">Sonst. A.</th>
-                    <th class="text-end text-black bg-light-hover pt-2">SUMME A</th>
+                    <th class="text-end  bg-light-hover pt-2">SUMME A</th>
                     <th class="text-end">Zsmlg.</th>
                     <th class="text-end">Vertr.-Res.</th>
                     <th class="text-end">Mehrarbeit</th>
-                    <th class="text-end text-black bg-light-hover pt-2">SUMME B</th>
-                    <th class="text-end text-black fw-bold">A - B</th>
+                    <th class="text-end  bg-light-hover pt-2">SUMME B</th>
+                    <th class="text-end  fw-bold">A - B</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -65,16 +65,16 @@
                         .set('filters', filterParams)
                     %}
                     <tr>
-                        <td><a href="{{ viewUrl }}">{{ item.DATE|date('d.m.Y') }}</a></td>
+                        <td class="bg-light-hover"><a href="{{ viewUrl }}">{{ item.DATE|date('d.m.Y') }}</a></td>
                         <td class="text-end">{{ item.ILL }}</td>
                         <td class="text-end">{{ item.TRAINING }}</td>
                         <td class="text-end">{{ item.EVENT }}</td>
                         <td class="text-end">{{ item.CANCELLED }}</td>
-                        <td class="text-end text-black bg-light-hover">{{ item.CANCELLED + item.ILL + item.TRAINING + item.EVENT }}</td>
+                        <td class="text-end  bg-light-hover">{{ item.CANCELLED + item.ILL + item.TRAINING + item.EVENT }}</td>
                         <td class="text-end">{{ item.MERGED }}</td>
                         <td class="text-end">{{ item.SUBSTITUTED }}</td>
                         <td class="text-end">{{ item.ADDITIONAL }}</td>
-                        <td class="text-end text-black bg-light-hover">{{ item.SUBSTITUTED + item.ADDITIONAL + item.MERGED }}</td>
+                        <td class="text-end  bg-light-hover">{{ item.SUBSTITUTED + item.ADDITIONAL + item.MERGED }}</td>
                         <td class="text-end fw-bold bg-medium-hover">{{ (item.CANCELLED + item.ILL + item.TRAINING + item.EVENT) - (item.SUBSTITUTED + item.ADDITIONAL + item.MERGED) }}</td>
                     </tr>
                 {% else %}

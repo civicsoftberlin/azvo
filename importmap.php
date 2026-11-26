@@ -33,4 +33,6 @@ return [
     'tabulator-tables' => ['version' => '6.7.1'],
     'tabulator-tables/dist/css/tabulator.min.css' => ['version' => '6.7.1', 'type' => 'css'],
     'echarts' => ['path' => './echarts.esm.min.js'],
+    'htmx.org' => ['version' => '2.0.7'],
+    'htmx-ext-sse' => ['version' => '2.2.4'],
 ];

@@ -9,6 +9,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -33,6 +34,7 @@ class GpuImportCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output): int
     {
+        $io = new SymfonyStyle($input, $output);
         $importSetting = null;
         $tempFile = tempnam(sys_get_temp_dir(), 'gpu_import_');
         try {
@@ -68,6 +70,7 @@ class GpuImportCommand extends Command
             $this->entityManager->persist($importSetting);
             $this->entityManager->flush();
         }
+        $io->info("Import wurde erfolgreich durchgeführt.");
         return Command::SUCCESS;
     }
 

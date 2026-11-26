@@ -161,10 +161,10 @@ class TeacherDebutatCrudController extends AbstractCrudController
     {
 
         return [
-            IdField::new('ID')->hideOnForm(),
+            //IdField::new('ID')->hideOnForm(),
 
             FormField::addRow(),
-            AssociationField::new('teacher')->setRequired(true)
+            AssociationField::new('teacher')->setRequired(true)->addCssClass('bg-light-hover')
                 ->setSortProperty('shortName')
                 ->setQueryBuilder(function (QueryBuilder $queryBuilder) {
                     return $queryBuilder->orderBy('entity.shortName', 'ASC');

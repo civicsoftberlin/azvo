@@ -3,6 +3,8 @@
 
 import { TabulatorFull as Tabulator } from 'tabulator-tables';
 import * as echarts from 'echarts';
+import "htmx.org";
+import "htmx-ext-sse";
 /*
  * Welcome to your app's main JavaScript file!
  *
@@ -54,4 +56,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Tabulator erkennt die Spalten automatisch aus dem HTML-thead!
         });
     }
+
+    function updateStickyTop() {
+        const contentHeader = document.querySelector('.content-header');
+        if (contentHeader) {
+            const headerHeight = contentHeader.offsetHeight;
+            document.documentElement.style.setProperty('--sticky-top', headerHeight + 'px');
+        }
+    }
+
+    updateStickyTop();
+    window.addEventListener('resize', updateStickyTop);
 });

@@ -1,0 +1,17 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}
+    {{ page_title|trans }}
+{% endblock %}
+
+{% block page_actions %}
+
+{% endblock %}
+
+{% block main %}
+    {{ include('component/section.html.twig', {
+        icon: 'database',
+        title: 'Datenbank',
+        template: 'cron/part/database.html.twig'}
+    ) }}
+{% endblock %}

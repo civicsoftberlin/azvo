@@ -1,0 +1,15 @@
+<div class="form-fieldset field-form_fieldset">
+    <fieldset class="">
+        <div class="form-fieldset-header">
+            <div class="form-fieldset-title">
+                <span class="not-collapsible form-fieldset-title-content">
+                    <span class="icon form-fieldset-icon"><i class="ti ti-{{ icon|default('-home') }}"></i></span>
+                    {{ title|default('ohne Titel') }}
+                </span>
+            </div>
+        </div>
+        <div class="form-fieldset-body pb-2 show">
+            {{ include(template, vars|default({})) }}
+        </div>
+    </fieldset>
+</div>

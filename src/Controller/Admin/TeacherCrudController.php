@@ -123,7 +123,7 @@ class TeacherCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->onlyOnIndex(),
+            //IdField::new('id')->onlyOnIndex(),
 
             FormField::addFieldset("Mehr-/Minderstunden", "ti ti-clock")->onlyOnDetail(),
             TextField::new('shortName')->hideOnDetail(),
