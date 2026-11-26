@@ -1,12 +1,12 @@
 <div class="list-group list-group-flush">
 
-    <div class="list-groip-item border-bottom mb-3">
+    <div class="list-group-item mb-3">
         <div class="mb-2">
-            <div class="d-flex align-items-center gap-3 mb-2">
+            <div class="d-flex align-items-center gap-1 mb-2">
                 <i class="ti ti-database"></i>
                 <div class="tk-text-primary">GPU-Daten importieren</div>
             </div>
-            <p class="text-muted small">Kurze Beschreibung, was dieser Prozess genau tut und macht.</p>
+            <p class="text-muted small">GPU Daten vom Infoscreen importieren, sofern konfiguriert.</p>
         </div>
         <div class="my-2 px-3 rounded-3 code" id="target-gpu">
             <pre><code id="test-target"></code></pre>
@@ -21,9 +21,9 @@
         </div>
     </div>
 
-    <div class="list-groip-item border-bottom mb-3">
+    <div class="list-group-item mb-3">
         <div class="mb-2">
-            <div class="d-flex align-items-center gap-3 mb-2">
+            <div class="d-flex align-items-center gap-1 mb-2">
                 <i class="ti ti-database"></i>
                 <div class="tk-text-primary">Tagesberichte erzeugen</div>
             </div>
@@ -42,13 +42,13 @@
         </div>
     </div>
 
-    <div class="list-groip-item border-bottom mb-3">
+    <div class="list-group-item mb-3">
         <div class="mb-2">
-            <div class="d-flex align-items-center gap-3 mb-2">
+            <div class="d-flex align-items-center gap-1 mb-2">
                 <i class="ti ti-database"></i>
                 <div class="text-danger">Stundenkonto zurücksetzen</div>
             </div>
-            <p class="text-muted small">Löscht alle vorhandenen Einträge im Stundenkonto</p>
+            <p class="text-muted small">Löscht alle vorhandenen Einträge im Stundenkonto.</p>
         </div>
         <div class="my-2 px-3 rounded-3 code" id="target-to">
             <pre><code id="to-target"></code></pre>
@@ -59,17 +59,17 @@
             </div>
         </div>
         <div class="actions mb-3">
-            <button type="submit" hx-post="{{ path('admin_cron_truncate_table', {table: 'overtime_entry'}) }}"  hx-indicator="#indicator-to, #target-to"  hx-target="#to-target" class="btn btn-secondary">Prozess starten</button>
+            <button type="submit" hx-post="{{ path('admin_cron_truncate_table', {table: 'overtime_entry'}) }}"  hx-indicator="#indicator-to, #target-to"  hx-target="#to-target" class="btn btn-danger">Prozess starten</button>
         </div>
     </div>
 
-    <div class="list-groip-item">
+    <div class="list-group-item">
         <div class="mb-2">
-            <div class="d-flex align-items-center gap-3 mb-2">
+            <div class="d-flex align-items-center gap-1 mb-2">
                 <i class="ti ti-database"></i>
                 <div class="text-danger">Tagesberichte zurücksetzen</div>
             </div>
-            <p class="text-muted small">Löscht alle vorhandenen Tagesberichte</p>
+            <p class="text-muted small">Löscht alle vorhandenen Tagesberichte.</p>
         </div>
         <div class="my-2 px-3 rounded-3 code" id="target-tdr">
             <pre><code id="tdr-target"></code></pre>
@@ -80,7 +80,7 @@
             </div>
         </div>
         <div class="actions mb-2">
-            <button type="submit" hx-post="{{ path('admin_cron_truncate_table', {table: 'daily_report'}) }}"  hx-indicator="#indicator-tdr, #target-tdr"  hx-target="#tdr-target" class="btn btn-secondary">Prozess starten</button>
+            <button type="submit" hx-post="{{ path('admin_cron_truncate_table', {table: 'daily_report'}) }}"  hx-indicator="#indicator-tdr, #target-tdr"  hx-target="#tdr-target" class="btn btn-danger">Prozess starten</button>
         </div>
     </div>
 
