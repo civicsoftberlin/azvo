@@ -205,6 +205,10 @@ html, body {
     color: var(--bs-body-color) !important;
 }
 
+.tk-bg-primary {
+    background-color: #2171b5 !important;
+}
+
 /* --- WARNING --- */
 .is-warning > td {
     background-color: color-mix(in srgb, var(--color-warning) 10%, transparent) !important;
@@ -213,6 +217,14 @@ html, body {
 
 .code {
     background-color: #262626  !important;
+}
+
+tr td:first-child {
+    border-left: none !important;
+}
+
+tr td:last-child {
+    border-right: none !important;
 }
 
 .htmx-indicator{
@@ -225,16 +237,19 @@ html, body {
     display:block;
 }
 
-code{
+.code{
     display: block;
 }
 
-.htmx-request .code{
+.code .btn-close {
+    display: none;
+}
+
+.htmx-request .code,.htmx-request.code{
     display:none;
 }
-.htmx-request.code{
-    display:none;
-}
+
+
 
 /* nur, wenn kein Elternelement fieldset */
 tbody .bg-light-hover {

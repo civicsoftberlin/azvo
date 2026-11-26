@@ -65,6 +65,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const progressBars = document.querySelectorAll('.progress-infinite');
+
+    progressBars.forEach((bar) => {
+        // Bootstrap-Transition deaktivieren für flüssige 100%-Animation
+        bar.style.transition = 'none';
+
+        let progress = 0;
+        let filling = true;
+        let isPaused = false; // Steuert die Pause bei 100%
+
+        setInterval(() => {
+            // Wenn pausiert, diesen Durchlauf überspringen
+            if (isPaused) return;
+
+            if (filling) {
+                // Phase 1: Von links füllen
+                progress += 1;
+                bar.style.marginLeft = '0%';
+                bar.style.width = progress + '%';
+
+                if (progress >= 100) {
+                    filling = false;
+                    isPaused = true; // Pause aktivieren
+
+                    // Nach 1 Sekunde (1000ms) die Pause wieder aufheben
+                    setTimeout(() => {
+                        isPaused = false;
+                    }, 1000);
+                }
+            } else {
+                // Phase 2: Von links leeren
+                progress -= 1;
+                bar.style.width = progress + '%';
+                bar.style.marginLeft = (100 - progress) + '%';
+
+                if (progress <= 0) {
+                    filling = true;
+                }
+            }
+        }, 15);
+    });
+
     updateStickyTop();
     window.addEventListener('resize', updateStickyTop);
 });
