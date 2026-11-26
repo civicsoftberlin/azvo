@@ -1,0 +1,24 @@
+<div class="list-group list-group-flush">
+
+    <div class="list-groip-item">
+        <div class="mb-2">
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <i class="ti ti-database"></i>
+                <div class="tk-text-primary">Systemcache leeren</div>
+            </div>
+            <p class="text-muted small">Leert den Systemcache</p>
+        </div>
+        <div class="my-2 px-3 rounded-3 code" id="target-clr_cache">
+            <pre><code id="clr_cache-target"></code></pre>
+        </div>
+        <div class="htmx-indicator mb-3" id="indicator-clr_cache">
+            <div class="progress"  role="progressbar" aria-label="Animated striped example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+            </div>
+        </div>
+        <div class="actions mb-2">
+            <button type="submit" hx-post="{{ path('admin_cron_cache_clear') }}" hx-indicator="#indicator-clr_cache, #target-clr_cache"  hx-target="#clr_cache-target" class="btn btn-secondary">Prozess starten</button>
+        </div>
+    </div>
+
+</div>

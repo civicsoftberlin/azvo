@@ -19,21 +19,68 @@
         <div class="actions mb-3">
             <button type="submit" hx-post="{{ path('admin_cron_test') }}"  hx-indicator="#indicator-gpu, #target-gpu"  hx-target="#test-target" class="btn btn-secondary">Prozess starten</button>
         </div>
+    </div>
 
+    <div class="list-groip-item border-bottom mb-3">
+        <div class="mb-2">
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <i class="ti ti-database"></i>
+                <div class="tk-text-primary">Tagesberichte erzeugen</div>
+            </div>
+            <p class="text-muted small">Erzeugt die Tagesberichte.</p>
+        </div>
+        <div class="my-2 px-3 rounded-3 code" id="target-create_reports">
+            <pre><code id="create_reports-target"></code></pre>
+        </div>
+        <div class="htmx-indicator mb-3" id="indicator-create_reports">
+            <div class="progress"  role="progressbar" aria-label="Animated striped example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+            </div>
+        </div>
+        <div class="actions mb-3">
+            <button type="submit" hx-post="{{ path('admin_cron_reports_create') }}"  hx-indicator="#indicator-create_reports, #target-create_reports"  hx-target="#create_reports-target" class="btn btn-secondary">Prozess starten</button>
+        </div>
+    </div>
+
+    <div class="list-groip-item border-bottom mb-3">
+        <div class="mb-2">
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <i class="ti ti-database"></i>
+                <div class="text-danger">Stundenkonto zurücksetzen</div>
+            </div>
+            <p class="text-muted small">Löscht alle vorhandenen Einträge im Stundenkonto</p>
+        </div>
+        <div class="my-2 px-3 rounded-3 code" id="target-to">
+            <pre><code id="to-target"></code></pre>
+        </div>
+        <div class="htmx-indicator mb-3" id="indicator-to">
+            <div class="progress"  role="progressbar" aria-label="Animated striped example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+            </div>
+        </div>
+        <div class="actions mb-3">
+            <button type="submit" hx-post="{{ path('admin_cron_truncate_table', {table: 'overtime_entry'}) }}"  hx-indicator="#indicator-to, #target-to"  hx-target="#to-target" class="btn btn-secondary">Prozess starten</button>
+        </div>
     </div>
 
     <div class="list-groip-item">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <div class="d-flex align-items-center gap-3">
+        <div class="mb-2">
+            <div class="d-flex align-items-center gap-3 mb-2">
                 <i class="ti ti-database"></i>
-                <div class="tk-text-primary">GPU-Daten importieren</div>
+                <div class="text-danger">Tagesberichte zurücksetzen</div>
+            </div>
+            <p class="text-muted small">Löscht alle vorhandenen Tagesberichte</p>
+        </div>
+        <div class="my-2 px-3 rounded-3 code" id="target-tdr">
+            <pre><code id="tdr-target"></code></pre>
+        </div>
+        <div class="htmx-indicator mb-3" id="indicator-tdr">
+            <div class="progress"  role="progressbar" aria-label="Animated striped example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
             </div>
         </div>
-        <div class="my-2 p-3 rounded-3 code d-none">
-            <pre><code class="gpu-result">Ergebnis</code></pre>
-        </div>
-        <div class="actions mb-3">
-            <a href="#" class="btn btn-secondary">Ausführen</a>
+        <div class="actions mb-2">
+            <button type="submit" hx-post="{{ path('admin_cron_truncate_table', {table: 'daily_report'}) }}"  hx-indicator="#indicator-tdr, #target-tdr"  hx-target="#tdr-target" class="btn btn-secondary">Prozess starten</button>
         </div>
     </div>
 

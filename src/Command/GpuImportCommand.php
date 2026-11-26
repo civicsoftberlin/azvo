@@ -40,13 +40,13 @@ class GpuImportCommand extends Command
         try {
             $importSetting = $this->settingRepository->findOneBy([]);
             if (!$importSetting) {
-                throw new \Exception('Import setting not found!');
+                throw new \Exception('Es wurden keine Importeinstellungen gefunden.');
             }
             if (
                 !$importSetting->isAutoImportActive() or
                 $importSetting->getAutoImportUrl() == null or
                 $importSetting->getAutoImportUrl() == "") {
-                throw new \Exception('Import setting not active!');
+                throw new \Exception('Automatischer Import ist nicht aktiviert.');
             }
             $importSetting->setLastImportDate(new \DateTimeImmutable("now"));
             $importUrl = rtrim($importSetting->getAutoImportUrl(), '/');
@@ -58,9 +58,11 @@ class GpuImportCommand extends Command
             $file = new File($tempFile, true);
             $this->workingTimeImportService->importFromCsv($file, null, true, true);
             $importSetting->setLastImportMessage("Import erfolgreich");
-
+            $io->success("Import wurde erfolgreich durchgeführt.");
         } catch (\Exception $exception) {
             $importSetting?->setLastImportMessage($exception->getMessage());
+            $io->error($exception->getMessage());
+
         } finally {
             if (file_exists($tempFile)) {
                 unlink($tempFile);
@@ -70,7 +72,6 @@ class GpuImportCommand extends Command
             $this->entityManager->persist($importSetting);
             $this->entityManager->flush();
         }
-        $io->info("Import wurde erfolgreich durchgeführt.");
         return Command::SUCCESS;
     }
 

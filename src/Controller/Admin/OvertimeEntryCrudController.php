@@ -328,7 +328,7 @@ class OvertimeEntryCrudController extends AbstractCrudController
             //IdField::new('ID')->hideOnForm(),
             AssociationField::new('teacher', 'Lehrkraft')->addCssClass('bg-light-hover')
                 ->setTemplatePath('admin/overtime_entries/teacher.html.twig')
-                ->setSortable(true) // Sortiert jetzt perfekt A-Z nach dem Kürzel
+                ->setSortable(true)// Sortiert jetzt perfekt A-Z nach dem Kürzel
                 ->formatValue(function ($value, $entity) {
                     $teacher = $entity->getTeacher();
                     if (!$teacher) {

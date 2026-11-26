@@ -14,12 +14,14 @@ class Absence
     ];
 
     public const EVENT = [
+        "d",
         "dsv",
         "dien",
         "schv",
         "klau",
         "betr",
         "prü",
+        "prüfung",
         "spo",
         "hos",
         "pro",
@@ -27,6 +29,8 @@ class Absence
     ];
 
     public const TRAINING = [
+        "b",
+        "fb",
         "fs",
         "fobi",
         "sou",

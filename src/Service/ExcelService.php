@@ -34,7 +34,7 @@ class ExcelService
                         break 2;
                     }
                 }
-                elseif (str_contains($cell->getCalculatedValue(), $needle)) {
+                elseif ($cell->getCalculatedValue() != null and str_contains($cell->getCalculatedValue(), $needle)) {
                     $foundRow = $cell->getRow();
                     $foundColLetter = $cell->getColumn();
                     break 2;

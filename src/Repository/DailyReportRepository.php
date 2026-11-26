@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\DailyReport;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\SortOrder;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<DailyReport>
@@ -20,7 +22,7 @@ class DailyReportRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('d')
             ->select('DISTINCT d.date')
-            ->orderBy('d.id', 'DESC')
+            ->orderBy('d.id', SortDirection::Descending)
             ->getQuery()
             ->getResult()
         ;
@@ -41,7 +43,7 @@ class DailyReportRepository extends ServiceEntityRepository
             ->leftJoin('dr.type', 't')
             ->groupBy('dr.date')
             ->having('MAX(dr.max) > 0')
-            ->orderBy('dr.date', 'DESC')
+            ->orderBy('dr.date', SortDirection::Descending)
             ->getQuery()
             ->getArrayResult();
     }
@@ -73,7 +75,7 @@ class DailyReportRepository extends ServiceEntityRepository
             ->setParameter('monday', $monday->format('Y-m-d'))
             ->setParameter('friday', $friday->format('Y-m-d'))
             ->groupBy('dr.date')
-            ->orderBy('dr.date', 'DESC')
+            ->orderBy('dr.date', SortDirection::Descending)
             ->getQuery()
             ->getArrayResult(); // WICHTIG: Kein Entity-Overhead, nur rohe Arrays!
     }

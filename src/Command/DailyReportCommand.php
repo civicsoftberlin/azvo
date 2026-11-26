@@ -1,5 +1,8 @@
 <?php
 
+
+
+
 namespace App\Command;
 
 use App\Entity\DailyReport;
@@ -23,6 +26,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+error_reporting(E_ERROR | E_PARSE);
 
 #[AsCommand(
     name: 'app:report:daily',
@@ -76,15 +83,21 @@ class DailyReportCommand extends Command
                     return Command::FAILURE;
                 }
             }
-
+            $count = 0;
             while ($fromDate->setTime(0,0) <= $now->setTime(0,0)) {
                 $this->runEach(DateTimeImmutable::createFromInterface($fromDate));
                 $fromDate->modify('+1 day');
+                // TODO: Cache hier leeren und dann weiter?
+                $count++;
+                if ($count % 10 === 0) {
+                    gc_collect_cycles();
+                }
             }
 
         } catch (Exception $e) {
             $this->logger->notice($e->getMessage());
         }
+        $io->success("Tagesberichte wurden erfolgreich erzeugt.");
         return Command::SUCCESS;
     }
 
@@ -212,7 +225,6 @@ class DailyReportCommand extends Command
 
             $this->updateExcelFile($date->format('d.m.Y'));
         } catch (Exception $e) {
-            $this->logger->notice($e->getMessage());
         }
         return Command::SUCCESS;
     }
