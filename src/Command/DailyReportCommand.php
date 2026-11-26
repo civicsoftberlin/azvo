@@ -87,15 +87,9 @@ class DailyReportCommand extends Command
             while ($fromDate->setTime(0,0) <= $now->setTime(0,0)) {
                 $this->runEach(DateTimeImmutable::createFromInterface($fromDate));
                 $fromDate->modify('+1 day');
-                // TODO: Cache hier leeren und dann weiter?
-                $count++;
-                if ($count % 10 === 0) {
-                    gc_collect_cycles();
-                }
             }
-
         } catch (Exception $e) {
-            $this->logger->notice($e->getMessage());
+            $io->error($e->getMessage());
         }
         $io->success("Tagesberichte wurden erfolgreich erzeugt.");
         return Command::SUCCESS;
