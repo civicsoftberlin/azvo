@@ -100,7 +100,7 @@ class CronJobController extends AbstractController
             'period' => $now->format('Y-m-d'),
         ]);
         $output = new BufferedOutput(
-            OutputInterface::VERBOSITY_QUIET,
+            OutputInterface::VERBOSITY_NORMAL,
             false
         );
 
