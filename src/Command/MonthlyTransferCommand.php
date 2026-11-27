@@ -6,10 +6,12 @@ use App\Entity\OvertimeEntry;
 use App\Entity\Teacher;
 use App\Repository\OvertimeEntryRepository;
 use App\Repository\TeacherRepository;
+use DateMalformedStringException;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use SortDirection;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -50,48 +52,54 @@ class MonthlyTransferCommand extends Command
         $io = new SymfonyStyle($input, $output);
         try {
             $periodInput = $input->getArgument('period');
-            if ($periodInput === null) {
-                $now = new \DateTimeImmutable();
-                $period = $now
-                    ->modify('first day of this month')
-                    ->modify('-1 month')
-                    ->format('Y-m');
-
-                //$io->note(sprintf('Kein Zeitraum angegeben. Verwende automatisch: %s', $period));
-            } else {
-                $date = DateTimeImmutable::createFromFormat('Y-m', $periodInput);
-                if (!$date || $date->format('Y-m') !== $periodInput) {
-                    $io->error(sprintf(
-                        'Ungültiges Format "%s". Erwartet wird YYYY-MM (z.B. 2026-09).',
-                        $periodInput
-                    ));
-                    return Command::FAILURE;
-                }
-                $period = $periodInput;
+            if (null === $periodInput) {
+                $periodInput = new DateTimeImmutable("first day of this month")->modify("-1 month")->format('Y-m');
             }
+            $date = DateTime::createFromFormat('Y-m-d', "$periodInput-01")->setTime(0,0);
+            if ($date->format('Y-m') !== $periodInput) {
+                $io->error(sprintf(
+                    'Ungültiges Format "%s". Erwartet wird YYYY-MM (z.B. 2026-09).',
+                    $periodInput
+                ));
+                return Command::FAILURE;
+            }
+            $now = new DateTimeImmutable("first day of this month")->setTime(0, 0);
+            $dateString = $date->format('d.m.Y');
+            $nowString = $now->format('d.m.Y');
 
-            $startDate = DateTimeImmutable::createFromFormat('Y-m-d', $period . '-01');
-            $endDate = $startDate->modify('last day of this month')->setTime(23, 59, 59);
-
-            $this->calculateCarryOver($io, $startDate, $endDate);
-            $this->calculateDecay($io, $startDate, $endDate);
+            while ($date < $now) {
+                $this->runEach($io, $date->format('Y-m'));
+                $date->modify('+1 month');
+            }
+            $io->success(sprintf("Alle Buchungen für den Zeitraum von %s bis %s erfolgreich erzeugt.", $dateString, $nowString));
             return Command::SUCCESS;
         } catch (Exception $e) {
-            $io->error('Ein Fehler ist aufgetreten: ' . $e->getMessage());
+            $io->error($e->getMessage());
             $this->entityManager->rollback();
             return Command::FAILURE;
         }
     }
 
     /**
-     * @throws \DateMalformedStringException
+     * @throws DateMalformedStringException
+     */
+    private function runEach($io, $period): void
+    {
+        $startDate = DateTimeImmutable::createFromFormat('Y-m-d', $period . '-01');
+        $endDate = $startDate->modify('last day of this month')->setTime(23, 59, 59);
+        $this->calculateCarryOver($io, $startDate, $endDate);
+        $this->calculateDecay($io, $startDate, $endDate);
+    }
+
+    /**
+     * @throws DateMalformedStringException
      */
     private function calculateCarryOver(SymfonyStyle $io, DateTimeImmutable $startDate, DateTimeImmutable $endDate): void
     {
         $teacherSums = $this->overtimeEntryRepository->sumAmountByTeacherAndPeriod(DateTime::createFromImmutable($startDate), DateTime::createFromImmutable($endDate));
 
         if (count($teacherSums) === 0) {
-            $io->warning('Keine Einträge im angegebenen Zeitraum gefunden.');
+            $io->info('Keine Einträge im angegebenen Zeitraum gefunden.');
             return;
         }
 
@@ -126,14 +134,14 @@ class MonthlyTransferCommand extends Command
     }
 
     /**
-     * @throws \DateMalformedStringException
+     * @throws DateMalformedStringException
      */
     private function calculateDecay(SymfonyStyle $io, DateTimeImmutable $startDate, DateTimeImmutable $endDate): void
     {
         $teacherSums = $this->overtimeEntryRepository->sumAmountByTeacherAndPeriod(DateTime::createFromImmutable($startDate), DateTime::createFromImmutable($endDate));
 
         if (count($teacherSums) === 0) {
-            $io->warning('Keine Einträge im angegebenen Zeitraum gefunden.');
+            $io->info('Keine Einträge im angegebenen Zeitraum gefunden.');
             return;
         }
 
@@ -171,7 +179,7 @@ class MonthlyTransferCommand extends Command
     }
 
     /**
-     * @throws \DateMalformedStringException
+     * @throws DateMalformedStringException
      */
     private function invalidateOldEntries(Teacher $teacher, int $amountToInvalidate, OvertimeEntry $decayEntry): void
     {
@@ -190,7 +198,7 @@ class MonthlyTransferCommand extends Command
             ->andWhere('e.comment IS NULL OR e.comment NOT IN (:systemComments)')
             ->andWhere('e.incidentDate >= :decayBegin')
             ->andWhere('e.incidentDate <= :decayDate')
-            ->orderBy('e.incidentDate', 'ASC')
+            ->orderBy('e.incidentDate', SortDirection::Ascending)
             ->setParameter('teacher', $teacher)
             ->setParameter('systemComments', ['DECAY'])
             ->setParameter('decayBegin', $decayDateBegin->format('Y-m-d'))

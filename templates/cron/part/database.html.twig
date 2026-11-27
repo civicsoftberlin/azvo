@@ -3,7 +3,7 @@
     <div class="list-group-item mb-3">
         <div class="mb-2">
             <div class="d-flex align-items-center gap-1 mb-2">
-                <i class="ti ti-database"></i>
+                <i class="ti ti-table-import fs-4"></i>
                 <div class="tk-text-primary">GPU-Daten importieren</div>
             </div>
             <p class="text-muted small">GPU Daten vom Infoscreen importieren, sofern konfiguriert.</p>
@@ -24,7 +24,28 @@
     <div class="list-group-item mb-3">
         <div class="mb-2">
             <div class="d-flex align-items-center gap-1 mb-2">
-                <i class="ti ti-database"></i>
+                <i class="ti ti-arrow-bar-to-right fs-4"></i>
+                <div class="tk-text-primary">Stundenüberträge erzeugen</div>
+            </div>
+            <p class="text-muted small">Erzeugt Hilfsbuchungen für den monatlichen Verfall von Minderstunden und Überträge von Mehrstunden.</p>
+        </div>
+        <div class="my-2 px-3 rounded-3 code" id="target-month_transfer">
+            <pre><code id="month_transfer-target"></code></pre>
+        </div>
+        <div class="htmx-indicator mb-3" id="indicator-month_transfer">
+            <div class="progress"  role="progressbar" aria-label="Animated striped example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="max-height: 4px;">
+                <div class="progress-bar tk-bg-primary progress-infinite"></div>
+            </div>
+        </div>
+        <div class="actions mb-3">
+            <button type="submit" hx-post="{{ path('admin_cron_transfer_month') }}"  hx-indicator="#indicator-month_transfer, #target-month_transfer"  hx-target="#month_transfer-target" class="btn btn-secondary">Prozess starten</button>
+        </div>
+    </div>
+
+    <div class="list-group-item mb-3">
+        <div class="mb-2">
+            <div class="d-flex align-items-center gap-1 mb-2">
+                <i class="ti ti-report fs-4"></i>
                 <div class="tk-text-primary">Tagesberichte erzeugen</div>
             </div>
             <p class="text-muted small">Erzeugt die Tagesberichte.</p>
@@ -45,7 +66,7 @@
     <div class="list-group-item mb-3">
         <div class="mb-2">
             <div class="d-flex align-items-center gap-1 mb-2">
-                <i class="ti ti-database"></i>
+                <i class="ti ti-database-x fs-4"></i>
                 <div class="text-danger">Stundenkonto zurücksetzen</div>
             </div>
             <p class="text-muted small">Löscht alle vorhandenen Einträge im Stundenkonto.</p>
@@ -66,7 +87,7 @@
     <div class="list-group-item">
         <div class="mb-2">
             <div class="d-flex align-items-center gap-1 mb-2">
-                <i class="ti ti-database"></i>
+                <i class="ti ti-database-x fs-4"></i>
                 <div class="text-danger">Tagesberichte zurücksetzen</div>
             </div>
             <p class="text-muted small">Löscht alle vorhandenen Tagesberichte.</p>

@@ -80,6 +80,40 @@ class CronJobController extends AbstractController
     /**
      * @throws Exception
      */
+    #[Route('/transfer/month', name: 'transfer_month', methods: ['POST'])]
+    public function monthlyTransfer(KernelInterface $kernel): Response
+    {
+        $startDate = new DateTime("now");
+        $startDate->setTime(0, 0);
+        $currentYear = (int)$startDate->format('Y');
+        $currentMonth = (int)$startDate->format('m');
+        $targetYear = $currentMonth < 8 ? $currentYear - 1 : $currentYear;
+        $startDate->setDate($targetYear, 8, 1);
+
+
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+        $input = new ArrayInput([
+            'command' => 'app:monthly-transfer:create',
+            'period' => $startDate->format('Y-m'),
+        ]);
+        $output = new BufferedOutput(
+            OutputInterface::VERBOSITY_NORMAL,
+            false
+        );
+
+        $application->run($input, $output);
+        $content = $output->fetch();
+        unset($output);
+        gc_collect_cycles();
+        $theme = new SolarizedXTermTheme();
+        $converter = new AnsiToHtmlConverter($theme);
+        return new Response($converter->convert($content));
+    }
+
+    /**
+     * @throws Exception
+     */
     #[Route('/reports/create', name: 'reports_create', methods: ['POST'])]
     public function createReports(KernelInterface $kernel): Response
     {
