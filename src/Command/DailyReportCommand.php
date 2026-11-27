@@ -43,7 +43,6 @@ class DailyReportCommand extends Command
         private readonly DailyReportRepository                             $reportRepository,
         private readonly DailyReportTypeRepository                         $reportTypeRepository,
         private readonly EntityManagerInterface                            $entityManager,
-        private readonly LoggerInterface                                   $logger,
         private readonly ExcelService                                      $excelService,
         #[Autowire('%kernel.project_dir%')] private readonly string        $projectDir,
         #[Autowire(env: 'DAILY_REPORT_DIR_NAME')] private readonly string  $dailyReportDirName,
@@ -85,7 +84,7 @@ class DailyReportCommand extends Command
             }
             $count = 0;
             while ($fromDate->setTime(0,0) <= $now->setTime(0,0)) {
-                $this->runEach(DateTimeImmutable::createFromInterface($fromDate));
+                $this->runEach(DateTimeImmutable::createFromInterface($fromDate), $io);
                 $fromDate->modify('+1 day');
             }
         } catch (Exception $e) {
@@ -95,12 +94,16 @@ class DailyReportCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function runEach(DateTimeInterface $date): int
+    protected function runEach(DateTimeInterface $date, SymfonyStyle $io): int
     {
         try {
             $reportData = $this->overtimeEntryRepository->countCancellationForToday($date);
             if (!$reportData) {
                 throw new Exception("Keine Daten gefunden.");
+            }
+
+            if (!empty($reportData['OTHERS'])) {
+                $io->warning(sprintf("Fehlende Datenzuordnung erkannt für %d Elemente.", count($reportData['OTHERS'])));
             }
 
             // Hilfsvariablen
@@ -112,6 +115,7 @@ class DailyReportCommand extends Command
             $substituted = $reportData['SUBSTITUTED'];
             $merged = $reportData['MERGED'];
             $additional = $reportData['ADDITIONAL'];
+            $special = $reportData['SPECIAL'];
             $count = $reportData['COUNT'];
 
             // Bereits erstellt? Dann ignorieren
@@ -130,6 +134,7 @@ class DailyReportCommand extends Command
             $substitutionType = $this->reportTypeRepository->findOneBy(['label' => 'Vertretung']);
             $mergeType = $this->reportTypeRepository->findOneBy(['label' => 'Zusammenlegung']);
             $additionalType = $this->reportTypeRepository->findOneBy(['label' => 'Mehrarbeit']);
+            $specialType = $this->reportTypeRepository->findOneBy(['label' => 'Sondereinsatz']);
 
             if (!$cancellationType) {
                 throw new Exception("Typ 'Ausfall' existiert nicht.");
@@ -151,6 +156,10 @@ class DailyReportCommand extends Command
             }
             if (!$additionalType) {
                 throw new Exception("Typ 'Mehrarbeit' existiert nicht.");
+            }
+
+            if (!$specialType) {
+                throw new Exception("Typ 'Sondereinsatz' existiert nicht.");
             }
 
             // Ausfall
@@ -209,6 +218,14 @@ class DailyReportCommand extends Command
             $report->setMax($count);
             $this->entityManager->persist($report);
 
+            // Sondereinsatz
+            $report = new DailyReport();
+            $report->setDate($date);
+            $report->setType($specialType);
+            $report->setAmount($special);
+            $report->setMax($count);
+            $this->entityManager->persist($report);
+
             // Persistieren
             $this->entityManager->flush();
 
@@ -245,7 +262,8 @@ class DailyReportCommand extends Command
         $config = file_exists($configFile)
             ? json_decode(file_get_contents($configFile), true)
             : [
-                'substituted' => 'L',
+                'substituted' => 'O',
+                'special' => 'L',
                 'additional' => 'M',
                 'merged' => 'K',
                 'cancelled' => 'E',
@@ -280,6 +298,7 @@ class DailyReportCommand extends Command
         $illnessCount = 0;
         $eventCount = 0;
         $trainingCount = 0;
+        $specialCount = 0;
 
         if (!empty($reportData)) {
             foreach ($reportData as $row) {
@@ -290,6 +309,7 @@ class DailyReportCommand extends Command
                 $illnessCount += $row['ILL'] ?? 0;
                 $eventCount += $row['EVENT'] ?? 0;
                 $trainingCount += $row['TRAINING'] ?? 0;
+                $specialCount += $row['SPECIAL'] ?? 0;
             }
         } else {
             return;
@@ -300,7 +320,8 @@ class DailyReportCommand extends Command
         $config = file_exists($configFile)
             ? json_decode(file_get_contents($configFile), true)
             : [
-                'substituted' => 'L',
+                'substituted' => 'O',
+                'special' => 'L',
                 'merged' => 'K',
                 'cancelled' => 'E',
                 'not_ill' => 'I',
@@ -317,6 +338,7 @@ class DailyReportCommand extends Command
         $additional =  $config['additional'];
         $event =  $config['event'];
         $training =  $config['training'];
+        $special =  $config['special'];
         $merged = $config['merged'];
         $sum = $config['total'];
         $rowOffset = $config['row_offset'];
@@ -333,6 +355,7 @@ class DailyReportCommand extends Command
             $sheet->getCell($notIll . $row)->setValue($cancelCount);
             $sheet->getCell($event . $row)->setValue($eventCount);
             $sheet->getCell($training . $row)->setValue($trainingCount);
+            $sheet->getCell($special . $row)->setValue($specialCount);
             $sheet->getCell($substituted . $row)->setValue($substitutionCount);
             $sheet->getCell($additional . $row)->setValue($additionalCount);
             $sheet->getCell($merged . $row)->setValue($mergeCount);

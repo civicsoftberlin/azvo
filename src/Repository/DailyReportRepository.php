@@ -69,6 +69,7 @@ class DailyReportRepository extends ServiceEntityRepository
             ->addSelect('SUM(CASE WHEN t.label = \'Zusammenlegung\' THEN dr.amount ELSE 0 END) AS MERGED')
             ->addSelect('SUM(CASE WHEN t.label = \'Veranstaltung\' THEN dr.amount ELSE 0 END) AS EVENT')
             ->addSelect('SUM(CASE WHEN t.label = \'Fortbildung\' THEN dr.amount ELSE 0 END) AS TRAINING')
+            ->addSelect('SUM(CASE WHEN t.label = \'Sondereinsatz\' THEN dr.amount ELSE 0 END) AS SPECIAL')
             ->leftJoin('dr.type', 't')
             ->andWhere('dr.date >= :monday')
             ->andWhere('dr.date <= :friday')

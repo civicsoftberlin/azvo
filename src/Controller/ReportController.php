@@ -137,9 +137,10 @@ class ReportController extends AbstractController
 
             $defaultData = [];
             if (file_exists($filePath)) {
+                $this->addFlash('success', 'Die Report-Konfiguration existiert.');
                 $existingData = json_decode(file_get_contents($filePath), true);
                 if (is_array($existingData)) {
-                    $defaultData = array_merge(['UNTIL' => $lastDate->format('Y-m-d')], $existingData);
+                    $defaultData = array_merge($existingData, ['UNTIL' => $lastDate->format('Y-m-d')]);
                 }
             }
 

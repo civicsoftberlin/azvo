@@ -1,5 +1,7 @@
 {
-    "substituted": "L",
+    "UNTIL": "2027-01-29",
+    "substituted": "O",
+    "special": "L",
     "additional": "M",
     "merged": "K",
     "cancelled": "E",
@@ -8,6 +10,5 @@
     "not_ill": "I",
     "total": "Z",
     "row_offset": 0,
-    "UNTIL": "2027-01-29",
     "page_index": 3
 }

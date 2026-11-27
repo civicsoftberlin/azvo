@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Constants\Absence;
 use App\Entity\OvertimeEntry;
 use App\Entity\Teacher;
+use App\Enum\GpuSubstitutionType;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Criteria;
@@ -153,7 +154,7 @@ class OvertimeEntryRepository extends ServiceEntityRepository
         // $date = new \DateTimeImmutable('2026-09-16'); // nur zum testen
         $qb = $this->createQueryBuilder('e');
 
-        $dbResult = $qb->select('e.untisId, e.incidentDate, e.statistics, e.reason, e.amount')
+        $dbResult = $qb->select('e.untisId, e.incidentDate, e.statistics, e.reason, e.amount, e.untisType')
             ->andWhere('e.incidentDate = :date')
             ->andWhere('e.comment IS NULL')
             ->setParameter('date', $date->format('Y-m-d'))
@@ -168,29 +169,33 @@ class OvertimeEntryRepository extends ServiceEntityRepository
             'TRAINING' => 0,                // Fortbildung
             'CANCELLED' => 0,               // Ausfall
             'SUBSTITUTED' => 0,             // Vertretung
-            'ADDITIONAL' => 0,             // Vertretung
+            'SPECIAL' => 0,                 // Reserve
+            'ADDITIONAL' => 0,              // Mehrarbeit
             'MERGED' => 0,                  // Zusammenlegung
         ];
 
         foreach ($dbResult as $row) {
 
-            // Fallback immer Ausfall
-            $category = 'CANCELLED';
+            $category = 'OTHERS';
 
-            // Vertretung
-            if (str_contains($row['untisId'], '_vert') and $row['amount'] == 0) {
-                $category = 'SUBSTITUTED';
+            if (!str_contains($row['untisId'], '_vert')) {
+                $category = 'CANCELLED';
             }
 
-            // Mehrarbeit (NEU)
-            if (str_contains($row['untisId'], '_vert') and $row['amount'] == 1) {
+            if (
+                (!empty($row['statistics']) and strtolower($row['statistics']) == 'z' and str_contains($row['untisId'], '_vert')) or
+                ($row['untisType'] == GpuSubstitutionType::Supervision->value and str_contains($row['untisId'], '_vert'))
+            ) {
+                $category = 'MERGED';
+            } elseif (str_contains($row['untisId'], '_vert') and $row['amount'] == 0) {
+                $category = 'SUBSTITUTED';
+            } elseif (str_contains($row['untisId'], '_vert') and $row['amount'] == 1) {
                 $category = 'ADDITIONAL';
             }
 
-            // Zusammenlegung
-            //  || (str_contains($row['untisId'], '_vert') and $row['amount'] == 0)
-            if ((!empty($row['statistics']) and strtolower($row['statistics']) == 'z')) {
-                $category = 'MERGED';
+            // Vertretungsreserve
+            if (!str_contains($row['untisId'], '_') and $row['amount'] == 0 and $row['untisType'] == GpuSubstitutionType::SpecialOccurrence->value) {
+                $category = 'SPECIAL';
             }
 
             // Krankheit
