@@ -53,6 +53,7 @@ class MonthlyTransferCommand extends Command
         try {
             $periodInput = $input->getArgument('period');
             if (null === $periodInput) {
+                $io->info("Parameter 'period' wurde nicht angegeben.");
                 $periodInput = new DateTimeImmutable("first day of this month")->modify("-1 month")->format('Y-m');
             }
             $date = DateTime::createFromFormat('Y-m-d', "$periodInput-01")->setTime(0,0);
@@ -96,7 +97,7 @@ class MonthlyTransferCommand extends Command
      */
     private function calculateCarryOver(SymfonyStyle $io, DateTimeImmutable $startDate, DateTimeImmutable $endDate): void
     {
-        $teacherSums = $this->overtimeEntryRepository->sumAmountByTeacherAndPeriod(DateTime::createFromImmutable($startDate), DateTime::createFromImmutable($endDate));
+        $teacherSums = $this->overtimeEntryRepository->sumAmountByTeacherAndPeriod($startDate, $endDate);
 
         if (count($teacherSums) === 0) {
             $io->info('Keine Einträge im angegebenen Zeitraum gefunden.');
@@ -113,7 +114,7 @@ class MonthlyTransferCommand extends Command
             }
             if ($totalAmount > 0) {
                 $hasCarryOver = $this->overtimeEntryRepository->hasCarryOverForTeacherAndDate(
-                    $data['teacherId'], DateTime::createFromImmutable($endDate->modify("+1 day")), "CARRYOVER"
+                    $data['teacherId'], $endDate->modify("+1 day"), "CARRYOVER"
                 );
                 if ($hasCarryOver) {
                     continue;
@@ -122,10 +123,10 @@ class MonthlyTransferCommand extends Command
                 $carryOverEntry->setTeacher($teacher);
                 $carryOverEntry->setTeacherShortname($teacher->getShortName());
                 $carryOverEntry->setAmount($totalAmount);
-                $carryOverEntry->setIncidentDate(DateTime::createFromImmutable($endDate->modify("+1 day")));
+                $carryOverEntry->setIncidentDate($endDate->modify("+1 day"));
                 $carryOverEntry->setCourseHour(0);
                 $carryOverEntry->setComment("CARRYOVER");
-                $carryOverEntry->setExpiresAt(DateTime::createFromImmutable($startDate)->modify("+13 month")->modify('last day of this month'));
+                $carryOverEntry->setExpiresAt($startDate->modify("+13 month")->modify('last day of this month'));
                 $carryOverEntry->setReason("Übertrag aus Vormonat");
                 $this->entityManager->persist($carryOverEntry);
             }
@@ -154,7 +155,7 @@ class MonthlyTransferCommand extends Command
             }
             $decayAmount = (int) abs($totalAmount);
             $hasCarryOver = $this->overtimeEntryRepository->hasCarryOverForTeacherAndDate(
-                $data['teacherId'], DateTime::createFromImmutable($endDate), "DECAY"
+                $data['teacherId'], $endDate, "DECAY"
             );
             if ($hasCarryOver) {
                 continue;
@@ -164,7 +165,7 @@ class MonthlyTransferCommand extends Command
             $carryOverEntry->setTeacher($teacher);
             $carryOverEntry->setTeacherShortname($teacher->getShortName());
             $carryOverEntry->setAmount(-($totalAmount));
-            $carryOverEntry->setIncidentDate(DateTime::createFromImmutable($endDate));
+            $carryOverEntry->setIncidentDate($endDate);
             $carryOverEntry->setCourseHour(0);
             $carryOverEntry->setComment("DECAY");
             $carryOverEntry->setExpiresAt(null);
@@ -186,7 +187,7 @@ class MonthlyTransferCommand extends Command
         //if ($amountToInvalidate <= 0) return;
 
         $decayDateBegin = clone $decayEntry->getIncidentDate();
-        $decayDateBegin->modify('-12 months')->modify('first day of this month');
+        $decayBeginDate = $decayDateBegin->modify('-12 months')->modify('first day of this month');
 
         // Hole genau die Anzahl an ältesten, noch gültigen +1 Einträgen
         $entriesToKill = $this->entityManager->createQueryBuilder()
@@ -201,7 +202,7 @@ class MonthlyTransferCommand extends Command
             ->orderBy('e.incidentDate', SortDirection::Ascending)
             ->setParameter('teacher', $teacher)
             ->setParameter('systemComments', ['DECAY'])
-            ->setParameter('decayBegin', $decayDateBegin->format('Y-m-d'))
+            ->setParameter('decayBegin', $decayBeginDate->format('Y-m-d'))
             ->setParameter('decayDate', $decayEntry->getIncidentDate()->format('Y-m-d'))
             ->getQuery()
             ->getResult();

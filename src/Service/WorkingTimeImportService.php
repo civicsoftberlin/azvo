@@ -2,17 +2,12 @@
 
 namespace App\Service;
 
-use App\Entity\BackupBag;
-use App\Entity\BackupItem;
 use App\Entity\Teacher;
 use App\Entity\OvertimeEntry;
-use App\Enum\GpuSubstitutionFlag;
-use App\Enum\GpuSubstitutionType;
 use App\Repository\OvertimeEntryRepository;
 use Btinet\Untis\Model\UntisSubstitutionModel;
 use DateMalformedStringException;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -126,7 +121,7 @@ class WorkingTimeImportService
         $entry->setUntiCount($gpuCount);
         $entry->setTeacher($teacher);
         $entry->setTeacherShortname($teacherKuerzel);
-        $entry->setIncidentDate(\DateTime::createFromFormat('Ymd', $dateString));
+        $entry->setIncidentDate(\DateTimeImmutable::createFromFormat('Ymd', $dateString));
         $entry->setCourseHour($courseHour);
         $entry->setAmount($amount);
         $entry->setReason($reason);
@@ -139,7 +134,7 @@ class WorkingTimeImportService
 
         // 4. Verfallsdatum nur bei Mehrarbeit (+1) berechnen
         if ($amount != 0) {
-            $date = \DateTime::createFromFormat('Ymd', $dateString);
+            $date = \DateTimeImmutable::createFromFormat('Ymd', $dateString);
             $startOfNextMonth = $date->modify('first day of next month');
             $expiryDate = $startOfNextMonth->modify('+12 months')->modify('-1 day');
             if ($amount > 0) {

@@ -21,7 +21,6 @@ class UntisImport
     #[Vich\UploadableField(mapping: 'gpu', fileNameProperty: 'upload', size: 'size')]
     private ?File $uploadFile = null;
 
-    #[ORM\Transient] // Sagt Doctrine: "Ignorier mich, keine DB-Spalte!"
     private bool $autoCreate = false;
 
     #[ORM\Embedded(class: 'Vich\UploaderBundle\Entity\File')]

@@ -27,8 +27,8 @@ class OvertimeEntry
     #[ORM\Column(length: 255)]
     private ?string $teacherShortname = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $incidentDate = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $incidentDate = null;
 
     #[ORM\Column]
     private ?int $courseHour = null;
@@ -48,8 +48,8 @@ class OvertimeEntry
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $room = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $expiresAt = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $expiresAt = null;
 
     #[ORM\ManyToOne(targetEntity: self::class)]
     #[ORM\JoinColumn(name: 'invalidated_by_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
@@ -69,7 +69,7 @@ class OvertimeEntry
     private ?string $hook = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTime $invalidatedAt = null;
+    private ?\DateTimeImmutable $invalidatedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $untisComment = null;
@@ -135,12 +135,12 @@ class OvertimeEntry
         return $this;
     }
 
-    public function getIncidentDate(): ?\DateTime
+    public function getIncidentDate(): ?\DateTimeImmutable
     {
         return $this->incidentDate;
     }
 
-    public function setIncidentDate(\DateTime $incidentDate): static
+    public function setIncidentDate(\DateTimeImmutable $incidentDate): static
     {
         $this->incidentDate = $incidentDate;
 
@@ -219,12 +219,12 @@ class OvertimeEntry
         return $this;
     }
 
-    public function getExpiresAt(): ?\DateTime
+    public function getExpiresAt(): ?\DateTimeInterface
     {
         return $this->expiresAt;
     }
 
-    public function setExpiresAt(?\DateTime $expiresAt): static
+    public function setExpiresAt(?\DateTimeInterface $expiresAt): static
     {
         $this->expiresAt = $expiresAt;
 
@@ -284,12 +284,12 @@ class OvertimeEntry
         return $this;
     }
 
-    public function getInvalidatedAt(): ?\DateTime
+    public function getInvalidatedAt(): ?\DateTimeImmutable
     {
         return $this->invalidatedAt;
     }
 
-    public function setInvalidatedAt(?\DateTime $invalidatedAt): static
+    public function setInvalidatedAt(?\DateTimeImmutable $invalidatedAt): static
     {
         $this->invalidatedAt = $invalidatedAt;
 

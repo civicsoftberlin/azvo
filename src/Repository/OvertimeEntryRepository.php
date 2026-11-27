@@ -22,7 +22,7 @@ class OvertimeEntryRepository extends ServiceEntityRepository
         parent::__construct($registry, OvertimeEntry::class);
     }
 
-    public function sumAmountByPeriod(\DateTime $startDate, \DateTime $endDate, Teacher $teacher): int
+    public function sumAmountByPeriod(\DateTime $startDate, \DateTimeInterface $endDate, Teacher $teacher): int
     {
         $result = $this->createQueryBuilder('e')
             ->select('SUM(e.amount) as totalAmount')
@@ -39,7 +39,7 @@ class OvertimeEntryRepository extends ServiceEntityRepository
 
         return $result ?? 0;
     }
-    public function sumAmountByTeacherAndPeriod(\DateTime $startDate, \DateTime $endDate): array
+    public function sumAmountByTeacherAndPeriod(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
     {
         return $this->createQueryBuilder('e')
             ->select('t.id as teacherId, t.shortName as teacherName, SUM(e.amount) as totalAmount')
@@ -263,7 +263,7 @@ class OvertimeEntryRepository extends ServiceEntityRepository
 
     public function hasCarryOverForTeacherAndDate(
         int $teacherId,
-        \DateTime $incidentDate,
+        \DateTimeImmutable $incidentDate,
         string $untisId
     ): bool {
         return $this->createQueryBuilder('e')
@@ -291,7 +291,7 @@ class OvertimeEntryRepository extends ServiceEntityRepository
 
     public function getCarryOverForTeacherAndDate(
         int $teacherId,
-        \DateTime $incidentDate,
+        \DateTimeImmutable $incidentDate,
     ): int {
         return $this->createQueryBuilder('e')
             ->select('e.amount as totalAmount')
@@ -307,7 +307,7 @@ class OvertimeEntryRepository extends ServiceEntityRepository
 
     public function hasEndOfMonthHook(
         int $teacherId,
-        \DateTime $incidentDate
+        \DateTimeImmutable $incidentDate
     ): bool {
         $count = $this->createQueryBuilder('e')
             ->select('COUNT(e.id)')
@@ -341,7 +341,7 @@ class OvertimeEntryRepository extends ServiceEntityRepository
             ->setParameter('teacherId', $teacher->getId())
             ->setParameter('fromDate', $fromDate)
             ->setParameter('toDate', $toDate)
-            ->orderBy('e.incidentDate', 'ASC')
+            ->orderBy('e.incidentDate', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }

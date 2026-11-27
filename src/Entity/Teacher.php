@@ -25,8 +25,8 @@ class Teacher
 
     private ?string $shortName = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $birthdate = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $birthdate = null;
 
     /**
      * @var Collection<int, TeacherDebutat>
@@ -74,12 +74,12 @@ class Teacher
         return $this;
     }
 
-    public function getBirthdate(): ?\DateTime
+    public function getBirthdate(): ?\DateTimeImmutable
     {
         return $this->birthdate;
     }
 
-    public function setBirthdate(\DateTime $birthdate): static
+    public function setBirthdate(\DateTimeImmutable $birthdate): static
     {
         $this->birthdate = $birthdate;
 
@@ -154,8 +154,8 @@ class Teacher
     public function getCurrentMonthOvertimeEntries(?\DateTimeInterface $date = null, ?string $filter = null): Collection
     {
         if ($date === null) {
-            $startOfMonth = new \DateTime('first day of this month');
-            $endOfMonth = new \DateTime('last day of this month 23:59:59');
+            $startOfMonth = new \DateTimeImmutable('first day of this month');
+            $endOfMonth = new \DateTimeImmutable('last day of this month 23:59:59');
         } else {
             $startOfMonth = $date;
             $endOfMonth = $date->modify('last day of this month 23:59:59');
@@ -216,7 +216,7 @@ class Teacher
     public function countCurrentExpiringEntries(): int
     {
         $criteria = Criteria::create()
-            ->where(Criteria::expr()->eq('expiresAt', new \DateTime("last day of this month")->format('Y-m-d')))
+            ->where(Criteria::expr()->eq('expiresAt', new \DateTimeImmutable("last day of this month")->format('Y-m-d')))
             ->andWhere(Criteria::expr()->isNull('invalidatedAt'))
             //->andWhere(Criteria::expr()->neq('comment', "CARRYOVER"))
         ;

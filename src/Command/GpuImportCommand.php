@@ -28,7 +28,6 @@ class GpuImportCommand extends Command
         #[Autowire(env: 'GPU_PATH')] private readonly string $gpuPath,
     )
     {
-        // TODO: automatisch mit User 'admin' einloggen
         parent::__construct();
     }
 

@@ -23,17 +23,17 @@ class TeacherDebutat
     #[ORM\Column(nullable: true)]
     private ?int $discount = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $validFrom = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $validFrom = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $invalidFrom = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $invalidFrom = null;
 
     #[ORM\Column]
     private ?int $threshold = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $discountValidFrom = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $discountValidFrom = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $autoAppend = null;
@@ -82,24 +82,24 @@ class TeacherDebutat
         return $this;
     }
 
-    public function getValidFrom(): ?\DateTime
+    public function getValidFrom(): ?\DateTimeImmutable
     {
         return $this->validFrom;
     }
 
-    public function setValidFrom(\DateTime $validFrom): static
+    public function setValidFrom(\DateTimeImmutable $validFrom): static
     {
         $this->validFrom = $validFrom;
 
         return $this;
     }
 
-    public function getInvalidFrom(): ?\DateTime
+    public function getInvalidFrom(): ?\DateTimeImmutable
     {
         return $this->invalidFrom;
     }
 
-    public function setInvalidFrom(?\DateTime $invalidFrom): static
+    public function setInvalidFrom(?\DateTimeImmutable $invalidFrom): static
     {
         $this->invalidFrom = $invalidFrom;
 
@@ -118,12 +118,12 @@ class TeacherDebutat
         return $this;
     }
 
-    public function getDiscountValidFrom(): ?\DateTime
+    public function getDiscountValidFrom(): ?\DateTimeImmutable
     {
         return $this->discountValidFrom;
     }
 
-    public function setDiscountValidFrom(?\DateTime $discountValidFrom): static
+    public function setDiscountValidFrom(?\DateTimeImmutable $discountValidFrom): static
     {
         $this->discountValidFrom = $discountValidFrom;
 

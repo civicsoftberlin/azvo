@@ -17,11 +17,11 @@ class AzVo
     #[ORM\Column]
     private ?int $debutat = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $validFrom = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $validFrom = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $invalidFrom = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $invalidFrom = null;
 
     public function getId(): ?int
     {
@@ -40,24 +40,24 @@ class AzVo
         return $this;
     }
 
-    public function getValidFrom(): ?\DateTime
+    public function getValidFrom(): ?\DateTimeImmutable
     {
         return $this->validFrom;
     }
 
-    public function setValidFrom(\DateTime $validFrom): static
+    public function setValidFrom(\DateTimeImmutable $validFrom): static
     {
         $this->validFrom = $validFrom;
 
         return $this;
     }
 
-    public function getInvalidFrom(): ?\DateTime
+    public function getInvalidFrom(): ?\DateTimeImmutable
     {
         return $this->invalidFrom;
     }
 
-    public function setInvalidFrom(?\DateTime $invalidFrom): static
+    public function setInvalidFrom(?\DateTimeImmutable $invalidFrom): static
     {
         $this->invalidFrom = $invalidFrom;
 
