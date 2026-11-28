@@ -236,6 +236,7 @@ class DailyReportCommand extends Command
 
             $this->updateExcelFile($date->format('d.m.Y'));
         } catch (Exception $e) {
+            $io->error($e->getMessage());
         }
         return Command::SUCCESS;
     }
