@@ -82,162 +82,164 @@ class DailyReportCommand extends Command
                     return Command::FAILURE;
                 }
             }
-            $count = 0;
+
             while ($fromDate->setTime(0,0) <= $now->setTime(0,0)) {
                 $this->runEach(DateTimeImmutable::createFromInterface($fromDate), $io);
                 $fromDate->modify('+1 day');
             }
+            $io->success("Tagesberichte wurden erfolgreich erzeugt.");
         } catch (Exception $e) {
             $io->error($e->getMessage());
         }
-        $io->success("Tagesberichte wurden erfolgreich erzeugt.");
+
         return Command::SUCCESS;
     }
 
+    /**
+     * @throws Exception
+     */
     protected function runEach(DateTimeInterface $date, SymfonyStyle $io): int
     {
-        try {
-            $reportData = $this->overtimeEntryRepository->countCancellationForToday($date);
-            if (!$reportData) {
-                throw new Exception("Keine Daten gefunden.");
-            }
 
-            if (!empty($reportData['OTHERS'])) {
-                $io->warning(sprintf("Fehlende Datenzuordnung erkannt für %d Elemente.", count($reportData['OTHERS'])));
-            }
-
-            // Hilfsvariablen
-            $date = $reportData['DATE'];
-            $cancelled = $reportData['CANCELLED'];
-            $ill = $reportData['ILL'];
-            $event = $reportData['EVENT'];
-            $training = $reportData['TRAINING'];
-            $substituted = $reportData['SUBSTITUTED'];
-            $merged = $reportData['MERGED'];
-            $additional = $reportData['ADDITIONAL'];
-            $special = $reportData['SPECIAL'];
-            $count = $reportData['COUNT'];
-
-            // Bereits erstellt? Dann ignorieren
-            $reportExists = $this->reportRepository->findOneBy([
-                'date' => $date->format('Y-m-d'),
-            ]);
-            if ($reportExists) {
-                throw new Exception("Report für '{$date->format('d.m.Y')}' existiert bereits.");
-            }
-
-            // Alle Typen erfassen (werden über DataFixtures erstellt)
-            $cancellationType = $this->reportTypeRepository->findOneBy(['label' => 'Ausfall']);
-            $illnessType = $this->reportTypeRepository->findOneBy(['label' => 'Krank']);
-            $eventType = $this->reportTypeRepository->findOneBy(['label' => 'Veranstaltung']);
-            $trainingType = $this->reportTypeRepository->findOneBy(['label' => 'Fortbildung']);
-            $substitutionType = $this->reportTypeRepository->findOneBy(['label' => 'Vertretung']);
-            $mergeType = $this->reportTypeRepository->findOneBy(['label' => 'Zusammenlegung']);
-            $additionalType = $this->reportTypeRepository->findOneBy(['label' => 'Mehrarbeit']);
-            $specialType = $this->reportTypeRepository->findOneBy(['label' => 'Sondereinsatz']);
-
-            if (!$cancellationType) {
-                throw new Exception("Typ 'Ausfall' existiert nicht.");
-            }
-            if (!$substitutionType) {
-                throw new Exception("Typ 'Vertretung' existiert nicht.");
-            }
-            if (!$mergeType) {
-                throw new Exception("Typ 'Zusammenlegung' existiert nicht.");
-            }
-            if (!$illnessType) {
-                throw new Exception("Typ 'Krank' existiert nicht.");
-            }
-            if (!$eventType) {
-                throw new Exception("Typ 'Fortbildung' existiert nicht.");
-            }
-            if (!$trainingType) {
-                throw new Exception("Typ 'Fortbildung' existiert nicht.");
-            }
-            if (!$additionalType) {
-                throw new Exception("Typ 'Mehrarbeit' existiert nicht.");
-            }
-
-            if (!$specialType) {
-                throw new Exception("Typ 'Sondereinsatz' existiert nicht.");
-            }
-
-            // Ausfall
-            $report = new DailyReport();
-            $report->setDate($date);
-            $report->setType($cancellationType);
-            $report->setAmount($cancelled);
-            $report->setMax($count);
-            $this->entityManager->persist($report);
-
-            // Krankheit
-            $report = new DailyReport();
-            $report->setDate($date);
-            $report->setType($illnessType);
-            $report->setAmount($ill);
-            $report->setMax($count);
-            $this->entityManager->persist($report);
-
-            // Vertretung
-            $report = new DailyReport();
-            $report->setDate($date);
-            $report->setType($substitutionType);
-            $report->setAmount($substituted);
-            $report->setMax($count);
-            $this->entityManager->persist($report);
-
-            // Mehrarbeit
-            $report = new DailyReport();
-            $report->setDate($date);
-            $report->setType($additionalType);
-            $report->setAmount($additional);
-            $report->setMax($count);
-            $this->entityManager->persist($report);
-
-            // Zusammenlegung
-            $report = new DailyReport();
-            $report->setDate($date);
-            $report->setType($mergeType);
-            $report->setAmount($merged);
-            $report->setMax($count);
-            $this->entityManager->persist($report);
-
-            // Veranstaltung
-            $report = new DailyReport();
-            $report->setDate($date);
-            $report->setType($eventType);
-            $report->setAmount($event);
-            $report->setMax($count);
-            $this->entityManager->persist($report);
-
-            // Fortbildung
-            $report = new DailyReport();
-            $report->setDate($date);
-            $report->setType($trainingType);
-            $report->setAmount($training);
-            $report->setMax($count);
-            $this->entityManager->persist($report);
-
-            // Sondereinsatz
-            $report = new DailyReport();
-            $report->setDate($date);
-            $report->setType($specialType);
-            $report->setAmount($special);
-            $report->setMax($count);
-            $this->entityManager->persist($report);
-
-            // Persistieren
-            $this->entityManager->flush();
-
-            // Datei nur updaten, wenn heute Freitag ist.
-            if ($date->format('N') != "5") {
-                return Command::SUCCESS;
-            }
-
-            $this->updateExcelFile($date->format('d.m.Y'));
-        } catch (Exception $e) {
-            $io->error($e->getMessage());
+        $reportData = $this->overtimeEntryRepository->countCancellationForToday($date);
+        if (!$reportData) {
+            throw new Exception("Keine Daten gefunden.");
         }
+
+        if (!empty($reportData['OTHERS'])) {
+            $io->warning(sprintf("Fehlende Datenzuordnung erkannt für %d Elemente.", count($reportData['OTHERS'])));
+        }
+
+        // Hilfsvariablen
+        $date = $reportData['DATE'];
+        $cancelled = $reportData['CANCELLED'];
+        $ill = $reportData['ILL'];
+        $event = $reportData['EVENT'];
+        $training = $reportData['TRAINING'];
+        $substituted = $reportData['SUBSTITUTED'];
+        $merged = $reportData['MERGED'];
+        $additional = $reportData['ADDITIONAL'];
+        $special = $reportData['SPECIAL'];
+        $count = $reportData['COUNT'];
+
+        // Bereits erstellt? Dann ignorieren
+        $reportExists = $this->reportRepository->findOneBy([
+            'date' => $date->format('Y-m-d'),
+        ]);
+        if ($reportExists) {
+            throw new Exception("Report für '{$date->format('d.m.Y')}' existiert bereits.");
+        }
+
+        // Alle Typen erfassen (werden über DataFixtures erstellt)
+        $cancellationType = $this->reportTypeRepository->findOneBy(['label' => 'Ausfall']);
+        $illnessType = $this->reportTypeRepository->findOneBy(['label' => 'Krank']);
+        $eventType = $this->reportTypeRepository->findOneBy(['label' => 'Veranstaltung']);
+        $trainingType = $this->reportTypeRepository->findOneBy(['label' => 'Fortbildung']);
+        $substitutionType = $this->reportTypeRepository->findOneBy(['label' => 'Vertretung']);
+        $mergeType = $this->reportTypeRepository->findOneBy(['label' => 'Zusammenlegung']);
+        $additionalType = $this->reportTypeRepository->findOneBy(['label' => 'Mehrarbeit']);
+        $specialType = $this->reportTypeRepository->findOneBy(['label' => 'Sondereinsatz']);
+
+        if (!$cancellationType) {
+            throw new Exception("Typ 'Ausfall' existiert nicht.");
+        }
+        if (!$substitutionType) {
+            throw new Exception("Typ 'Vertretung' existiert nicht.");
+        }
+        if (!$mergeType) {
+            throw new Exception("Typ 'Zusammenlegung' existiert nicht.");
+        }
+        if (!$illnessType) {
+            throw new Exception("Typ 'Krank' existiert nicht.");
+        }
+        if (!$eventType) {
+            throw new Exception("Typ 'Fortbildung' existiert nicht.");
+        }
+        if (!$trainingType) {
+            throw new Exception("Typ 'Fortbildung' existiert nicht.");
+        }
+        if (!$additionalType) {
+            throw new Exception("Typ 'Mehrarbeit' existiert nicht.");
+        }
+
+        if (!$specialType) {
+            throw new Exception("Typ 'Sondereinsatz' existiert nicht.");
+        }
+
+        // Ausfall
+        $report = new DailyReport();
+        $report->setDate($date);
+        $report->setType($cancellationType);
+        $report->setAmount($cancelled);
+        $report->setMax($count);
+        $this->entityManager->persist($report);
+
+        // Krankheit
+        $report = new DailyReport();
+        $report->setDate($date);
+        $report->setType($illnessType);
+        $report->setAmount($ill);
+        $report->setMax($count);
+        $this->entityManager->persist($report);
+
+        // Vertretung
+        $report = new DailyReport();
+        $report->setDate($date);
+        $report->setType($substitutionType);
+        $report->setAmount($substituted);
+        $report->setMax($count);
+        $this->entityManager->persist($report);
+
+        // Mehrarbeit
+        $report = new DailyReport();
+        $report->setDate($date);
+        $report->setType($additionalType);
+        $report->setAmount($additional);
+        $report->setMax($count);
+        $this->entityManager->persist($report);
+
+        // Zusammenlegung
+        $report = new DailyReport();
+        $report->setDate($date);
+        $report->setType($mergeType);
+        $report->setAmount($merged);
+        $report->setMax($count);
+        $this->entityManager->persist($report);
+
+        // Veranstaltung
+        $report = new DailyReport();
+        $report->setDate($date);
+        $report->setType($eventType);
+        $report->setAmount($event);
+        $report->setMax($count);
+        $this->entityManager->persist($report);
+
+        // Fortbildung
+        $report = new DailyReport();
+        $report->setDate($date);
+        $report->setType($trainingType);
+        $report->setAmount($training);
+        $report->setMax($count);
+        $this->entityManager->persist($report);
+
+        // Sondereinsatz
+        $report = new DailyReport();
+        $report->setDate($date);
+        $report->setType($specialType);
+        $report->setAmount($special);
+        $report->setMax($count);
+        $this->entityManager->persist($report);
+
+        // Persistieren
+        $this->entityManager->flush();
+
+        // Datei nur updaten, wenn heute Freitag ist.
+        if ($date->format('N') != "5") {
+            return Command::SUCCESS;
+        }
+
+        $this->updateExcelFile($date->format('d.m.Y'));
+
         return Command::SUCCESS;
     }
 
